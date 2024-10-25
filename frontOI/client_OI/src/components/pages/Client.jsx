@@ -7,6 +7,14 @@ import { Button } from '@nextui-org/react';
 import MainClient from './MainClient';
 import Static_2_c from './static_2_c';
 import Static_2_nc from './static_2_nc';
+import Static_3 from './static_3';
+import Static_4 from './static_4';
+import Static_5 from './static_5';
+import Static_6 from './static_6';
+import Static_7 from './static_7';
+import Static_8 from './static_8';
+import Static_9 from './static_9';
+import Static_10 from './static_10';
 
 const Client = () => {
 
@@ -33,6 +41,14 @@ const Client = () => {
         <Route path="/static_1" element={<Static_1/>}/>
         <Route path="/static_2_c" element={<Static_2_c/>}/>
         <Route path="/static_2_nc" element={<Static_2_nc/>}/>
+        <Route path="/static_3" element={<Static_3/>}/>
+        <Route path="/static_4" element={<Static_4/>}/>
+        <Route path="/static_5" element={<Static_5/>}/>
+        <Route path="/static_6" element={<Static_6/>}/>
+        <Route path="/static_7" element={<Static_7/>}/>
+        <Route path="/static_8" element={<Static_8/>}/>
+        <Route path="/static_9" element={<Static_9/>}/>
+        <Route path="/static_10" element={<Static_10/>}/>
       </Routes>
       {/* Botón del menú móvil */}
       <Button
