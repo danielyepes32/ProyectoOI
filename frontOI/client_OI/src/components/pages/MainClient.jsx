@@ -1,11 +1,6 @@
 import { LuEye } from "react-icons/lu";
-import { Button, table } from "@nextui-org/react";
-import {  
-    Modal,   
-    ModalContent,   
-    ModalHeader,   
-    ModalBody,   
-    ModalFooter,
+import { Button } from "@nextui-org/react";
+import { 
     useDisclosure
 } from "@nextui-org/modal";
 import React from "react";
@@ -21,7 +16,7 @@ import {
   } from "@nextui-org/react";
   //Componente
 import {columns, DataPrueba} from "../../utils/tests/data"  //"../../utils/tests/data";
-import { thead } from "framer-motion/client";
+import ModalData from "../shared/ModalData";
 
 //Las columnas se pueden agregar o eliminar de la vista, aquí inicializamos por default las necesarias
 const INITIAL_VISIBLE_COLUMNS = ["test_id", "state", "result"];
@@ -61,66 +56,11 @@ export default function MainClient() {
     //Usamos memo para describir la parte superior de la tabla como el buscador y los filtros
     const modal = React.useMemo(() => {
         return (
-            <Modal 
-            isOpen={isOpen} 
-            placement="center"
+          <ModalData
+            isOpen={isOpen}
             onOpenChange={onOpenChange}
-            className="mx-5"
-          >
-            <ModalContent>
-              {(onClose) => (
-                <>
-                  <ModalHeader className="flex flex-col gap-1 text-center font-mulish font-bold">{popUpData === 'banco' ? 'Banco': 'Instrumentos'}</ModalHeader>
-                  <ModalBody>
-                        {React.useMemo(() => {
-                          if(popUpData === 'banco'){
-                            return (
-                              <div className="w-full h-full grid grid-cols-2 mb-10">
-                                <div className="w-full h-full space-y-5 flex flex-col justify-start items-left">
-                                  <p className="h-1/3 font-semibold">Dato opeario 1</p>
-                                  <p className="h-1/3 font-semibold">Dato opeario 2</p>
-                                  <p className="h-1/3 font-semibold">Dato opeario 3</p>
-                                </div>
-                                <div className="w-full h-full space-y-2 flex flex-col justify-end">
-                                  <p className="text-right h-1/3">Respuesta 1</p>
-                                  <p className="text-right h-1/3">Respuesta 1</p>
-                                  <p className="text-right h-1/3">Respuesta 1</p>
-                                </div>
-                              </div>
-                            )
-                          }else if(popUpData === 'instrument'){
-                            return (
-                              <div className="w-full h-full grid grid-cols-5 mb-10">
-                                <div className="col-span-2 w-full h-full space-y-5 flex flex-col justify-start items-left">
-                                  <p className="h-1/3 font-semibold">Manómetro</p>
-                                  <p className="h-1/3 font-semibold">Cronómetro</p>
-                                  <p className="h-1/3 font-semibold">Termostato</p>
-                                </div>
-                                <div className="col-span-3 w-full h-full space-y-2 flex flex-col justify-end">
-                                  <p className="text-left h-1/3">Vigencia (De: 2023-04-27, hasta 2024-04-27)</p>
-                                  <p className="text-left h-1/3">Vigencia (De: 2023-01-15, hasta 2027-01-15)</p>
-                                  <p className="justify-start h-1/3 flex place-items-center align-right">Vigencia (De: 2023-05-30, hasta 2024-05-30)</p>
-                                </div>
-                              </div>
-                            )
-                          }
-                          }, [popUpData])
-                        }
-                  </ModalBody>
-                  {/*   
-                    <ModalFooter>
-                      <Button color="danger" variant="light" onPress={onClose}>
-                        Close
-                      </Button>
-                      <Button color="primary" onPress={onClose}>
-                        Action
-                      </Button>
-                    </ModalFooter>
-                  */}
-                </>
-              )}
-            </ModalContent>
-          </Modal>    
+            popUpData={popUpData}
+          />
         );
     }, [isOpen]);
 

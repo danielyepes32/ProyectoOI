@@ -23,6 +23,7 @@ import {
     useDisclosure
 } from "@nextui-org/modal";
 import CustomAlert from "../shared/CustomAlert";
+import ModalData from "../shared/ModalData";
 
 
 export default function Static_3() {
@@ -31,6 +32,7 @@ export default function Static_3() {
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [isOpenCustomMessage, setIsOpenCustomMessage] = React.useState(false);
     const [customMessage, setCustomMessage] = React.useState(null);
+    const [popUpData, setPopUpData] = React.useState(null);
 
     const selectedValue = React.useMemo(
       () => Array.from(selectedKeys).join(", ").replaceAll("_", " "),
@@ -39,81 +41,11 @@ export default function Static_3() {
 
     const modal = React.useMemo(() => {
         return (
-            <Modal 
-            isOpen={isOpen} 
-            placement="center"
-            onOpenChange={onOpenChange}
-            className="mx-10"
-            size="sm"
-            scrollBehavior="outside"
-          >
-            <ModalContent>
-              {(onClose) => (
-                <>
-                  <ModalBody>
-                    <div className="mt-7">
-                        <div className="w-full flex flex-col rounded-[10px] border border-1 h-auto bg-white shadow-sm">
-                            <div className="w-full h-[10px] rounded-tl-[60px] rounded-tr-[60px] bg-oi-bg"></div>
-                            <div className="w-full flex justify-left place-items-center">
-                                <div className="m-3 w-full h-auto rounded-full justify-center place-items-center flex items-center">
-                                    <span className="font-poppins font-bold text-center">No. orden</span>
-                                </div>
-                                <div className="w-full flex items-center place-items-center justify-center h-auto py-1 px-4">
-                                    <span className="font-poppins font-bold text-center">Selección de medidores</span>
-                                </div>
-                            </div>
-                            <div className="w-full h-[10px] rounded-tl-[60px] rounded-tr-[60px] bg-oi-bg"></div>
-                            <div className="w-full flex justify-left place-items-center">
-                                <div className="m-3 w-full h-auto rounded-full justify-center place-items-center flex items-center">
-                                    <span className="font-inter text-blue-600 font-semibold text-center">VI-001-2024</span>
-                                </div>
-                                <div className="w-full flex items-center place-items-center justify-center h-auto py-2 px-4">
-                                    <span className="text-center">AA23099470 al AA23099476</span>
-                                </div>
-                            </div>
-                            <div className="w-full h-[10px] rounded-tl-[60px] rounded-tr-[60px] bg-oi-bg"></div>
-                            <div className="w-full flex justify-left place-items-center">
-                                <div className="m-3 w-full h-auto rounded-full justify-center place-items-center flex items-center">
-                                    <span className="font-inter text-blue-600 font-semibold text-center">VI-001-2024</span>
-                                </div>
-                                <div className="w-full flex items-center place-items-center justify-center h-auto py-2 px-4">
-                                    <span className="text-center">AA23099470 al AA23099476</span>
-                                </div>
-                            </div>
-                            <div className="w-full h-[10px] rounded-tl-[60px] rounded-tr-[60px] bg-oi-bg"></div>
-                            <div className="w-full flex justify-left place-items-center">
-                                <div className="m-3 w-full h-auto rounded-full justify-center place-items-center flex items-center">
-                                    <span className="font-inter text-blue-600 font-semibold text-center">VI-001-2024</span>
-                                </div>
-                                <div className="w-full flex items-center place-items-center justify-center h-auto py-2 px-4">
-                                    <span className="text-center">AA23099470 al AA23099476</span>
-                                </div>
-                            </div>
-                            <div className="w-full h-[10px] rounded-tl-[60px] rounded-tr-[60px] bg-oi-bg"></div>
-                            <div className="w-full flex justify-left place-items-center">
-                                <div className="m-3 w-full h-auto rounded-full justify-center place-items-center flex items-center">
-                                    <span className="font-inter text-blue-600 font-semibold text-center">VI-001-2024</span>
-                                </div>
-                                <div className="w-full flex items-center place-items-center justify-center h-auto py-2 px-4">
-                                    <span className="text-center">AA23099470 al AA23099476</span>
-                                </div>
-                            </div>
-                            <div className="w-full h-[10px] rounded-tl-[60px] rounded-tr-[60px] bg-oi-bg"></div>
-                            <div className="w-full flex justify-left place-items-center">
-                                <div className="m-3 w-full h-auto rounded-full justify-center place-items-center flex items-center">
-                                    <span className="font-inter text-blue-600 font-semibold text-center">VI-001-2024</span>
-                                </div>
-                                <div className="w-full flex items-center place-items-center justify-center h-auto py-2 px-4">
-                                    <span className="text-center">AA23099470 al AA23099476</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                  </ModalBody>  
-                </>
-              )}
-            </ModalContent>
-          </Modal>    
+            <ModalData
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+                popUpData={popUpData}
+            />
         );
     }, [isOpen]);
 
@@ -160,7 +92,10 @@ export default function Static_3() {
             <div>
                 <Button 
                     className="flex justify-center place-items-center bg-custom-blue w-full mt-[3vh]"
-                    onClick={onOpen}
+                    onClick={()=>{
+                        setPopUpData("order")
+                        onOpen()
+                    }}
                     endContent={<RiPlayListAddFill className="w-auto justify-end text-right text-white h-[40px]"/>}
                     classNames={{
                         base:"bg-red-100",

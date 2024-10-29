@@ -1,103 +1,66 @@
+//Importación de Iconos
+//-------------------------------------------------------------
 import { LuEye } from "react-icons/lu";
 import { FiTool } from "react-icons/fi";
 import { Button } from "@nextui-org/react";
+//Librería de UI NextUI, la librería usa un Disclosure para desplegar el modal y los eventos
+//----------------------------------------------------------------------------------------
 import {  
-    Modal,   
-    ModalContent,   
-    ModalHeader,   
-    ModalBody,   
-    ModalFooter,
     useDisclosure
 } from "@nextui-org/modal";
+//Elementos de react necesarios
+//-----------------------------------------------------------------
 import React from "react";
-import CustomAlert from "../shared/CustomAlert";
+//Elementos externos
+//-------------------------------------------------------------
+import CustomAlert from "../shared/CustomAlert"; //Modal externo para mensages de confirmación
+import ModalData from "../shared/ModalData"; //Modal externo para el manejo de mensages y forms en el popUp
 
 export default function Static_1() {
 
+    //Variables del useDisclosure, este useDisclosure se usa solo para el popUp de datos 
+    //isOpen define si se abre o no el modal
+    //onOpen es la función useState que activa la variable isOpen
+    //onOpenChanges es la función que hace el manejo de eventos en el popUp
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
+    //Variable para definir que elementos va a mostrar el modal al activarse (instrumentos, banco, etc)
     const [popUpData,setPopUpData] = React.useState(null);
+    //Esta variable se usa para el modal de los mensages de confirmación para setear un mensaje de confirmación customizado
     const [customMessage, setCustomMessage] = React.useState(null);
+    //El useDisclosure se pueda usar una vez por reenderizado y objeto react, por lo que se activará el segundo popUp de una manera distinta
+    //Esta variable setea en true o false en caso de querer activar el modal de confirmación
     const [isOpenCustomMessage, setIsOpenCustomMessage] = React.useState(false);
     
 
-    //Usamos memo para describir la parte superior de la tabla como el buscador y los filtros
+    //Modal para mostrar datos de los intrumentos o del banco en la vista
     const modal = React.useMemo(() => {
-        return (
-            <Modal 
-            isOpen={isOpen} 
-            placement="center"
+      return (
+          <ModalData
+            isOpen={isOpen}
             onOpenChange={onOpenChange}
-            className="mx-5"
-          >
-            <ModalContent>
-              {(onClose) => (
-                <>
-                  <ModalHeader className="flex flex-col gap-1 text-center font-mulish font-bold">{popUpData === 'banco' ? 'Banco': 'Instrumentos'}</ModalHeader>
-                  <ModalBody>
-                        {React.useMemo(() => {
-                          if(popUpData === 'banco'){
-                            return (
-                              <div className="w-full h-full grid grid-cols-2 mb-10">
-                                <div className="w-full h-full space-y-5 flex flex-col justify-start items-left">
-                                  <p className="h-1/3 font-semibold">No. Banco</p>
-                                  <p className="h-1/3 font-semibold">Capacidad de medidores</p>
-                                  <p className="h-1/3 font-semibold">Certificados vigentes</p>
-                                </div>
-                                <div className="w-full h-full space-y-2 flex flex-col justify-end">
-                                  <p className="text-right h-1/3">1</p>
-                                  <p className="text-right h-1/3">15</p>
-                                  <p className="text-right h-1/3">CONFORME</p>
-                                </div>
-                              </div>
-                            )
-                          }else if(popUpData === 'instrument'){
-                            return (
-                              <div className="w-full h-full grid grid-cols-5 mb-10">
-                                <div className="col-span-2 w-full h-full space-y-5 flex flex-col justify-start items-left">
-                                  <p className="h-1/3 font-semibold">Manómetro</p>
-                                  <p className="h-1/3 font-semibold">Cronómetro</p>
-                                  <p className="h-1/3 font-semibold">Termostato</p>
-                                </div>
-                                <div className="col-span-3 w-full h-full space-y-2 flex flex-col justify-end">
-                                  <p className="text-left h-1/3">Vigencia (De: 2023-04-27, hasta 2024-04-27)</p>
-                                  <p className="text-left h-1/3">Vigencia (De: 2023-01-15, hasta 2027-01-15)</p>
-                                  <p className="justify-start h-1/3 flex place-items-center align-right">Vigencia (De: 2023-05-30, hasta 2024-05-30)</p>
-                                </div>
-                              </div>
-                            )
-                          }
-                          }, [popUpData])
-                        }
-                  </ModalBody>
-                  {/*   
-                    <ModalFooter>
-                      <Button color="danger" variant="light" onPress={onClose}>
-                        Close
-                      </Button>
-                      <Button color="primary" onPress={onClose}>
-                        Action
-                      </Button>
-                    </ModalFooter>
-                  */}
-                </>
-              )}
-            </ModalContent>
-          </Modal>    
+            popUpData={popUpData}
+          />
         );
-    }, [isOpen]);
+    }, [isOpen, popUpData]); //Se reenderiza cada que se realiza un cambio en la variable isOpen
   
+    //En esta función de reenderización se ejecuta 
     const confirmationMessage = React.useMemo(() => {
-      console.log(isOpenCustomMessage)
+      //El reenderizado solo se ejecuta al reconoce un true en a variable, al estarse ejecutando en diferentes reenderizados y no usar el disclosure, puede reenderizarse el modal en un false de la variable
       return isOpenCustomMessage === true ? (
         <CustomAlert message={customMessage} isVisible={isOpenCustomMessage} setIsVisible={setIsOpenCustomMessage}></CustomAlert>
-      ) : null
-    }, [isOpenCustomMessage]);
+      ) : null //En caso de ser false no ejecuta nada
+    }, [isOpenCustomMessage]); //Se reenderiza cada que hay un cambio en la variable isOpenCustomMessage
 
   return (
     <>
+      {/*
+      Se crea un div padre para la vista del tamaño de toda la pantalla
+      Color de fondo establecido en el tailwind.config flex-col para que los items se agreguen hacia abajo y un overflow automático hacia abajo
+      */}
       <div className="w-screen h-screen bg-oi-bg flex flex-col px-[5vw] overflow-y-auto">
-        {modal}
-        {confirmationMessage}
+        {modal} {/*Se ejecuta el modal la primera vez que se reenderiza la vista*/}
+        {confirmationMessage} {/*Se ejecuta el modal la primera vez que se reenderiza la vista*/}
+          {/*Header*/}
           <span className="font-mulish font-bold pt-5 text-[24px]">Ensayo de presión estática</span>
           <span className="font-mulisg font-semibold text-opacity-text">Julio 24, 2024</span>
           <div className="w-full h-auto grid grid-cols-4 space-x-2 py-2">
@@ -110,8 +73,8 @@ export default function Static_1() {
                 className="w-[50px] h-[50px] bg-custom-blue p-2 rounded-xl shadow-lg items-center"
                 onClick={
                     ()=>{
-                        setPopUpData("banco")
-                        onOpen()
+                        setPopUpData("banco") //Primero se ejecuta el cambio de la variable para saber qué datos se van a mostrar
+                        onOpen() //Se cambia el estado de la variable isOpen para ejecutarse
                         }
                     }
                 >
@@ -121,28 +84,30 @@ export default function Static_1() {
               </Button>
             </div>
           </div>
-          <div>
+          <div className="flex justify-between">
             <Button 
               className="bg-custom-blue h-auto w-full flex py-2 my-2 shadow-lg items-center"
               fullWidth={true}
               onClick={
                 ()=>{
-                    setPopUpData("instrument")
-                    onOpen()
+                    setPopUpData("instrument") //Primero se ejecuta el cambio de la variable para saber qué datos se van a mostrar
+                    onOpen() //Se cambia el estado de la variable isOpen para ejecutarse
                     }
                 }
-              endContent={<FiTool className="text-white w-auto h-full"/>}
               >
               <span className="font-inter w-full text-white text-[17px]">Estado actual de los instrumentos</span>
+              <FiTool className="text-white w-full h-full"/>
             </Button>
           </div>
+          {/*-----------------------------------------------------------------------------------------------*/}
+          {/*Body*/}
           <div className="w-full h-auto bg-white shadow-lg rounded-[20px] flex flex-col px-[7.5vw] py-3 mt-3">
             <span className="font-mulish font-bold text-[24px] text-center">Ajustes generales</span>
             <div className="w-full grid grid-cols-3 py-3">
               <div className="col-span-2 flex justify-center place-items-center">
                 <span className="font-inter text-[18px]">Selección de capacidad (No de medidores por prueba)</span>
               </div>
-              <div className="col-span-1 flex justify-end">
+              <div className="col-span-1 flex justify-end place-items-center">
                 <span className="font-teko font-semibold text-[40px] border border-oi-bg border-4 rounded-xl px-5 my-2 text-right">10</span>
               </div>
             </div>
@@ -155,12 +120,14 @@ export default function Static_1() {
               </div>
             </div>
           </div>
-          <div className="w-full flex flex-col h-auto bg-white shadow-lg rounded-[20px] mt-5 px-[7.5vw]">
+          {/*------------------------------------------------------------------------------------------*/}
+          {/*Footer*/}
+          <div className="w-full flex flex-col flex-grow bg-white shadow-lg rounded-[20px] my-5 px-[7.5vw]">
             <span className="font-mulish font-bold text-[22px] pt-5 text-center">Selección de medidores a evaluar</span>
             <Button 
               className="w-full bg-custom-blue mt-3 py-1 rounded-[15px]"
               onClick={()=>{
-                setIsOpenCustomMessage(true)
+                setIsOpenCustomMessage(true) //Abrir mensage de confirmación
               }}>
               <span className="font-inter text-[18px] text-white">Correlativos</span>
             </Button>
@@ -168,6 +135,7 @@ export default function Static_1() {
               <span className="font-inter text-[18px] text-white">No correlativos</span>
             </Button>
           </div>
+          {/*-------------------------------------------------------------------------------------------*/}
       </div>
     </>
   )

@@ -8,6 +8,19 @@ const meterColumns = [
   {name: "", uid : "checkbox", sortable: true},
   {name: "SERIE", uid: "meter_id", sortable: true},
   {name: "ESTADO", uid: "state", sortable: true},
+  {name: "ESTADO", uid: "drain", sortable: true},
+  {name: "CONCLUSION", uid: "result", sortable: true},
+  {name: "CONCLUSION", uid: "obs", sortable: true},
+  {name: "NUMERO", uid: "num", sortable: true},
+  {name: "LECTURA (Li)", uid: "record_li", sortable: true},
+  {name: "LECTURA (Lf)", uid: "record_lf", sortable: true},
+  {name: "ERROR", uid : "error", sortable: true},
+];
+
+const orderColumns = [
+  {name: "", uid : "checkbox", sortable: true},
+  {name: "SERIE", uid: "meter_id", sortable: true},
+  {name: "ESTADO", uid: "state", sortable: true},
   {name: "CONCLUSION", uid: "result", sortable: true},
   {name: "CONCLUSION", uid: "obs", sortable: true},
   {name: "NUMERO", uid: "num", sortable: true},
@@ -94,10 +107,28 @@ const DataPrueba = [
   }
 ]
 
+const orderDataTest = [
+  {
+    "order_id": "VI-001-2024",
+    "state": "Sin inspección",
+    "obs" : "Conforme",
+  },
+  {
+
+  },
+  {
+
+  },
+  {
+
+  }
+]
+
 const meterDataTest = [
   {
     "meter_id": "AA23099471",
     "state": "Sin inspección",
+    "drain": "Sin inspección",
     "obs" : "Conforme",
     "result": "Apto",
     "num": "1",
@@ -109,6 +140,7 @@ const meterDataTest = [
   {
     "meter_id": "AA23099472",
     "state": "Sin inspección",
+    "drain": "Sin inspección",
     "obs" : "Conforme",
     "result": "Apto",
     "num": "2",
@@ -120,6 +152,7 @@ const meterDataTest = [
   {
     "meter_id": "AA23099473",
     "state": "Sin inspección",
+    "drain": "Sin inspección",
     "obs" : "Conforme",
     "result": "Apto",
     "num": "3",
@@ -131,6 +164,7 @@ const meterDataTest = [
   {
     "meter_id": "AA23099474",
     "state": "Sin inspección",
+    "drain": "Sin inspección",
     "obs" : "Conforme",
     "result": "Apto",
     "num": "4",
@@ -142,6 +176,7 @@ const meterDataTest = [
   {
     "meter_id": "AA23099475",
     "state": "Sin inspección",
+    "drain": "Sin inspección",
     "obs" : "Conforme",
     "result": "Apto",
     "num": "5",
@@ -153,6 +188,7 @@ const meterDataTest = [
   {
     "meter_id": "AA23099476",
     "state": "Sin inspección",
+    "drain": "Sin inspección",
     "obs" : "Conforme",
     "result": "Apto",
     "num": "6",
