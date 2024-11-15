@@ -11,6 +11,8 @@ import { MdOutlineWbIncandescent } from "react-icons/md";
 import TableRecordInspection from "../../record_inspection/TableRecordInspection";
 import ModalData from "../../shared/ModalData";
 
+import apiService from "../../../hook/services/apiService";
+
 //Las columnas se pueden agregar o eliminar de la vista, aquí inicializamos por default las necesarias
 const INITIAL_VISIBLE_COLUMNS = ["meter_id", "num", "record_lf"];
 
@@ -29,14 +31,41 @@ export default function static_7_Q2() {
     //Constante para establecer las columnas visibles puesto que estas son dinamicas
     const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
     //En esta variable se guardarán los medidores que se extraigan de la API
-    const [meters, setMeters] = React.useState(meterDataTest);
+    const [meters, setMeters] = React.useState([]);
     //Variable para guardar el tamaño del conteo de medidores totales puesto que los datos se traen por pagination
-    const [metersLength, setMetersLength] = React.useState(meterDataTest.length);
+    const [metersLength, setMetersLength] = React.useState(null);
     //Constante usada para definir si se estan cargando los datos o si en su defecto simplemente no hay datos en la consulta
     const loadingState = isLoading === true & metersLength === 0 ? "loading" : "idle";
 
+    const [confirm, setConfirm] = React.useState(false)
+
     //---------------------------------------------------------------------------------------------------------------------------
     //Aquí se encuentran las funciones usadas en el componente MainClient
+
+    React.useEffect(() => {
+
+      //Al estar ejecutando el fetch activamos el loading de la data
+      setIsLoading(true);
+      const fetchMetersPrueba = async () => {
+      try {
+      
+      const response = await apiService.getMedidoresPrueba();
+      // Suponiendo que setPruebas es un setter de un estado que contiene un array
+      setMeters(response)  
+      setMetersLength(response.length);
+          //usamos el componente "count" de la consulta para establecer el tamaño de los registros
+      } catch (error) {
+          //En caso de error en el llamado a la API se ejecuta un console.error
+          console.error('Error fetching initial meters:', error);
+      } finally {
+          //al finalizar independientemente de haber encontrado o no datos se detiene el circulo de cargue de datos
+          //console.log("salio");
+      }
+      }
+  
+      fetchMetersPrueba();
+    }, []);
+
     //Esta función se usa para calcular las columnas que se etsablecen como visibles
     const headerColumns = React.useMemo(() => {
 
@@ -47,13 +76,20 @@ export default function static_7_Q2() {
 
     const validateInput = (pruebaValue) => pruebaValue ? pruebaValue.match(/^\d{1,3}(\.\d{0,2})?$/) : "";
 
-        // Función para actualizar el value de un objeto específico
+    // Función para actualizar el value de un objeto específico
     const updateResult = (key, newValue) => {
-      setMeters((prevMeters) => 
-        prevMeters.map((meter) => 
+      console.log("Entra:", newValue)
+      setMeters((prevMeters) =>
+        prevMeters.map((meter) =>
           meter.meter_id === key
-            ? { ...meter, record_lf: Number(newValue)} // Actualiza solo el que coincide
-            : meter // Deja el resto igual
+            ? {
+                ...meter,
+                q3: {
+                  ...meter.q3, // Copia el objeto q3 existente
+                  record_lf: Number(newValue), // Actualiza solo record_li
+                },
+              }
+            : meter // Deja el resto de los medidores igual
         )
       );
     };
@@ -109,6 +145,26 @@ export default function static_7_Q2() {
           />
         );
     }, [isOpen]);
+  
+    React.useMemo(()=>{
+      if(confirm){
+        const handleUpdateMeter = async () => {
+          try {
+            const updates = meters[0];  // Aquí defines el campo que quieres actualizar
+            const response = await apiService.updateMetersPrueba(meters[0].meter_id, updates);  // Llamada a la función updateMeter
+            console.log('Meter updated:', response);  
+          } catch (error) {
+            console.error(error); 
+          } 
+          }
+    
+          handleUpdateMeter()
+      }else{null}
+      },[confirm])
+  
+      const handleConfirm = () => {
+        setConfirm(true)
+      };
 
     const confirmationMessage = React.useMemo(() => {
         return isOpenCustomMessage === true ? (
@@ -117,6 +173,7 @@ export default function static_7_Q2() {
             isVisible={isOpenCustomMessage} 
             setIsVisible={setIsOpenCustomMessage}
             routeRedirect={"/client/Q2/static_8"}
+            handleConfirm={handleConfirm}
             />
         ) : null
       }, [isOpenCustomMessage]);
@@ -147,7 +204,7 @@ export default function static_7_Q2() {
           <div className="w-full h-auto grid grid-cols-4 space-x-2 pt-2">
             <div className="col-span-3 bg-white shadow-lg px-4 flex justify-between rounded-[30px] items-center">
               <span className="font-inter text-center w-full pr-2">Usted se encuentra en la prueba</span>
-              <span className="font-teko text-[48px] font-semibold w-auto text-right">Q2</span>
+              <span className="font-teko text-[48px] font-semibold w-auto text-right">Q3</span>
             </div>
             <div className="col-span-1 w-full flex justify-center place-items-center flex">
               <Button

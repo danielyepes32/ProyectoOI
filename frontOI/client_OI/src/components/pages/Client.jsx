@@ -1,6 +1,8 @@
 import React from 'react';
 import { RiMenuSearchLine } from 'react-icons/ri';
 import { BrowserRouter as Router, Route, Routes , useLocation} from 'react-router-dom';
+import { MdCancel } from "react-icons/md";
+
 import Menu from '../shared/menu';
 import Static_1 from './static_1';
 import { Button } from '@nextui-org/react';
@@ -30,8 +32,11 @@ import Static_8_Q3 from './Record_Q3/static_8';
 import Static_9 from './static_9';
 import Static_10 from './static_10';
 
+import { useNavigate } from 'react-router-dom';
+
 const Client = () => {
 
+  const navigate = useNavigate()
   //const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
   const isAuthenticated = true
   console.log(isAuthenticated)
@@ -79,6 +84,14 @@ const Client = () => {
         <Route path="/static_10" element={<Static_10/>}/>
       </Routes>
       {/* Botón del menú móvil */}
+      <Button
+        className="z-[200] fixed bottom-4 right-4 mb-12 bg-red-400 border border-gray-400 text-white py-2 px-0 rounded-full shadow-lg text-2xl"
+        onClick={()=>{
+          navigate("/client/")
+        }}
+      >
+        <MdCancel className='w-full h-full'/>
+      </Button>
       <Button
         className="z-[200] fixed bottom-4 right-4 bg-custom-blue border border-gray-400 text-white py-2 px-4 rounded-full shadow-lg text-2xl"
         onClick={handleSidebar}
