@@ -10,7 +10,7 @@ import {
 } from "@nextui-org/modal";
 import { useNavigate } from 'react-router-dom';
 
-const CustomAlert = ({ message, isVisible, setIsVisible, routeRedirect}) => {
+const CustomAlert = ({ message, isVisible, setIsVisible, routeRedirect, handleConfirm}) => {
 
   const {isOpen, onOpen, onOpenChange} = useDisclosure();
   console.log("Visible: ",isVisible)
@@ -60,6 +60,7 @@ const CustomAlert = ({ message, isVisible, setIsVisible, routeRedirect}) => {
                 <Button 
                 className='bg-red-200 text-white'
                 onPress={()=>{
+                  handleConfirm ? handleConfirm() : null
                   setIsVisible(false)
                   onClose()
                 }}

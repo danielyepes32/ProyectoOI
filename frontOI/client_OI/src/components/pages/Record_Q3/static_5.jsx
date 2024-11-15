@@ -11,6 +11,7 @@ import { TbTableShortcut } from "react-icons/tb";
 import ModalData from "../../shared/ModalData";
 import TableVisualInspection from "../../visual_inspection/TableVisualInspection";
 import { useNavigate } from "react-router-dom";
+import apiService from "../../../hook/services/apiService";
 
 //Las columnas se pueden agregar o eliminar de la vista, aquí inicializamos por default las necesarias
 const INITIAL_VISIBLE_COLUMNS = ["meter_id", "drain", "obs"];
@@ -20,16 +21,7 @@ export default function Static_5_Q3() {
     const navigate = useNavigate()
 
     const [isChanged, setIsChanged] = useState(false)
-    const [visualInspection, setVisualInspection] = useState(
-        {
-          'AA23099471': { value: "Sin inspección" },
-          'AA23099472': { value: "Sin inspección" },
-          'AA23099473': { value: "Sin inspección" },
-          'AA23099474': { value: "Sin inspección" },
-          'AA23099475': { value: "Sin inspección" },
-          'AA23099476': { value: "Sin inspección" }
-        }
-      )
+    const [visualInspection, setVisualInspection] = useState({})
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [popUpData,setPopUpData] = React.useState(null);
     const [customMessage, setCustomMessage] = React.useState(null);
@@ -47,8 +39,68 @@ export default function Static_5_Q3() {
     //Constante usada para definir si se estan cargando los datos o si en su defecto simplemente no hay datos en la consulta
     const loadingState = isLoading === true & metersLength === 0 ? "loading" : "idle";
 
+    const [pruebas, setPruebas] = React.useState([])
+
+    const [confirm, setConfirm] = React.useState(false)
+
     //---------------------------------------------------------------------------------------------------------------------------
     //Aquí se encuentran las funciones usadas en el componente MainClient
+
+    React.useEffect(() => {
+  
+      //Al estar ejecutando el fetch activamos el loading de la data
+      //setIsLoading(true);
+      const fetchPruebas = async () => {
+      try {
+      
+      const response = await apiService.getOrdenes();
+      // Suponiendo que setPruebas es un setter de un estado que contiene un array
+      setPruebas(prevState => [response[0].identificador]);
+          //usamos el componente "count" de la consulta para establecer el tamaño de los registros
+      } catch (error) {
+          //En caso de error en el llamado a la API se ejecuta un console.error
+          console.error('Error fetching initial meters:', error);
+      } finally {
+          //al finalizar independientemente de haber encontrado o no datos se detiene el circulo de cargue de datos
+          //console.log("salio");
+      }
+      }
+
+      fetchPruebas();
+  }, []);
+
+  React.useEffect(() => {
+
+    //Al estar ejecutando el fetch activamos el loading de la data
+    setIsLoading(true);
+    const fetchMetersPrueba = async () => {
+    try {
+    
+    const response = await apiService.getMedidoresPrueba();
+    // Suponiendo que setPruebas es un setter de un estado que contiene un array
+    setMeters(response)
+    const visualInspectionObj = response.reduce((acc, item) => {
+      acc[item.meter_id] = { value: "Sin inspección" }; // Establecer valor por defecto
+      return acc;
+    }, {});
+    // Actualizar el estado visualInspection
+    setVisualInspection(visualInspectionObj);
+
+
+    setMetersLength(response.length);
+        //usamos el componente "count" de la consulta para establecer el tamaño de los registros
+    } catch (error) {
+        //En caso de error en el llamado a la API se ejecuta un console.error
+        console.error('Error fetching initial meters:', error);
+    } finally {
+        //al finalizar independientemente de haber encontrado o no datos se detiene el circulo de cargue de datos
+        //console.log("salio");
+    }
+    }
+
+    fetchMetersPrueba();
+  }, []);
+
     //Esta función se usa para calcular las columnas que se etsablecen como visibles
     const headerColumns = React.useMemo(() => {
 
@@ -84,6 +136,33 @@ export default function Static_5_Q3() {
         return updatedSet; // Devolver el nuevo Set actualizado
       });
     };
+
+    React.useMemo(()=>{
+      if(confirm){
+        const handleUpdateMeter = async () => {
+          try {
+            const updates = meters[0];  // Aquí defines el campo que quieres actualizar
+            const response = await apiService.updateMetersPrueba(meters[0].meter_id, updates);  // Llamada a la función updateMeter
+            console.log('Meter updated:', response);  
+          } catch (error) {
+            console.error(error); 
+          } 
+          }
+    
+          handleUpdateMeter()
+      }else{null}
+      },[confirm])
+  
+      const handleConfirm = () => {
+        // Actualizar todos los medidores con el valor de `visualInspection` correspondiente
+        setMeters((prevMeters) =>
+          prevMeters.map((meter) => ({
+            ...meter,
+            drain: visualInspection[meter.meter_id].value, // Asigna el valor de visualInspection para cada meter
+          }))
+        )
+        setConfirm(true)
+      };
     
     //Usamos memo para describir la parte superior de la tabla como el buscador y los filtros
     const modal = React.useMemo(() => {
@@ -104,6 +183,7 @@ export default function Static_5_Q3() {
             isVisible={isOpenCustomMessage} 
             setIsVisible={setIsOpenCustomMessage}
             routeRedirect={"/client/Q3/static_6"}
+            handleConfirm={handleConfirm}
             />
         ) : null
       }, [isOpenCustomMessage]);
@@ -123,6 +203,8 @@ export default function Static_5_Q3() {
     )
   }, [meters, headerColumns, visualInspection])
 
+  console.log(meters)
+
     return (
         <div className="w-screen h-screen bg-oi-bg flex flex-col px-[5vw] overflow-y-auto">
             {modal}
@@ -131,8 +213,8 @@ export default function Static_5_Q3() {
           <span className="font-mulisg font-semibold text-opacity-text ">Sesion iniciada en Julio 24, 2024</span>
           <div className="w-full h-auto grid grid-cols-4 space-x-2 pt-2">
             <div className="col-span-3 bg-white shadow-lg px-7 flex flex-col space-x-2 rounded-[20px] items-center py-4">
-              <span className="font-inter text-center w-full">Usted se encuentra en la orden No.</span>
-              <span className="font-teko text-[32px] font-semibold w-full text-center">VI-001-2024</span>
+              <span className="font-inter text-center w-full">Usted se encuentra en la prueba No.</span>
+              <span className="font-teko text-[32px] font-semibold w-full text-center">{pruebas[0]}</span>
             </div>
             <div className="col-span-1 w-full flex justify-center place-items-center flex">
               <Button

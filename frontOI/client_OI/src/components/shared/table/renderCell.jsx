@@ -13,7 +13,6 @@ const statusColorMap = {
 
 const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, visualInspection, updateResult, updateValue, addKey, updateValidate, meters, handleValidateErrorInput, location, handleEnterAction) => {
   const cellValue = user[columnKey];
-
   switch (columnKey) {
     case "status":
       return (
@@ -78,7 +77,7 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
               className="flex justify-center w-full whitespace-pre-wrap mt-2 z-[0] border-none px-0"
               >
               <div className="flex justify-center w-full h-full place-items-center">
-                  <span className="font-inter text-black text-[12px] font-semibold w-full text-center whitespace-pre-wrap h-auto">{visualInspection[user.meter_id].value}</span>
+                  <span className="font-inter text-black text-[12px] font-semibold w-full text-center whitespace-pre-wrap h-auto">{visualInspection[user.meter_id] ? visualInspection[user.meter_id].value : null}</span>
               </div>
               </Button>
           </DropdownTrigger>
@@ -88,7 +87,7 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
               disallowEmptySelection
               className="flex justify-center place-items-center"
               selectionMode="single"
-              selectedKeys={visualInspection[user.meter_id].value}
+              selectedKeys={visualInspection[user.meter_id] ? visualInspection[user.meter_id].value : null}
               onSelectionChange={(keys)=>{
                 updateValue(user.meter_id, keys.anchorKey);
                 keys.anchorKey !== 'Sin observaciones' ? updateResult(user.meter_id, 'No apto') : updateResult(user.meter_id, 'Apto');
@@ -125,7 +124,7 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
             className="flex justify-center w-full whitespace-pre-wrap mt-2 z-[0] border-none px-0"
             >
             <div className="flex justify-center w-full h-full place-items-center">
-                <span className="font-inter text-black text-[14px] w-full text-center whitespace-pre-wrap h-auto">{visualInspection[user.meter_id].value}</span>
+                <span className="font-inter text-black text-[14px] w-full text-center whitespace-pre-wrap h-auto">{visualInspection[user.meter_id] ? visualInspection[user.meter_id].value : null}</span>
             </div>
             </Button>
         </DropdownTrigger>
@@ -135,7 +134,7 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
             disallowEmptySelection
             className="flex justify-center place-items-center"
             selectionMode="single"
-            selectedKeys={visualInspection[user.meter_id].value}
+            selectedKeys={visualInspection[user.meter_id] ? visualInspection[user.meter_id].value : null}
             onSelectionChange={(keys)=>{
               updateValue(user.meter_id, keys.anchorKey);
               keys.anchorKey !== 'Sin fuga' ? updateResult(user.meter_id, 'No conforme') : updateResult(user.meter_id, 'Conforme');
@@ -157,7 +156,7 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
         <Input 
           className="flex justify-center text-center w-full whitespace-pre-wrap z-[0] border-none px-0 shadow-none" 
           //placeholder={cellValue}
-          value={pointerMeter.record_li === null ? '' : pointerMeter.record_li}
+          value={pointerMeter.q3.record_li === 0  ? '' : pointerMeter.q3.record_li}
           variant = "underlined"
           type='number'
           isInvalid = {pointerMeter.isInvalid}
@@ -165,7 +164,7 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
           classNames={{
             input: "text-center bg-green-100"
           }}
-          color={pointerMeter.record_li === '' ? "danger" : pointerMeter.record_li ? "primary" : "danger"} //Aquí hay un error, el isInbvalid debe actualizarse por fuera de este reenderizado para funcionar porque los sets no actualizan hasta el proximo reanderizado, pero por ahora no tengo tiempo :P
+          color={pointerMeter.q3.record_li === '' ? "danger" : pointerMeter.q3.record_li ? "primary" : "danger"} //Aquí hay un error, el isInbvalid debe actualizarse por fuera de este reenderizado para funcionar porque los sets no actualizan hasta el proximo reanderizado, pero por ahora no tengo tiempo :P
           onValueChange={(value)=>{
             updateResult(user.meter_id, value)
             updateValidate(user.meter_id, value)
@@ -191,7 +190,7 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
           <Input
             className="flex justify-center text-center w-full whitespace-pre-wrap z-[0] border-none px-0 shadow-none" 
             //placeholder={cellValue}
-            value={pointerRecordlf.record_lf === null ? '' : pointerRecordlf.record_lf}
+            value={pointerRecordlf.q3.record_lf === 0  ? '' : pointerRecordlf.q3.record_lf}
             variant = "underlined"
             type='number'
             isInvalid = {pointerRecordlf.isInvalid}
@@ -199,7 +198,7 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
             classNames={{
               input: "text-center bg-green-100"
             }}
-            color={pointerRecordlf.record_lf === '' ? "danger" : pointerRecordlf.record_lf ? "primary" : "danger"} //Aquí hay un error, el isInbvalid debe actualizarse por fuera de este reenderizado para funcionar porque los sets no actualizan hasta el proximo reanderizado, pero por ahora no tengo tiempo :P
+            color={pointerRecordlf.q3.record_lf === '' ? "danger" : pointerRecordlf.q3.record_lf ? "primary" : "danger"} //Aquí hay un error, el isInbvalid debe actualizarse por fuera de este reenderizado para funcionar porque los sets no actualizan hasta el proximo reanderizado, pero por ahora no tengo tiempo :P
             onValueChange={(value)=>{
               updateResult(user.meter_id, value)
               updateValidate(user.meter_id, value)
@@ -234,8 +233,9 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
           </div>
         );
       case "error":
+        
         return(
-          <span>{`${user.error} %`}</span>
+          <span>{`${user.q3.error} %`}</span>
         )
     default:
       return cellValue || 'NO DATA';

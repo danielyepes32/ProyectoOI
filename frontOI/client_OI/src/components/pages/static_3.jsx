@@ -89,7 +89,7 @@ export default function Static_3() {
                 <div className="w-5/6 justify-between full flex place-items-center">
                     <span className="font-inter text-center text-[18.4px] w-full">Total de medidores seleccionados</span>
                     <div className="flex flex-col w-full justify-center place-items-center" style={{ lineHeight: '0.7' }}>
-                        <span className="text-center font-teko font-semibold text-[64px]">550</span>
+                        <span className="text-center font-teko font-semibold text-[64px]">50</span>
                         <span className="text-center font-inter text-[18.4px]">Medidores</span>
                     </div>
                 </div>
@@ -107,7 +107,7 @@ export default function Static_3() {
                         startContent: "bg-red-100"
                     }}
                     >
-                    <span className="font-inter text-[14px] text-center text-white py-2">Medidores disponibles en orden (350ud)</span>
+                    <span className="font-inter text-[14px] text-center text-white py-2">Medidores disponibles en orden (8ud)</span>
                 </Button>
             </div>
             <div className="flex-grow flex flex-col w-full justify-between place-items-center rounded-[20px] my-[8vw] bg-white shadow-sm">

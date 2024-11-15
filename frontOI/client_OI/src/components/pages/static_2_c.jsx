@@ -27,6 +27,7 @@ import { GoPencil } from "react-icons/go";
 //---------------------------------------------------------------
 import CustomAlert from "../shared/CustomAlert";
 import ModalData from "../shared/ModalData";
+import apiService from "../../hook/services/apiService";
 //---------------------------------------------------------------
 //Funcionamiento
 import React from "react";
@@ -34,7 +35,7 @@ import React from "react";
 export default function Static_2_c() {
 
     //Variable para guardar los identificadores seleccionados en el dropdown
-    const [selectedKeys, setSelectedKeys] = React.useState(new Set(["OIVI-0001-2024-0001"]));
+    const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
     //Variable para abrir el modal del componente ModalData
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     //Variable para abrir el modal de confirmación
@@ -46,15 +47,74 @@ export default function Static_2_c() {
 
     const[maxCapacity, setMaxCapacity] = React.useState(10)
 
-    const[metersLength, setMetersLength] = React.useState(100)
+    const[metersPrueba, setMetersPrueba] = React.useState([])
 
-    const[ordenID, setOrdenID] = React.useState('OIVI-0001-2024')
+    const[metersLength, setMetersLength] = React.useState(null)
+
+    const[ordenID, setOrdenID] = React.useState(null)
 
     const[pruebas, setPruebas] = React.useState([])
 
     //----------------------------------------------------------------------------------------------
     //Funciones que requieren un manejo de reenderizado y manejo de caché
     //------------------------------------------------------------------------------------------------
+
+    //Función para obtener los gateways del autocomplete
+    React.useEffect(() => {
+  
+    //Al estar ejecutando el fetch activamos el loading de la data
+        //setIsLoading(true);
+        const fetchOrders = async () => {
+        try {
+        //inizializamos los parametros de consultas a la API de consumo
+        //console.log("No ha salido")
+        //const params = {
+           // q: filterValue,
+            //page:1,
+            //page_size : 10
+        //};
+        
+        const response = await apiService.getOrdenes();
+        // Suponiendo que setPruebas es un setter de un estado que contiene un array
+        setPruebas(prevState => [response[0].identificador]);
+            //usamos el componente "count" de la consulta para establecer el tamaño de los registros
+        } catch (error) {
+            //En caso de error en el llamado a la API se ejecuta un console.error
+            console.error('Error fetching initial meters:', error);
+        } finally {
+            //al finalizar independientemente de haber encontrado o no datos se detiene el circulo de cargue de datos
+            //console.log("salio");
+        }
+        }
+
+        fetchOrders();
+      }, []);
+
+    React.useEffect(() => {
+
+    //Al estar ejecutando el fetch activamos el loading de la data
+        //setIsLoading(true);
+        const fetchMetersPrueba = async () => {
+        try {
+        
+        const response = await apiService.getMedidoresPrueba();
+        // Suponiendo que setPruebas es un setter de un estado que contiene un array
+        setMetersPrueba(response)
+        setMetersLength(response.length);
+            //usamos el componente "count" de la consulta para establecer el tamaño de los registros
+        } catch (error) {
+            //En caso de error en el llamado a la API se ejecuta un console.error
+            console.error('Error fetching initial meters:', error);
+        } finally {
+            //al finalizar independientemente de haber encontrado o no datos se detiene el circulo de cargue de datos
+            //console.log("salio");
+        }
+        }
+
+        fetchMetersPrueba();
+        }, []);
+
+
     //Se agrupan y formatean los datos seleccionados en el dropdownBox
     const selectedValue = React.useMemo(
       () => Array.from(selectedKeys).join(", ").replaceAll("_", " "),
@@ -62,6 +122,8 @@ export default function Static_2_c() {
     );
 
     // Función para calcular los IDs de las pruebas
+    {/*Agregar esta función después para generar los IDs de prueba de una orden*/}
+    {/*
     const generateTestIds = () => {
         const testsCount = Math.ceil(metersLength / maxCapacity); // Redondeo hacia arriba
 
@@ -72,12 +134,13 @@ export default function Static_2_c() {
 
         return ids;
     };
-
+    */}
     // useEffect para ejecutar generateTestIds solo al cargar la vista
     React.useEffect(() => {
-        const ids = generateTestIds();
-        setPruebas(ids); // Almacena los IDs en el estado
-    }, []); // Arreglo de dependencias vacío
+        //const ids = generateTestIds();
+        //setPruebas(ids); // Almacena los IDs en el estado
+        setSelectedKeys(new Set([pruebas[0]]))
+    }, [pruebas]); // Arreglo de dependencias vacío
 
     //Modal para mostrar datos de medidores disponibles en el correlativo
     const modal = React.useMemo(() => {
@@ -200,7 +263,7 @@ export default function Static_2_c() {
                         startContent: "bg-red-100"
                     }}
                     >
-                    <span className="font-inter text-[14px] text-center text-white py-2">Medidores disponibles en orden (350ud)</span>
+                    <span className="font-inter text-[14px] text-center text-white py-2">{`Medidores disponibles en orden (${metersLength}uds)`}</span>
                 </Button>
             </div>
             <div className="bg-white shadow-sm w-full h-auto rounded-[20px] place-items-center flex flex-col">
@@ -215,11 +278,11 @@ export default function Static_2_c() {
                     <div className="ml-3 bg-white col-span-3 w-full h-auto rounded-[20px] flex flex-col place-items-center">
                         <div className="flex w-full justify-between items-center place-items-center space-x-[2vw]">
                             <span className="w-auto font-inter font-semibold text-opacity-text text-left text-[18.4px]">Desde:</span>
-                            <span className="w-full font-teko font-semibold text-[24px] text-left">AA23099470</span>
+                            <span className="w-full font-teko font-semibold text-[24px] text-left">{metersPrueba[0] === undefined ? 'No hay' : metersPrueba[0].meter_id}</span>
                         </div>
                         <div className="flex w-full justify-between place-items-center space-x-[3.5vw]">
                             <span className="w-auto font-inter font-semibold text-opacity-text text-left text-[18.4px]">Hasta:</span>
-                            <span className="w-full font-teko font-semibold text-[24px] text-left">AA23099482</span>
+                            <span className="w-full font-teko font-semibold text-[24px] text-left">{metersPrueba[0] === undefined ? 'No hay' : metersPrueba[metersPrueba.length - 1].meter_id}</span>
                         </div>
                     </div>  
                     <div className="ml-3 bg-white col-span-1 h-auto rounded-[20px] flex flex-col place-items-center mb-3">
@@ -247,7 +310,7 @@ export default function Static_2_c() {
             <div className="flex-grow flex w-full justify-between place-items-center space-x-2 rounded-[20px] my-[8vw] bg-white shadow-sm">
                 <div className="ml-3 bg-white w-[45%] h-auto rounded-[20px] flex flex-col place-items-center">
                     <span className="font-inter font-semibold text-opacity-text text-center text-[16px] mt-3">Medidores seleccionados</span>
-                    <span className="font-teko font-semibold text-[40px]">6</span>
+                    <span className="font-teko font-semibold text-[40px]">{metersLength}</span>
                 </div>
                 <Button
                     className="mx-[20vw] h-[60px] my-5 py-2 bg-custom-blue "
