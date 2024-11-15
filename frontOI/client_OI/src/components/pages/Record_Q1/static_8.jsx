@@ -9,7 +9,7 @@ import {
     useDisclosure
 } from "@nextui-org/modal";
 import React, { useState } from "react";
-import CustomAlert from "../shared/CustomAlert";
+import CustomAlert from "../../shared/CustomAlert";
 import {
     Table, //Componente tabla 
     TableHeader, //Componente header de la tabla
@@ -20,19 +20,14 @@ import {
     Spinner,
   } from "@nextui-org/react";
   //Componente
-import {meterColumns, meterDataTest} from "../../utils/tests/data"  //"../../utils/tests/data";
-import { div, span, td, thead, tr } from "framer-motion/client";
-
+import {meterColumns, meterDataTest} from "../../../utils/tests/data"  //"../../utils/tests/data";
 import { IoSpeedometerOutline } from "react-icons/io5";
-import { RiPlayListAddFill } from "react-icons/ri";
 import { MdOutlineWbIncandescent } from "react-icons/md";
 import { FaCheck } from "react-icons/fa";
-
-import { TbTableShortcut } from "react-icons/tb";
 //Las columnas se pueden agregar o eliminar de la vista, aquí inicializamos por default las necesarias
 const INITIAL_VISIBLE_COLUMNS = ["checkbox","meter_id", "num", "error"];
 
-export default function Static_7() {
+export default function Static_8() {
 
     const [isChanged, setIsChanged] = useState(false)
     const [pruebaValue, setPruebaValue] = useState(null)
@@ -72,6 +67,17 @@ export default function Static_7() {
       setPruebaValue(newValue);
       setIsChanged(true);
     };
+
+    React.useEffect(() => {
+      const nuevaData = meters.map((meter) => ({
+        ...meter,
+        //El valor de 10 es un valor de referencia, neccesario cambiarlo con los valores del instrumento de medicion
+        error: Math.round(((meter.record_lf - meter.record_li - 5.015) / 5.015) * 100 * 100) / 100
+      }));
+      setMeters(nuevaData)
+    },[])
+
+    console.log(meters)
 
     const handleValidateError = (key) => {
       // Buscar el objeto que coincide con el `meter_id` especificado
@@ -176,7 +182,12 @@ export default function Static_7() {
     const confirmationMessage = React.useMemo(() => {
         //console.log("CustomMessage: ", isOpenCustomMessage)
         return isOpenCustomMessage === true ? (
-          <CustomAlert message={customMessage} isVisible={isOpenCustomMessage} setIsVisible={setIsOpenCustomMessage}></CustomAlert>
+          <CustomAlert 
+            message={customMessage} 
+            isVisible={isOpenCustomMessage} 
+            setIsVisible={setIsOpenCustomMessage}
+            routeRedirect={"/client/"}
+            />
         ) : null
       }, [isOpenCustomMessage]);
   //Funcion callback al obtener datos para la tabla dependiendo del columkey
@@ -343,7 +354,7 @@ export default function Static_7() {
       default:
         return cellValue;
     }
-  }, []);
+  }, [meters]);
 
   
   console.log("Prueba: ", typeof(pruebaValue))
@@ -406,7 +417,7 @@ export default function Static_7() {
           <div className="w-full h-auto grid grid-cols-4 space-x-2 pt-2">
             <div className="col-span-3 bg-white shadow-lg px-4 flex justify-between rounded-[30px] items-center">
               <span className="font-inter text-center w-full pr-2">Usted se encuentra en la prueba</span>
-              <span className="font-teko text-[48px] font-semibold w-auto text-right">Q3</span>
+              <span className="font-teko text-[48px] font-semibold w-auto text-right">Q1</span>
             </div>
             <div className="col-span-1 w-full flex justify-center place-items-center flex">
               <Button

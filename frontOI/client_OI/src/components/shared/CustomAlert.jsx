@@ -8,12 +8,13 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@nextui-org/modal";
-import {Divider} from "@nextui-org/divider";
+import { useNavigate } from 'react-router-dom';
 
-const CustomAlert = ({ message, isVisible, setIsVisible,}) => {
+const CustomAlert = ({ message, isVisible, setIsVisible, routeRedirect}) => {
 
   const {isOpen, onOpen, onOpenChange} = useDisclosure();
   console.log("Visible: ",isVisible)
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     if(isVisible === true){
@@ -72,9 +73,10 @@ const CustomAlert = ({ message, isVisible, setIsVisible,}) => {
                 onPress={()=>{
                   setIsVisible(false)
                   onClose()
+                  navigate(routeRedirect)
                 }}
                 >
-                Action
+                Confirmar
               </Button>
               </div>
             </div>

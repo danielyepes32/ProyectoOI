@@ -4,17 +4,20 @@ import {
     useDisclosure
 } from "@nextui-org/modal";
 import React, { useState } from "react";
-import CustomAlert from "../shared/CustomAlert";
+import CustomAlert from "../../shared/CustomAlert";
   //Componente
-import {meterColumns, meterDataTest} from "../../utils/tests/data"  //"../../utils/tests/data";
+import {meterColumns, meterDataTest} from "../../../utils/tests/data"  //"../../utils/tests/data";
 import { TbTableShortcut } from "react-icons/tb";
-import ModalData from "../shared/ModalData";
-import TableVisualInspection from "../visual_inspection/TableVisualInspection";
+import ModalData from "../../shared/ModalData";
+import TableVisualInspection from "../../visual_inspection/TableVisualInspection";
+import { useNavigate } from "react-router-dom";
 
 //Las columnas se pueden agregar o eliminar de la vista, aquí inicializamos por default las necesarias
 const INITIAL_VISIBLE_COLUMNS = ["meter_id", "state", "result"];
 
-export default function Static_4() {
+export default function Static_4_Q2() {
+
+    const navigate = useNavigate()
 
     const [isChanged, setIsChanged] = useState(false)
     const [pruebaValue, setPruebaValue] = useState(null)
@@ -97,7 +100,12 @@ export default function Static_4() {
 
     const confirmationMessage = React.useMemo(() => {
         return isOpenCustomMessage === true ? (
-          <CustomAlert message={customMessage} isVisible={isOpenCustomMessage} setIsVisible={setIsOpenCustomMessage}></CustomAlert>
+          <CustomAlert 
+            message={customMessage} 
+            isVisible={isOpenCustomMessage} 
+            setIsVisible={setIsOpenCustomMessage}
+            routeRedirect={"/client/Q2/static_5"}
+            />
         ) : null
       }, [isOpenCustomMessage]);
 
@@ -181,8 +189,9 @@ export default function Static_4() {
             <Button
               className="mt-2 "
               onClick={()=>{
-                setIsOpenCustomMessage(true)
-                setIsChanged(!isChanged)
+                navigate("/client/static_3")
+                //setIsOpenCustomMessage(true)
+                //setIsChanged(!isChanged)
               }}
               >
               <span className="font-inter text-white text-center text-[16px]">regresar</span>

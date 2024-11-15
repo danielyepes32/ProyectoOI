@@ -13,7 +13,6 @@ import {
     Dropdown,  
     DropdownTrigger,  
     DropdownMenu,  
-    DropdownSection,  
     DropdownItem
 } from "@nextui-org/dropdown"; //Aquí se importan los elementos del dropdownBox 
 import {  
@@ -111,7 +110,7 @@ export default function Static_2_nc() {
             <span className="font-mulisg font-semibold text-opacity-text">Julio 24, 2024</span>
             <div className="w-full h-auto flex mt-8">
                 <div className="bg-white w-4/6 h-full rounded-[20px] flex flex-col justify-center p-3">
-                    <span className="font-inter font-semibold text-opacity-text text-[16px] ml-4">Orden Seleccionada</span>
+                    <span className="font-inter font-semibold text-opacity-text text-[16px] ml-4">Identificador de Prueba</span>
                     <Dropdown
                         >
                         <DropdownTrigger>
@@ -147,7 +146,8 @@ export default function Static_2_nc() {
                 </div>
             </div>
             <Button 
-                className="flex justify-center place-items-center bg-custom-blue w-full my-[3vh] h-auto py-2"
+                disableAnimation={true}
+                className="flex justify-center place-items-center bg-custom-blue w-full my-[3vh] h-auto py-3"
                 >
                 <span className="font-inter text-[15px] text-center text-white">Medidores disponibles en orden (350ud)</span>
             </Button>

@@ -4,13 +4,13 @@ import {
     useDisclosure
 } from "@nextui-org/modal";
 import React, { useState } from "react";
-import CustomAlert from "../shared/CustomAlert";
-import {meterColumns, meterDataTest} from "../../utils/tests/data"  //"../../utils/tests/data";
+import CustomAlert from "../../shared/CustomAlert";
+import {meterColumns, meterDataTest} from "../../../utils/tests/data"  //"../../utils/tests/data";
 
 import { IoSpeedometerOutline } from "react-icons/io5";
 import { MdOutlineWbIncandescent } from "react-icons/md";
-import ModalData from "../shared/ModalData";
-import TableRecordInspection from "../record_inspection/TableRecordInspection";
+import ModalData from "../../shared/ModalData";
+import TableRecordInspection from "../../record_inspection/TableRecordInspection";
 //Las columnas se pueden agregar o eliminar de la vista, aquí inicializamos por default las necesarias
 const INITIAL_VISIBLE_COLUMNS = ["meter_id", "num", "record_li"];
 
@@ -28,6 +28,8 @@ export default function Static_6() {
         'AA23099476': { value: null }
       }
     )
+    const [seconds, setSeconds] = useState(0);
+
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [popUpData,setPopUpData] = React.useState(null);
     const [customMessage, setCustomMessage] = React.useState(null);
@@ -47,6 +49,20 @@ export default function Static_6() {
 
     //---------------------------------------------------------------------------------------------------------------------------
     //Aquí se encuentran las funciones usadas en el componente MainClient
+    React.useEffect(() => {
+      // Inicia un intervalo que incrementa el tiempo cada segundo
+      const interval = setInterval(() => {
+        setSeconds((prevSeconds) => prevSeconds + 1);
+      }, 1000);
+  
+      // Limpia el intervalo al desmontar el componente
+      return () => clearInterval(interval);
+    }, []);
+
+    // Calcula los minutos y segundos a partir del total de segundos
+    const minutes = Math.floor(seconds / 60);
+    const displaySeconds = seconds % 60;
+
     //Esta función se usa para calcular las columnas que se etsablecen como visibles
     const headerColumns = React.useMemo(() => {
 
@@ -62,7 +78,7 @@ export default function Static_6() {
       setMeters((prevMeters) => 
         prevMeters.map((meter) => 
           meter.meter_id === key
-            ? { ...meter, record_li: newValue} // Actualiza solo el que coincide
+            ? { ...meter, record_li: Number(newValue)} // Actualiza solo el que coincide
             : meter // Deja el resto igual
         )
       );
@@ -72,7 +88,7 @@ export default function Static_6() {
     const updateValidate = (key, newValue) => {
 
       const validate = newValue === "" ? true : validateInput(newValue) ? false : true;
-      !validate ? addKey(key) : removeKey(key)
+      //!validate ? addKey(key) : removeKey(key)
       setMeters((prevMeters) => 
         prevMeters.map((meter) => 
           meter.meter_id === key
@@ -80,6 +96,15 @@ export default function Static_6() {
             : meter // Deja el resto igual
         )
       );
+    };
+
+    console.log("Registros: ", meters)
+
+    // Función para actualizar el value de un objeto específico
+    const handleEnterAction = (key, newValue) => {
+
+      const validate = newValue === "" ? true : validateInput(newValue) ? false : true;
+      !validate ? addKey(key) : removeKey(key)
     };
 
     const addKey = (newKey) => {
@@ -116,7 +141,12 @@ export default function Static_6() {
     const confirmationMessage = React.useMemo(() => {
         console.log("CustomMessage: ", isOpenCustomMessage)
         return isOpenCustomMessage === true ? (
-          <CustomAlert message={customMessage} isVisible={isOpenCustomMessage} setIsVisible={setIsOpenCustomMessage}></CustomAlert>
+          <CustomAlert 
+            message={customMessage} 
+            isVisible={isOpenCustomMessage} 
+            setIsVisible={setIsOpenCustomMessage}
+            routeRedirect={"/client/Q1/static_7"}
+            />
         ) : null
       }, [isOpenCustomMessage]);
 
@@ -131,6 +161,7 @@ export default function Static_6() {
         updateResult={updateResult}
         //updateValue={updateValue}
         //addKey={addKey}
+        handleEnterAction = {handleEnterAction}
         updateValidate={updateValidate}
       />
     );
@@ -145,7 +176,7 @@ export default function Static_6() {
           <div className="w-full h-auto grid grid-cols-4 space-x-2 pt-2">
             <div className="col-span-3 bg-white shadow-lg px-4 flex justify-between rounded-[30px] items-center">
               <span className="font-inter text-center w-full pr-2">Usted se encuentra en la prueba</span>
-              <span className="font-teko text-[48px] font-semibold w-auto text-right">Q3</span>
+              <span className="font-teko text-[48px] font-semibold w-auto text-right">Q1</span>
             </div>
             <div className="col-span-1 w-full flex justify-center place-items-center flex">
               <Button
@@ -198,7 +229,9 @@ export default function Static_6() {
             </div>
             <div className="w-full flex flex-col justify-betweenh-auto bg-white rounded-[20px] shadow-sm px-2 py-2">
               <div className="ml-2 w-full h-auto flex justify-left place-items-end">
-                <span className="font-teko font-semibold text-[32px]">18:53</span>
+                <span className="font-teko font-semibold text-[32px]">
+                  {String(minutes).padStart(2, '0')}:{String(displaySeconds).padStart(2, '0')}
+                </span>
                 <span className="font-teko font-semibold text-[20px]">min</span>
               </div>
               <div className="flex justify-between w-full">

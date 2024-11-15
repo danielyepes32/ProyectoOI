@@ -17,7 +17,7 @@ import { Button } from "@nextui-org/react";
 //-----------------------------------------------------------------
 //Iconos de react
 //-----------------------------------------------------------------
-import { FaCaretDown } from "react-icons/fa";
+import { FaCaretDown, FaCaretUp } from "react-icons/fa";
 import { BsArrow90DegRight } from "react-icons/bs";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { RiPlayListAddFill } from "react-icons/ri";
@@ -34,7 +34,7 @@ import React from "react";
 export default function Static_2_c() {
 
     //Variable para guardar los identificadores seleccionados en el dropdown
-    const [selectedKeys, setSelectedKeys] = React.useState(new Set(["text"]));
+    const [selectedKeys, setSelectedKeys] = React.useState(new Set(["OIVI-0001-2024-0001"]));
     //Variable para abrir el modal del componente ModalData
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     //Variable para abrir el modal de confirmación
@@ -44,6 +44,14 @@ export default function Static_2_c() {
     //Variable para seleccionar que informaciuón se va a mostrar en el modal
     const [popUpData, setPopUpData] = React.useState(null)
 
+    const[maxCapacity, setMaxCapacity] = React.useState(10)
+
+    const[metersLength, setMetersLength] = React.useState(100)
+
+    const[ordenID, setOrdenID] = React.useState('OIVI-0001-2024')
+
+    const[pruebas, setPruebas] = React.useState([])
+
     //----------------------------------------------------------------------------------------------
     //Funciones que requieren un manejo de reenderizado y manejo de caché
     //------------------------------------------------------------------------------------------------
@@ -52,6 +60,24 @@ export default function Static_2_c() {
       () => Array.from(selectedKeys).join(", ").replaceAll("_", " "),
       [selectedKeys]
     );
+
+    // Función para calcular los IDs de las pruebas
+    const generateTestIds = () => {
+        const testsCount = Math.ceil(metersLength / maxCapacity); // Redondeo hacia arriba
+
+        // Generamos el identificador con tantos '-000n' como pruebas necesarias
+        const ids = Array.from({ length: testsCount }, (_, index) => 
+        `${ordenID}-000${index + 1}`
+        );
+
+        return ids;
+    };
+
+    // useEffect para ejecutar generateTestIds solo al cargar la vista
+    React.useEffect(() => {
+        const ids = generateTestIds();
+        setPruebas(ids); // Almacena los IDs en el estado
+    }, []); // Arreglo de dependencias vacío
 
     //Modal para mostrar datos de medidores disponibles en el correlativo
     const modal = React.useMemo(() => {
@@ -64,10 +90,41 @@ export default function Static_2_c() {
         );
     }, [isOpen]);//Se ejecuta cada que cambia el valor de isOpen
 
+    function handleLeftKey() {
+        console.log(selectedKeys)
+        const currentIndex = pruebas.indexOf(selectedKeys.anchorKey ? selectedKeys.anchorKey : selectedKeys);
+        
+        // Verifica si hay un elemento a la izquierda del actual
+        if (currentIndex > 0) {
+          setSelectedKeys(pruebas[currentIndex - 1]);
+        } else {
+          // Si `selectedKeys` está en el primer elemento, no hace nada o puedes definir un comportamiento.
+          console.log("No hay un valor a la izquierda");
+        }
+      }
+
+      function handleRightKey() {
+        console.log(selectedKeys)
+        const currentIndex = pruebas.indexOf(selectedKeys.anchorKey ? selectedKeys.anchorKey : selectedKeys);
+        
+        // Verifica si hay un elemento a la izquierda del actual
+        if (currentIndex >= 0 && currentIndex < pruebas.length - 1) {
+          setSelectedKeys(pruebas[currentIndex + 1]);
+        } else {
+          // Si `selectedKeys` está en el primer elemento, no hace nada o puedes definir un comportamiento.
+          console.log("No hay un valor a la izquierda");
+        }
+      }
+
     //Modal para mostrar mensaje de confirmación
     const confirmationMessage = React.useMemo(() => {
         return isOpenCustomMessage === true ? (
-          <CustomAlert message={customMessage} isVisible={isOpenCustomMessage} setIsVisible={setIsOpenCustomMessage}></CustomAlert>
+          <CustomAlert 
+            message={customMessage} 
+            isVisible={isOpenCustomMessage} 
+            setIsVisible={setIsOpenCustomMessage}
+            routeRedirect={"/client/static_3"}
+            ></CustomAlert>
         ) : null
       }, [isOpenCustomMessage]);//Se ejecuta cada que cambia el valor de isOpen
 
@@ -81,7 +138,7 @@ export default function Static_2_c() {
             <span className="font-mulisg font-semibold text-opacity-text">Julio 24, 2024</span>
             <div className="w-full h-auto flex mt-8">
                 <div className="bg-white w-4/6 h-full rounded-[20px] flex flex-col justify-center p-3">
-                    <span className="font-inter font-semibold text-opacity-text text-[16px] ml-4">Orden Seleccionada</span>
+                    <span className="font-inter font-semibold text-opacity-text text-[16px] ml-4">Identificador de prueba</span>
                     <Dropdown
                         >
                         <DropdownTrigger>
@@ -90,7 +147,7 @@ export default function Static_2_c() {
                             className="capitalize mt-2 z-[0]"
                             >
                             <div className="flex justify-between w-full">
-                                <span className="font-teko font-semibold text-black text-[24px]">{selectedKeys}</span>
+                                <span className="font-teko font-semibold text-black text-center text-[22px]">{selectedKeys}</span>
                                 <FaCaretDown className="text-custom-blue"/>
                             </div>
                             </Button>
@@ -103,17 +160,31 @@ export default function Static_2_c() {
                             selectedKeys={selectedKeys}
                             onSelectionChange={setSelectedKeys}
                         >
-                            <DropdownItem key="text">Text</DropdownItem>
-                            <DropdownItem key="number">Number</DropdownItem>
-                            <DropdownItem key="date">Date</DropdownItem>
-                            <DropdownItem key="single_date">Single Date</DropdownItem>
-                            <DropdownItem key="iteration">Iteration</DropdownItem>
+                        {pruebas.map((prueba, index) => (
+                            <DropdownItem key={prueba} textValue={`Prueba: ${prueba}`}>
+                                Prueba: {prueba}
+                            </DropdownItem>
+                        ))}
                         </DropdownMenu>
                     </Dropdown>
+                    <div className="flex">
+                        <Button
+                            className="w-[30px] h-[20px] text-center flex justify-center mt-2 mx-auto"
+                            onClick={handleRightKey}
+                            >
+                            <FaCaretDown className="text-custom-blue"/>
+                        </Button>
+                        <Button
+                            className="w-[30px] h-[20px] text-center flex justify-center mt-2 mx-auto"
+                            onClick={handleLeftKey}
+                            >
+                            <FaCaretUp className="text-custom-blue"/>
+                        </Button>
+                    </div>
                 </div>
                 <div className="ml-3 bg-white w-2/6 h-auto rounded-[20px] flex flex-col justify-center place-items-center">
                     <span className="font-inter font-semibold text-opacity-text text-[16px] mt-3">Capacidad</span>
-                    <span className="font-teko font-semibold text-[40px]">10</span>
+                    <span className="font-teko font-semibold text-[40px]">{maxCapacity}</span>
                 </div>
             </div>
             <div>

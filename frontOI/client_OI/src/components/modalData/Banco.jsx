@@ -7,7 +7,7 @@ export default function Banco() {
             <p className="h-1/3 font-semibold">Certificados vigentes</p>
         </div>
         <div className="w-full h-full space-y-2 flex flex-col justify-end">
-            <p className="text-right h-1/3">1</p>
+            <p className="text-right h-1/3">Daniel recuerda que debes agregar los datos de los medidores en la prueba</p>
             <p className="text-right h-1/3">15</p>
             <p className="text-right h-1/3">CONFORME</p>
         </div>

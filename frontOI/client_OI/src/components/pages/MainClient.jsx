@@ -17,6 +17,7 @@ import {
   //Componente
 import {columns, DataPrueba} from "../../utils/tests/data"  //"../../utils/tests/data";
 import ModalData from "../shared/ModalData";
+import { Navigate } from "react-router-dom";
 
 //Las columnas se pueden agregar o eliminar de la vista, aquí inicializamos por default las necesarias
 const INITIAL_VISIBLE_COLUMNS = ["test_id", "state", "result"];
@@ -67,7 +68,13 @@ export default function MainClient() {
     const confirmationMessage = React.useMemo(() => {
         console.log("CustomMessage: ", isOpenCustomMessage)
         return isOpenCustomMessage === true ? (
-          <CustomAlert message={customMessage} isVisible={isOpenCustomMessage} setIsVisible={setIsOpenCustomMessage}></CustomAlert>
+          <CustomAlert 
+            message={customMessage} 
+            isVisible={isOpenCustomMessage} 
+            setIsVisible={setIsOpenCustomMessage}
+            routeRedirect={"/client/static_1"}
+
+          />
         ) : null
       }, [isOpenCustomMessage]);
   //Funcion callback al obtener datos para la tabla dependiendo del columkey

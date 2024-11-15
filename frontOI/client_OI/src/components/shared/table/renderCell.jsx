@@ -11,7 +11,7 @@ const statusColorMap = {
   pending: 'yellow',
 };
 
-const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, visualInspection, updateResult, updateValue, addKey, updateValidate, meters, handleValidateErrorInput, location) => {
+const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, visualInspection, updateResult, updateValue, addKey, updateValidate, meters, handleValidateErrorInput, location, handleEnterAction) => {
   const cellValue = user[columnKey];
 
   switch (columnKey) {
@@ -170,6 +170,13 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
             updateResult(user.meter_id, value)
             updateValidate(user.meter_id, value)
           }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              const inputValue = e.target.value; // Obtiene el valor actual del input
+              console.log("Enter", inputValue);
+              handleEnterAction(user.meter_id, inputValue);
+            }
+          }}
           onPointerDown={(e) => {
             e.stopPropagation();
             e.currentTarget.focus();
@@ -197,6 +204,13 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
               updateResult(user.meter_id, value)
               updateValidate(user.meter_id, value)
             }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                const inputValue = e.target.value; // Obtiene el valor actual del input
+                console.log("Enter", inputValue);
+                handleEnterAction(user.meter_id, inputValue);
+              }
+            }}
             onPointerDown={(e) => {
               e.stopPropagation();
               e.currentTarget.focus();
@@ -206,10 +220,8 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
         );
     case "meter_id":
       
-      const isStaticRoute = location.pathname === '/client/static_9';
-    
       return (
-        <span className={isStaticRoute ? '' : 'text-custom-blue'}>
+        <span className={ 'text-custom-blue'}>
           {cellValue}
         </span>
       );

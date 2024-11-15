@@ -17,7 +17,8 @@ export default function TableRecordInspection(
         meters,
         loadingState,
         updateResult,
-        updateValidate
+        updateValidate,
+        handleEnterAction
     }
 ){
 
@@ -65,7 +66,10 @@ export default function TableRecordInspection(
                         null,
                         null,
                         updateValidate,
-                        meters
+                        meters,
+                        null,
+                        null,
+                        handleEnterAction
                          )}</TableCell>}
         </TableRow>
         ));

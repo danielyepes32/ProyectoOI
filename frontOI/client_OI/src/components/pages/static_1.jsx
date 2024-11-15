@@ -30,9 +30,14 @@ export default function Static_1() {
     //El useDisclosure se pueda usar una vez por reenderizado y objeto react, por lo que se activará el segundo popUp de una manera distinta
     //Esta variable setea en true o false en caso de querer activar el modal de confirmación
     const [isOpenCustomMessage, setIsOpenCustomMessage] = React.useState(false);
-    
-
+    //Variable para guardar la capicidad maxima de cada prueba
+    const [maxCapacity, setMaxCapacity] = React.useState(null)
+    //Variable para guardar las notaciones especiales
+    const [specialAnotations, setSpecialAnotations] = React.useState(null)
     //Modal para mostrar datos de los intrumentos o del banco en la vista
+
+    const [navigateRoute, setNavigateRoute] = React.useState(null)
+
     const modal = React.useMemo(() => {
       return (
           <ModalData
@@ -47,10 +52,16 @@ export default function Static_1() {
     const confirmationMessage = React.useMemo(() => {
       //El reenderizado solo se ejecuta al reconoce un true en a variable, al estarse ejecutando en diferentes reenderizados y no usar el disclosure, puede reenderizarse el modal en un false de la variable
       return isOpenCustomMessage === true ? (
-        <CustomAlert message={customMessage} isVisible={isOpenCustomMessage} setIsVisible={setIsOpenCustomMessage}></CustomAlert>
+        <CustomAlert 
+          message={customMessage} 
+          isVisible={isOpenCustomMessage} 
+          setIsVisible={setIsOpenCustomMessage}
+          routeRedirect={navigateRoute}
+          />
       ) : null //En caso de ser false no ejecuta nada
     }, [isOpenCustomMessage]); //Se reenderiza cada que hay un cambio en la variable isOpenCustomMessage
 
+    console.log("Max: ", specialAnotations)
   return (
     <>
       {/*
@@ -108,7 +119,12 @@ export default function Static_1() {
                 <span className="font-inter text-[18px]">Selección de capacidad (No de medidores por prueba)</span>
               </div>
               <div className="col-span-1 flex justify-end place-items-center">
-                <span className="font-teko font-semibold text-[40px] border border-oi-bg border-4 rounded-xl px-5 my-2 text-right">10</span>
+                <input 
+                  onInput={(event)=>{
+                    setMaxCapacity(event.target.value)
+                  }}
+                  className="w-full font-teko font-semibold text-[40px] border border-oi-bg border-4 rounded-xl px-5 my-2 text-center"
+                  />
               </div>
             </div>
             <div className="w-full grid grid-cols-5 flex place-items-center py-3">
@@ -116,7 +132,11 @@ export default function Static_1() {
                 <span className="font-inter text-[18px]">Anotaciones especiales</span>
               </div>
               <div className="col-span-3 w-full h-full flex justify-center">
-                <span className="font-inter text-[16px] w-full h-full p-2 text-justify border border-oi-bg border-4 rounded-xl ml-5">Se interrumpio el numero total a usar por mantenimiento del banco</span>
+                <textarea 
+                  onInput={(event)=>{
+                    setSpecialAnotations(event.target.value)
+                  }}
+                  className="font-inter text-[16px] w-full h-auto p-2 text-justify border border-oi-bg border-4 rounded-xl ml-5"/>
               </div>
             </div>
           </div>
@@ -128,10 +148,17 @@ export default function Static_1() {
               className="w-full bg-custom-blue mt-3 py-1 rounded-[15px]"
               onClick={()=>{
                 setIsOpenCustomMessage(true) //Abrir mensage de confirmación
+                setNavigateRoute("/client/static_2_c")
               }}>
               <span className="font-inter text-[18px] text-white">Correlativos</span>
             </Button>
-            <Button className="w-ful bg-gray-but mt-3 mb-5 py-1 rounded-[15px]">
+            <Button 
+              className="w-ful bg-gray-but mt-3 mb-5 py-1 rounded-[15px]"
+              onClick={()=>{
+                setIsOpenCustomMessage(true) //Abrir mensage de confirmación
+                setNavigateRoute("/client/static_2_nc")
+              }}
+              >
               <span className="font-inter text-[18px] text-white">No correlativos</span>
             </Button>
           </div>

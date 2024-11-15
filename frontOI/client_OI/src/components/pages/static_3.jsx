@@ -52,7 +52,12 @@ export default function Static_3() {
     const confirmationMessage = React.useMemo(() => {
         console.log(isOpenCustomMessage)
         return isOpenCustomMessage === true ? (
-          <CustomAlert message={customMessage} isVisible={isOpenCustomMessage} setIsVisible={setIsOpenCustomMessage}></CustomAlert>
+          <CustomAlert 
+            message={customMessage} 
+            isVisible={isOpenCustomMessage} 
+            setIsVisible={setIsOpenCustomMessage}
+            routeRedirect={"/client/Q3/static_4"}
+            />
         ) : null
       }, [isOpenCustomMessage]);
 
