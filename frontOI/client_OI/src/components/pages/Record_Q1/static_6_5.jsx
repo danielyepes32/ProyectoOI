@@ -109,7 +109,7 @@ export default function Static_6_5() {
             Usted se encuentra en la prueba
           </span>
           <span className="font-teko text-[48px] font-semibold text-right">
-            Q3
+            Q1
           </span>
         </div>
         <div className="col-span-1 w-full flex justify-center items-center">

@@ -192,6 +192,7 @@ export default function static_7_Q3() {
         //addKey={addKey}
         updateValidate={updateValidate}
         handleEnterAction={handleEnterAction}
+        Q={"q1"}
       />
     );
   }, [meters, headerColumns ,selectedKeys])

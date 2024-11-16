@@ -18,7 +18,8 @@ export default function TableRecordInspection(
         loadingState,
         updateResult,
         updateValidate,
-        handleEnterAction
+        handleEnterAction,
+        Q
     }
 ){
 
@@ -69,7 +70,8 @@ export default function TableRecordInspection(
                         meters,
                         null,
                         null,
-                        handleEnterAction
+                        handleEnterAction,
+                        Q
                          )}</TableCell>}
         </TableRow>
         ));

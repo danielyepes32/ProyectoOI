@@ -112,7 +112,7 @@ export default function Static_8_Q3() {
 
     const handleValidateError = (key) => {
       // Buscar el objeto que coincide con el `meter_id` especificado
-      const err_record = meters.find(item => item.meter_id === key)?.q3.error;
+      const err_record = meters.find(item => item.meter_id === key)?.q1.error;
     
       // Validar el valor de `err_record` y retornar el `className` correspondiente
       switch (true) {
@@ -129,7 +129,7 @@ export default function Static_8_Q3() {
 
     const handleValidateErrorInput = (key) => {
       // Buscar el objeto que coincide con el `meter_id` especificado
-      const err_record = meters.find(item => item.meter_id === key)?.q3.error;
+      const err_record = meters.find(item => item.meter_id === key)?.q1.error;
       
       console.log((err_record >= -4.1 && err_record <= 4.1))
       // Validar el valor de `err_record` y retornar el `className` correspondiente
@@ -381,7 +381,7 @@ export default function Static_8_Q3() {
         );
       case "error":
         return(
-          <span>{`${ Math.round(user.q3.error * 100) / 100 } %`}</span>
+          <span>{`${ Math.round(user.q1.error * 100) / 100 } %`}</span>
         )
       default:
         return cellValue;
