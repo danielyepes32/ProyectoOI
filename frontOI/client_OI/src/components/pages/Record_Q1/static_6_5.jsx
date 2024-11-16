@@ -81,7 +81,7 @@ export default function Static_6_5() {
       routeRedirect={null} // No redirige automáticamente
       handleConfirm={() => {
         setIsOpenCustomMessage(false);
-        navigate("/client/Q3/static_7"); // Redirige al componente Static_7
+        navigate("/client/Q1/static_7"); // Redirige al componente Static_7
       }}
     />
   ) : null;

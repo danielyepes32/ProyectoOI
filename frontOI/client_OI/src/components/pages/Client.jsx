@@ -14,12 +14,14 @@ import Static_3 from './static_3';
 import Static_4 from './Record_Q1/static_4';
 import Static_5 from './Record_Q1/static_5';
 import Static_6 from './Record_Q1/static_6';
+import Static_6_5_Q1 from './Record_Q1/static_6_5';
 import Static_7 from './Record_Q1/static_7';
 import Static_8 from './Record_Q1/static_8';
 //Importaciones para Q2
 import Static_4_Q2 from './Record_Q2/static_4';
 import Static_5_Q2 from './Record_Q2/static_5';
 import Static_6_Q2 from './Record_Q2/static_6';
+import Static_6_5_Q2 from './Record_Q2/static_6_5';
 import Static_7_Q2 from './Record_Q2/static_7';
 import Static_8_Q2 from './Record_Q2/static_8';
 //Importaciones para Q3
@@ -66,12 +68,14 @@ const Client = () => {
         <Route path="/Q1/static_4" element={<Static_4/>}/>
         <Route path="/Q1/static_5" element={<Static_5/>}/>
         <Route path="/Q1/static_6" element={<Static_6/>}/>
+        <Route path="/Q1/static_6_5" element={<Static_6_5_Q1/>}/>
         <Route path="/Q1/static_7" element={<Static_7/>}/>
         <Route path="/Q1/static_8" element={<Static_8/>}/>
         {/*Rutas para Q2*/}
         <Route path="/Q2/static_4" element={<Static_4_Q2/>}/>
         <Route path="/Q2/static_5" element={<Static_5_Q2/>}/>
         <Route path="/Q2/static_6" element={<Static_6_Q2/>}/>
+        <Route path="/Q2/static_6_5" element={<Static_6_5_Q2/>}/>
         <Route path="/Q2/static_7" element={<Static_7_Q2/>}/>
         <Route path="/Q2/static_8" element={<Static_8_Q2/>}/>
         {/*Rutas para Q3*/}

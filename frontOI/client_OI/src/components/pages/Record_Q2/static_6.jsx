@@ -188,7 +188,7 @@ export default function Static_6_Q2() {
             message={customMessage} 
             isVisible={isOpenCustomMessage} 
             setIsVisible={setIsOpenCustomMessage}
-            routeRedirect={"/client/Q2/static_7"}
+            routeRedirect={"/client/Q2/static_6_5"}
             handleConfirm={handleConfirm}
             />
         ) : null
