@@ -60,7 +60,6 @@ const CustomAlert = ({ message, isVisible, setIsVisible, routeRedirect, handleCo
                 <Button 
                 className='bg-red-200 text-white'
                 onPress={()=>{
-                  handleConfirm ? handleConfirm() : null
                   setIsVisible(false)
                   onClose()
                 }}
@@ -72,6 +71,7 @@ const CustomAlert = ({ message, isVisible, setIsVisible, routeRedirect, handleCo
                 <Button 
                 className='bg-custom-blue text-white'
                 onPress={()=>{
+                  handleConfirm ? handleConfirm() : null
                   setIsVisible(false)
                   onClose()
                   navigate(routeRedirect)

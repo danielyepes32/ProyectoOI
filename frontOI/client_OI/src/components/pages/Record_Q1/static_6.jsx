@@ -54,7 +54,7 @@ export default function Static_6_Q3() {
       return () => clearInterval(interval);
     }, []);
 
-    React.useEffect(() => {
+    React.useMemo(() => {
 
       //Al estar ejecutando el fetch activamos el loading de la data
       setIsLoading(true);

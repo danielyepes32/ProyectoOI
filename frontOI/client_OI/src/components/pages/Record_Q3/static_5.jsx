@@ -80,7 +80,7 @@ export default function Static_5_Q3() {
     // Suponiendo que setPruebas es un setter de un estado que contiene un array
     setMeters(response)
     const visualInspectionObj = response.reduce((acc, item) => {
-      acc[item.meter_id] = { value: "Sin inspección" }; // Establecer valor por defecto
+      acc[item.meter_id] = { value: item.drain }; // Establecer valor por defecto
       return acc;
     }, {});
     // Actualizar el estado visualInspection
@@ -148,7 +148,6 @@ export default function Static_5_Q3() {
             console.error(error); 
           } 
           }
-    
           handleUpdateMeter()
       }else{null}
       },[confirm])
