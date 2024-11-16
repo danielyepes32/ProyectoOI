@@ -150,14 +150,14 @@ export default function static_7_Q2() {
       if(confirm){
         const handleUpdateMeter = async () => {
           try {
-            const updates = meters[0];  // Aquí defines el campo que quieres actualizar
-            const response = await apiService.updateMetersPrueba(meters[0].meter_id, updates);  // Llamada a la función updateMeter
-            console.log('Meter updated:', response);  
+            meters.map(async (item) => {
+              const response = await apiService.updateMetersPrueba(item.meter_id, item);  // Llamada a la función updateMeter
+              console.log('Meter updated:', response);
+            })
           } catch (error) {
             console.error(error); 
-          } 
           }
-    
+        }
           handleUpdateMeter()
       }else{null}
       },[confirm])

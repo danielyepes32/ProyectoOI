@@ -155,7 +155,7 @@ export default function Static_6_Q3() {
           try {
             meters.map(async (item) => {
               const response = await apiService.updateMetersPrueba(item.meter_id, item);  // Llamada a la función updateMeter
-              console.log('Meter updated:', response);  
+              console.log('Meter updated:', response);
             })
           } catch (error) {
             console.error(error); 
