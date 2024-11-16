@@ -149,7 +149,7 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
     );
     case "record_li":
       const pointerMeter = meters.find(item => item.meter_id === user.meter_id);
-      const selectedQ = Q || "q3"; // Define selectedQ antes de usarlo
+      const selectedQ = Q || "q2"; // Define selectedQ antes de usarlo
 
       return (
         <Input
@@ -193,7 +193,7 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
 
     case "record_lf":
       const pointerRecordlf = meters.find(item => item.meter_id === user.meter_id);
-      const selectedQlf = Q || "q3"; // Define selectedQlf antes de usarlo
+      const selectedQlf = Q || "q2"; // Define selectedQlf antes de usarlo
 
       return (
         <Input
@@ -235,7 +235,6 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
         ></Input>
       );
 
-
     case "meter_id":
       
       return (
@@ -254,7 +253,7 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
       case "error":
         
         return(
-          <span>{`${user.q3.error} %`}</span>
+          <span>{`${user.q2.error} %`}</span>
         )
     default:
       return cellValue || 'NO DATA';

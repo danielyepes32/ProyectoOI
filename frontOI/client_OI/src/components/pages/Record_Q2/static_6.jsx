@@ -99,8 +99,8 @@ export default function Static_6_Q2() {
           meter.meter_id === key
             ? {
                 ...meter,
-                q3: {
-                  ...meter.q3, // Copia el objeto q3 existente
+                q2: {
+                  ...meter.q2, // Copia el objeto q2 existente
                   record_li: Number(newValue), // Actualiza solo record_li
                 },
               }
@@ -207,7 +207,7 @@ export default function Static_6_Q2() {
         //addKey={addKey}
         handleEnterAction = {handleEnterAction}
         updateValidate={updateValidate}
-        Q={"q3"}
+        Q={"q2"}
       />
     );
   }, [meters, headerColumns ,selectedKeys])
