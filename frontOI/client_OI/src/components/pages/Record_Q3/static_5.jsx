@@ -262,14 +262,14 @@ export default function Static_5_Q3() {
             </div>
             */}
           <div className="w-full flex flex-col flex-grow mb-5 h-[300px] bg-white shadow-lg items-center place-items-center mt-5 rounded-[20px]">
-            <span className="font-mulish justify-center font-semibold text-[20px] mt-3 text-center">Inspección visual</span>
+            <span className="font-mulish justify-center font-semibold text-[20px] mt-3 text-center">Presión estatica</span>
             <div className="w-5/6 rounded-[20px] bg-custom-blue h-2 mb-2 text-white">'</div>
             <div className="w-full flex h-[30svh] my-3">
               {tableRow}
             </div>
           </div>
           <div className="flex flex-grow flex-col bg-white rounded-[20px] px-5 py-5 shadow-sm mb-5">
-            <span className="font-mulish font-semibold text-center text-[24px]">Terminar proceso de inspección visual</span>
+            <span className="font-mulish font-semibold text-center text-[24px]">Terminar proceso de presión estatica</span>
             <Button
               className="bg-custom-blue mt-1"
               onClick={()=>{

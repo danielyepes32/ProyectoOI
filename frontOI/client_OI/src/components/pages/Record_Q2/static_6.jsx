@@ -207,7 +207,7 @@ export default function Static_6_Q2() {
         //addKey={addKey}
         handleEnterAction = {handleEnterAction}
         updateValidate={updateValidate}
-        Q={"q2"}
+        Q={"q3"}
       />
     );
   }, [meters, headerColumns ,selectedKeys])
