@@ -10,7 +10,7 @@ import {
 } from "@nextui-org/modal";
 import { useNavigate } from 'react-router-dom';
 
-const CustomAlert = ({ message, isVisible, setIsVisible, routeRedirect, handleConfirm}) => {
+const CustomAlert = ({ message, isVisible, setIsVisible, routeRedirect,handleConfirm}) => {
 
   const {isOpen, onOpen, onOpenChange} = useDisclosure();
   console.log("Visible: ",isVisible)
@@ -70,11 +70,13 @@ const CustomAlert = ({ message, isVisible, setIsVisible, routeRedirect, handleCo
               <div className='col-span-1 w-full h-full flex justify-center items-center place-items-center'>
                 <Button 
                 className='bg-custom-blue text-white'
-                onPress={()=>{
-                  handleConfirm ? handleConfirm() : null
-                  setIsVisible(false)
-                  onClose()
-                  navigate(routeRedirect)
+                onPress={async () => {
+                  if (handleConfirm) {
+                    await handleConfirm(); // Espera a que handleConfirm termine
+                  }
+                  setIsVisible(false);
+                  onClose();
+                  navigate(routeRedirect); // Navega solo después de que todo lo anterior haya terminado
                 }}
                 >
                 Confirmar
