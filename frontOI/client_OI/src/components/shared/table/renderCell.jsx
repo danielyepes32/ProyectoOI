@@ -67,7 +67,6 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
       );
       case "state":
         return (
-
           <Dropdown
             key={user.meter_id}
           >
@@ -114,7 +113,6 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
     );
     case "drain":
       return (
-
         <Dropdown
           key={user.meter_id}
         >
@@ -150,28 +148,38 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
     </Dropdown>
     );
     case "record_li":
-      const pointerMeter = meters.find(item => item.meter_id === user.meter_id)  
-      
+      const pointerMeter = meters.find(item => item.meter_id === user.meter_id);
+      const selectedQ = Q || "q3"; // Define selectedQ antes de usarlo
+
       return (
-        <Input 
-          className="flex justify-center text-center w-full whitespace-pre-wrap z-[0] border-none px-0 shadow-none" 
-          //placeholder={cellValue}
-          value={pointerMeter.q3.record_li === 0  ? '' : pointerMeter.q3.record_li}
-          variant = "underlined"
-          type='number'
-          isInvalid = {pointerMeter.isInvalid}
-          placeholder = '-'
+        <Input
+          className="flex justify-center text-center w-full whitespace-pre-wrap z-[0] border-none px-0 shadow-none"
+          value={
+            pointerMeter?.[selectedQ]?.record_li === 0
+              ? ""
+              : pointerMeter?.[selectedQ]?.record_li
+          }
+          variant="underlined"
+          type="number"
+          isInvalid={pointerMeter?.isInvalid}
+          placeholder="-"
           classNames={{
-            input: "text-center bg-green-100"
+            input: "text-center bg-green-100",
           }}
-          color={pointerMeter.q3.record_li === '' ? "danger" : pointerMeter.q3.record_li ? "primary" : "danger"} //Aquí hay un error, el isInbvalid debe actualizarse por fuera de este reenderizado para funcionar porque los sets no actualizan hasta el proximo reanderizado, pero por ahora no tengo tiempo :P
-          onValueChange={(value)=>{
-            updateResult(user.meter_id, value)
-            updateValidate(user.meter_id, value)
+          color={
+            pointerMeter?.[selectedQ]?.record_li === ""
+              ? "danger"
+              : pointerMeter?.[selectedQ]?.record_li
+              ? "primary"
+              : "danger"
+          }
+          onValueChange={(value) => {
+            updateResult(user.meter_id, value);
+            updateValidate(user.meter_id, value);
           }}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              const inputValue = e.target.value; // Obtiene el valor actual del input
+            if (e.key === "Enter") {
+              const inputValue = e.target.value;
               console.log("Enter", inputValue);
               handleEnterAction(user.meter_id, inputValue);
             }
@@ -180,43 +188,54 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
             e.stopPropagation();
             e.currentTarget.focus();
           }}
-        >
-        </Input>
+        ></Input>
       );
-      case "record_lf":
-        const pointerRecordlf = meters.find(item => item.meter_id === user.meter_id)  
-        
-        return (
-          <Input
-            className="flex justify-center text-center w-full whitespace-pre-wrap z-[0] border-none px-0 shadow-none" 
-            //placeholder={cellValue}
-            value={pointerRecordlf.q3.record_lf === 0  ? '' : pointerRecordlf.q3.record_lf}
-            variant = "underlined"
-            type='number'
-            isInvalid = {pointerRecordlf.isInvalid}
-            placeholder = '-'
-            classNames={{
-              input: "text-center bg-green-100"
-            }}
-            color={pointerRecordlf.q3.record_lf === '' ? "danger" : pointerRecordlf.q3.record_lf ? "primary" : "danger"} //Aquí hay un error, el isInbvalid debe actualizarse por fuera de este reenderizado para funcionar porque los sets no actualizan hasta el proximo reanderizado, pero por ahora no tengo tiempo :P
-            onValueChange={(value)=>{
-              updateResult(user.meter_id, value)
-              updateValidate(user.meter_id, value)
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                const inputValue = e.target.value; // Obtiene el valor actual del input
-                console.log("Enter", inputValue);
-                handleEnterAction(user.meter_id, inputValue);
-              }
-            }}
-            onPointerDown={(e) => {
-              e.stopPropagation();
-              e.currentTarget.focus();
-            }}
-          >
-          </Input>
-        );
+
+    case "record_lf":
+      const pointerRecordlf = meters.find(item => item.meter_id === user.meter_id);
+      const selectedQlf = Q || "q3"; // Define selectedQlf antes de usarlo
+
+      return (
+        <Input
+          className="flex justify-center text-center w-full whitespace-pre-wrap z-[0] border-none px-0 shadow-none"
+          value={
+            pointerRecordlf?.[selectedQlf]?.record_lf === 0
+              ? ""
+              : pointerRecordlf?.[selectedQlf]?.record_lf
+          }
+          variant="underlined"
+          type="number"
+          isInvalid={pointerRecordlf?.isInvalid}
+          placeholder="-"
+          classNames={{
+            input: "text-center bg-green-100",
+          }}
+          color={
+            pointerRecordlf?.[selectedQlf]?.record_lf === ""
+              ? "danger"
+              : pointerRecordlf?.[selectedQlf]?.record_lf
+              ? "primary"
+              : "danger"
+          }
+          onValueChange={(value) => {
+            updateResult(user.meter_id, value);
+            updateValidate(user.meter_id, value);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              const inputValue = e.target.value;
+              console.log("Enter", inputValue);
+              handleEnterAction(user.meter_id, inputValue);
+            }
+          }}
+          onPointerDown={(e) => {
+            e.stopPropagation();
+            e.currentTarget.focus();
+          }}
+        ></Input>
+      );
+
+
     case "meter_id":
       
       return (
