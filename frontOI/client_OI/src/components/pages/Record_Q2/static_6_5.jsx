@@ -173,7 +173,7 @@ export default function Static_6_5() {
       </div>
 
       {/* Botón Confirmar */}
-      <div className="flex justify-end mt-5">
+      <div className="flex justify-start mt-5">
         <Button
           disabled={!canProceed}
           className={`${
