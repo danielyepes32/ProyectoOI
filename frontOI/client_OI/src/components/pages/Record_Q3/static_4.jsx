@@ -216,7 +216,7 @@ export default function Static_4_Q3() {
         <div className="w-screen h-screen bg-oi-bg flex flex-col px-[5vw] overflow-y-auto">
             {modal}
             {confirmationMessage}
-          <span className="font-mulish font-bold pt-5 text-[24px] justify-center">Ensayo de presión estática</span>
+          <span className="font-mulish font-bold pt-5 text-[24px] justify-center">Inspección visual</span>
           <span className="font-mulisg font-semibold text-opacity-text ">Sesion iniciada en Julio 24, 2024</span>
           <div className="w-full h-auto grid grid-cols-4 space-x-2 pt-2">
             <div className="col-span-3 bg-white shadow-lg px-7 flex flex-col space-x-2 rounded-[20px] items-center py-4">
@@ -239,7 +239,7 @@ export default function Static_4_Q3() {
               </Button>
             </div>
           </div>
-          <div>
+          {/* <div>
                 <Button 
                     className="flex justify-between place-items-center bg-custom-blue w-full mt-[3vh]"
                     onClick={onOpen}
@@ -251,7 +251,7 @@ export default function Static_4_Q3() {
                     >
                     <span className="font-inter text-[20px] text-center text-white py-2">Códigos de inspección</span>
                 </Button>
-            </div>
+            </div> */}
           <div className="w-full flex flex-col flex-grow mb-5 h-[300px] bg-white shadow-lg items-center place-items-center mt-5 rounded-[20px]">
             <span className="font-mulish justify-center font-semibold text-[20px] mt-3 text-center">Inspección visual</span>
             <div className="w-5/6 rounded-[20px] bg-custom-blue h-2 mb-2 text-white">'</div>

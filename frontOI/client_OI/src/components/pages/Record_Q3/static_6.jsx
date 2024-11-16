@@ -13,6 +13,7 @@ import ModalData from "../../shared/ModalData";
 import TableRecordInspection from "../../record_inspection/TableRecordInspection";
 
 import apiService from "../../../hook/services/apiService";
+import  DateService  from "../../../hook/services/dateService.js"
 //Las columnas se pueden agregar o eliminar de la vista, aquí inicializamos por default las necesarias
 const INITIAL_VISIBLE_COLUMNS = ["meter_id", "num", "record_li"];
 
@@ -216,8 +217,8 @@ export default function Static_6_Q3() {
         <div className="w-screen h-screen bg-oi-bg flex flex-col px-[5vw] overflow-y-auto">
             {modal}
             {confirmationMessage}
-          <span className="font-mulish font-bold pt-5 text-[24px] justify-center">Ensayo de presión estática</span>
-          <span className="font-mulisg font-semibold text-opacity-text ">Sesion iniciada en Julio 24, 2024</span>
+          <span className="font-mulish font-bold pt-5 text-[24px] justify-center">Ensayo de errores de indicación</span>
+          <span className="font-mulisg font-semibold text-opacity-text ">Sesion iniciada en {DateService.getCurrentDate()}</span>
           <div className="w-full h-auto grid grid-cols-4 space-x-2 pt-2">
             <div className="col-span-3 bg-white shadow-lg px-4 flex justify-between rounded-[30px] items-center">
               <span className="font-inter text-center w-full pr-2">Usted se encuentra en la prueba</span>

@@ -17,6 +17,7 @@ import {
   //Componente
 import {columns, DataPrueba} from "../../utils/tests/data"  //"../../utils/tests/data";
 import ModalData from "../shared/ModalData";
+import  DateService  from "../../hook/services/dateService.js"
 import { Navigate } from "react-router-dom";
 
 //Las columnas se pueden agregar o eliminar de la vista, aquí inicializamos por default las necesarias
@@ -245,7 +246,7 @@ export default function MainClient() {
             {modal}
             {confirmationMessage}
           <span className="font-mulish font-bold pt-5 text-[24px] justify-center">Bienvenido a la vista de operario</span>
-          <span className="font-mulisg font-semibold text-opacity-text ">Sesion iniciada en Julio 24, 2024</span>
+          <span className="font-mulisg font-semibold text-opacity-text ">Sesion iniciada en {DateService.getCurrentDate()}</span>
           <div className="w-full h-auto grid grid-cols-4 space-x-2 py-2">
             <div className="col-span-3 bg-white shadow-lg flex flex-col space-x-2 rounded-[20px] items-center py-4">
               <span className="font-inter text-center w-full px-2">Operario</span>

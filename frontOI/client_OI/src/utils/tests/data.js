@@ -65,44 +65,17 @@ const columnsGateways = [
 
 const DataPrueba = [
   {
-    "test_id": "001",
+    "test_id": "OI-PRUEBAS-0001",
     "state": "Pendiente",
     "result": "En progreso",
     "num": "1",
     "record_li": null
   },
   {
-    "test_id": "002",
-    "state": "Completado",
-    "result": "Aprobado",
+    "test_id": "OI-PRUEBAS-0002",
+    "state": "Pendiente",
+    "result": "Pendiente",
     "num": "2",
-    "record_li": null
-  },
-  {
-    "test_id": "003",
-    "state": "Completado",
-    "result": "Rechazado",
-    "num": "3",
-    "record_li": null
-  },
-  {
-    "test_id": "004",
-    "state": "Pendiente",
-    "result": "No iniciado",
-    "num": "4",
-    "record_li": null
-  },
-  {
-    "test_id": "005",
-    "state": "Pendiente",
-    "result": "No iniciado",
-    "num": "5",
-    "record_li": null
-  },  {
-    "test_id": "006",
-    "state": "Pendiente",
-    "result": "No iniciado",
-    "num": "6",
     "record_li": null
   }
 ]

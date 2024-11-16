@@ -132,7 +132,7 @@ export default function Static_4() {
         <div className="w-screen h-screen bg-oi-bg flex flex-col px-[5vw] overflow-y-auto">
             {modal}
             {confirmationMessage}
-          <span className="font-mulish font-bold pt-5 text-[24px] justify-center">Ensayo de presión estática</span>
+          <span className="font-mulish font-bold pt-5 text-[24px] justify-center">Inspección visual</span>
           <span className="font-mulisg font-semibold text-opacity-text ">Sesion iniciada en Julio 24, 2024</span>
           <div className="w-full h-auto grid grid-cols-4 space-x-2 pt-2">
             <div className="col-span-3 bg-white shadow-lg px-7 flex flex-col space-x-2 rounded-[20px] items-center py-4">

@@ -16,6 +16,8 @@ import React from "react";
 import CustomAlert from "../shared/CustomAlert"; //Modal externo para mensages de confirmación
 import ModalData from "../shared/ModalData"; //Modal externo para el manejo de mensages y forms en el popUp
 
+import  DateService  from "../../hook/services/dateService.js"
+
 export default function Static_1() {
 
     //Variables del useDisclosure, este useDisclosure se usa solo para el popUp de datos 
@@ -73,7 +75,7 @@ export default function Static_1() {
         {confirmationMessage} {/*Se ejecuta el modal la primera vez que se reenderiza la vista*/}
           {/*Header*/}
           <span className="font-mulish font-bold pt-5 text-[24px]">Ensayo de presión estática</span>
-          <span className="font-mulisg font-semibold text-opacity-text">Julio 24, 2024</span>
+          <span className="font-mulisg font-semibold text-opacity-text">{DateService.getCurrentDate()}</span>
           <div className="w-full h-auto grid grid-cols-4 space-x-2 py-2">
             <div className="col-span-3 bg-white shadow-lg flex space-x-2 rounded-[20px] items-center">
               <span className="font-inter text-center w-2/3 px-5">Usted está seleccionando el banco No.</span>

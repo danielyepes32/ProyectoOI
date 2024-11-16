@@ -28,6 +28,7 @@ import { GoPencil } from "react-icons/go";
 import CustomAlert from "../shared/CustomAlert";
 import ModalData from "../shared/ModalData";
 import apiService from "../../hook/services/apiService";
+import  DateService  from "../../hook/services/dateService.js"
 //---------------------------------------------------------------
 //Funcionamiento
 import React from "react";
@@ -198,7 +199,7 @@ export default function Static_2_c() {
         <div className="w-screen h-[100svh] bg-oi-bg flex flex-col px-[5vw] overflow-y-auto">
             {modal}
             <span className="font-mulish font-bold pt-5 text-[24px]">Ensayo de presión estática</span>
-            <span className="font-mulisg font-semibold text-opacity-text">Julio 24, 2024</span>
+            <span className="font-mulisg font-semibold text-opacity-text">{DateService.getCurrentDate()}</span>
             <div className="w-full h-auto flex mt-8">
                 <div className="bg-white w-4/6 h-full rounded-[20px] flex flex-col justify-center p-3">
                     <span className="font-inter font-semibold text-opacity-text text-[16px] ml-4">Identificador de prueba</span>

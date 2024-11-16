@@ -23,6 +23,7 @@ import {
     useDisclosure
 } from "@nextui-org/modal";
 import CustomAlert from "../shared/CustomAlert";
+import  DateService  from "../../hook/services/dateService.js"
 import ModalData from "../shared/ModalData";
 
 
@@ -68,7 +69,7 @@ export default function Static_3() {
         <div className="w-screen h-[100svh] bg-oi-bg flex flex-col px-[5vw] overflow-y-auto">
             {modal}
             <span className="font-mulish font-bold pt-5 text-[24px]">Ensayo de presión estática</span>
-            <span className="font-mulisg font-semibold text-opacity-text">Julio 24, 2024</span>
+            <span className="font-mulisg font-semibold text-opacity-text">{DateService.getCurrentDate()}</span>
             <div className="bg-white shadow-sm w-full h-auto rounded-[20px] place-items-center flex flex-col mt-4">
                 <span className="font-mulish font-semibold text-[24px]">Resumen de parámetros</span>
                 <div className="w-5/6 bg-gray-400 h-0.5 mb-2"></div>

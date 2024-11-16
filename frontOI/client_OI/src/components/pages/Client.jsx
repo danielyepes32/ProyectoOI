@@ -25,6 +25,7 @@ import Static_8_Q2 from './Record_Q2/static_8';
 //Importaciones para Q3
 import Static_4_Q3 from './Record_Q3/static_4';
 import Static_5_Q3 from './Record_Q3/static_5';
+import Static_6_5_Q3 from './Record_Q3/static_6_5';
 import Static_6_Q3 from './Record_Q3/static_6';
 import Static_7_Q3 from './Record_Q3/static_7';
 import Static_8_Q3 from './Record_Q3/static_8';
@@ -76,6 +77,7 @@ const Client = () => {
         {/*Rutas para Q3*/}
         <Route path="/Q3/static_4" element={<Static_4_Q3/>}/>
         <Route path="/Q3/static_5" element={<Static_5_Q3/>}/>
+        <Route path="/Q3/static_6_5" element={<Static_6_5_Q3/>}/>
         <Route path="/Q3/static_6" element={<Static_6_Q3/>}/>
         <Route path="/Q3/static_7" element={<Static_7_Q3/>}/>
         <Route path="/Q3/static_8" element={<Static_8_Q3/>}/>
