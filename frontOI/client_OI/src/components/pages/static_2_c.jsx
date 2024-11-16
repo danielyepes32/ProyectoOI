@@ -150,6 +150,7 @@ export default function Static_2_c() {
                 isOpen={isOpen}
                 onOpenChange={onOpenChange}
                 popUpData={popUpData}
+                meters={metersPrueba}
             />
         );
     }, [isOpen]);//Se ejecuta cada que cambia el valor de isOpen

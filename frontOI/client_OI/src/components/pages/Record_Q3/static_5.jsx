@@ -232,6 +232,8 @@ export default function Static_5_Q3() {
               </Button>
             </div>
           </div>
+          {/*
+          //Reparar componente una vez termine la presentación con Marco
           <div>
                 <Button 
                     className="flex justify-between place-items-center bg-custom-blue w-full mt-[3vh]"
@@ -258,6 +260,7 @@ export default function Static_5_Q3() {
                     <span className="font-inter text-[20px] text-center text-white py-2">Cuadro descriptivo</span>
                 </Button>
             </div>
+            */}
           <div className="w-full flex flex-col flex-grow mb-5 h-[300px] bg-white shadow-lg items-center place-items-center mt-5 rounded-[20px]">
             <span className="font-mulish justify-center font-semibold text-[20px] mt-3 text-center">Inspección visual</span>
             <div className="w-5/6 rounded-[20px] bg-custom-blue h-2 mb-2 text-white">'</div>
