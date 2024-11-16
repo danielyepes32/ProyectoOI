@@ -78,11 +78,7 @@ export default function Static_6_5() {
       message={customMessage}
       isVisible={isOpenCustomMessage}
       setIsVisible={setIsOpenCustomMessage}
-      routeRedirect={null} // No redirige automáticamente
-      handleConfirm={() => {
-        setIsOpenCustomMessage(false);
-        navigate("/client/Q3/static_7"); // Redirige al componente Static_7
-      }}
+      routeRedirect={"/client/Q3/static_7"} // No redirige automáticamente
     />
   ) : null;
 
@@ -173,11 +169,11 @@ export default function Static_6_5() {
       </div>
 
       {/* Botón Confirmar */}
-      <div className="flex justify-end mt-5">
+      <div className="flex justify-start mt-5">
         <Button
           disabled={!canProceed}
           className={`${
-            canProceed ? "bg-blue-500" : "bg-gray-300 cursor-not-allowed"
+            canProceed ? "bg-custom-blue" : "bg-gray-300 cursor-not-allowed"
           } text-white font-bold px-5 py-2 rounded-md text-sm md:text-base`}
           onClick={handleConfirm}
         >

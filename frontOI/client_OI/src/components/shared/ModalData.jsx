@@ -82,7 +82,9 @@ export default function ModalData(
                         )
                     }else if(popUpData === 'meter_c'){
                         return(
-                            <Meter_c/>
+                            <Meter_c
+                                meters={meters}
+                            />
                         )
                     }else if(popUpData === 'order'){
                         return(
