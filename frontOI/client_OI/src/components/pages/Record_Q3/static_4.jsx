@@ -171,6 +171,7 @@ export default function Static_4_Q3() {
     console.log(meters)
 
     const handleConfirm = () => {
+      console.log("Entra")
       // Actualizar todos los medidores con el valor de `visualInspection` correspondiente
       setMeters((prevMeters) =>
         prevMeters.map((meter) => ({
