@@ -52,8 +52,16 @@ export default function TableVisualInspection(
         return meters.map((item) => (
           <TableRow
               key={item.meter_id}
-              className={`${selectedKeys.has(item.meter_id) ? item.result === 'No apto' || item.obs === 'No conforme' ? 'bg-red-100' : 'bg-blue-100': item.result === 'No apto' ? 'bg-red-100' : ''}`}
-          >
+              className={`${
+                selectedKeys.has(item.meter_id)
+                  ? item.result === "No apto" || item.obs === "No conforme"
+                    ? "bg-red-100"
+                    : "bg-blue-100"
+                  : item.result === "No apto"
+                  ? "bg-red-100"
+                  : ""
+              }`}          
+            >
             {(columnKey) => 
             <TableCell>
                 {renderCell(
