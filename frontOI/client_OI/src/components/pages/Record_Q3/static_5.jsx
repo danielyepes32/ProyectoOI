@@ -6,8 +6,6 @@ import {
 import React, { useState } from "react";
 import CustomAlert from "../../shared/CustomAlert";
 import {meterColumns, meterDataTest} from "../../../utils/tests/data"  //"../../utils/tests/data";
-import { MdOutlineWbIncandescent } from "react-icons/md";
-import { TbTableShortcut } from "react-icons/tb";
 import ModalData from "../../shared/ModalData";
 import TableVisualInspection from "../../visual_inspection/TableVisualInspection";
 import { useNavigate } from "react-router-dom";
@@ -281,7 +279,7 @@ export default function Static_5_Q3() {
             <Button
               className="mt-2 "
               onClick={()=>{
-                navigate("/client/static_4")
+                navigate("/client/Q3/static_4")
                 //setIsOpenCustomMessage(true)
                 //setIsChanged(!isChanged)
               }}
