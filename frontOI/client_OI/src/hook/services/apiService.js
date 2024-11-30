@@ -1,6 +1,10 @@
 import axios from 'axios';
+<<<<<<< HEAD
 const baseUrl = 'https://2647-181-60-112-158.ngrok-free.app/api/';
 
+=======
+const baseUrl = 'http://127.0.0.1:8000/api/';
+>>>>>>> 2715ba456aeb7851e0637fd625bc60183e215381
 //servicio para hacerle get a los valores de los medidores
 const getOrdenes = async (params) => {
   try {
