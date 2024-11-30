@@ -85,8 +85,8 @@ export default function static_7_Q3() {
           meter.meter_id === key
             ? {
                 ...meter,
-                q3: {
-                  ...meter.q3, // Copia el objeto q3 existente
+                q1: {
+                  ...meter.q1, // Copia el objeto q3 existente
                   record_lf: Number(newValue), // Actualiza solo record_li
                 },
               }

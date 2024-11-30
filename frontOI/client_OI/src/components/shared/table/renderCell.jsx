@@ -193,7 +193,7 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
 
     case "record_lf":
       const pointerRecordlf = meters.find(item => item.meter_id === user.meter_id);
-      const selectedQlf = Q || "q2"; // Define selectedQlf antes de usarlo
+      const selectedQlf = Q || "q1"; // Define selectedQlf antes de usarlo
 
       return (
         <Input
