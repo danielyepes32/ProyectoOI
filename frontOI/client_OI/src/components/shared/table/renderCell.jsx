@@ -157,7 +157,7 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
           value={
             pointerMeter?.[selectedQ]?.record_li === 0
               ? ""
-              : pointerMeter?.[selectedQ]?.record_li
+              : pointerMeter?.[selectedQ]?.record_l5i
           }
           variant="underlined"
           type="number"
