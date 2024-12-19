@@ -78,11 +78,7 @@ export default function Static_6_5() {
       message={customMessage}
       isVisible={isOpenCustomMessage}
       setIsVisible={setIsOpenCustomMessage}
-      routeRedirect={null} // No redirige automáticamente
-      handleConfirm={() => {
-        setIsOpenCustomMessage(false);
-        navigate("/client/Q1/static_7"); // Redirige al componente Static_7
-      }}
+      routeRedirect={"/client/Q1/static_7"} // No redirige automáticamente
     />
   ) : null;
 

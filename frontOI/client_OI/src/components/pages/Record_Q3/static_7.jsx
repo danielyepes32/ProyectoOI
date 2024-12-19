@@ -51,8 +51,11 @@ export default function static_7_Q3() {
       
       const response = await apiService.getMedidoresPrueba();
       // Suponiendo que setPruebas es un setter de un estado que contiene un array
-      setMeters(response)  
-      setMetersLength(response.length);
+      const filtrados = response.filter(item => item.result !== "No apto" && item.obs !== "No conforme");
+
+      // Suponiendo que setPruebas es un setter de un estado que contiene un array
+      setMeters(filtrados)  
+      setMetersLength(filtrados.length);
           //usamos el componente "count" de la consulta para establecer el tamaño de los registros
       } catch (error) {
           //En caso de error en el llamado a la API se ejecuta un console.error

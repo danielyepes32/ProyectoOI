@@ -41,33 +41,41 @@ export default function TableVisualInspection(
             // last
             "group-data-[last=true]:first:before:rounded-none",
             "group-data-[last=true]:last:before:rounded-none",
-            //"group-data-[selected=true]:before:bg-default/0" //Eliminar color del bg de la fila seleccionada
+            "group-data-[selected=true]:before:bg-default/0" //Eliminar color del bg de la fila seleccionada
         ]
         }),
         [],
     );
 
     const tableRow = React.useMemo(() => {
+
         return meters.map((item) => (
           <TableRow
               key={item.meter_id}
-              //className={isChanged && item.test_id === '001' ? 'data-[selected=true]:bg-green-600 transition-colors duration-500' : 'transition-colors duration-500'}
-          >
+              className={`${
+                selectedKeys.has(item.meter_id)
+                  ? item.result === "No apto" || item.obs === "No conforme"
+                    ? "bg-red-100"
+                    : "bg-blue-100"
+                  : item.result === "No apto"
+                  ? "bg-red-100"
+                  : ""
+              }`}          
+            >
             {(columnKey) => 
-            <TableCell
-                >
-                    {renderCell(
-                        item, // Asegúrate de pasar el item correctamente
-                        columnKey, // Pasa columnKey directamente
-                        null, // Añade setSelectedMeter si es necesario en renderCell
-                        null, // Añade setActionKey si es necesario
-                        null,
-                        visualInspection,
-                        updateResult,
-                        updateValue,
-                        addKey
-
-                         )}</TableCell>}
+            <TableCell>
+                {renderCell(
+                    item, // Asegúrate de pasar el item correctamente
+                    columnKey, // Pasa columnKey directamente
+                    null, // Añade setSelectedMeter si es necesario en renderCell
+                    null, // Añade setActionKey si es necesario
+                    null,
+                    visualInspection,
+                    updateResult,
+                    updateValue,
+                    addKey
+                )}
+            </TableCell>}
         </TableRow>
         ));
       }, [meters, headerColumns, visualInspection])

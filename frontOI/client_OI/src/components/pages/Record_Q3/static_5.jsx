@@ -6,8 +6,6 @@ import {
 import React, { useState } from "react";
 import CustomAlert from "../../shared/CustomAlert";
 import {meterColumns, meterDataTest} from "../../../utils/tests/data"  //"../../utils/tests/data";
-import { MdOutlineWbIncandescent } from "react-icons/md";
-import { TbTableShortcut } from "react-icons/tb";
 import ModalData from "../../shared/ModalData";
 import TableVisualInspection from "../../visual_inspection/TableVisualInspection";
 import { useNavigate } from "react-router-dom";
@@ -141,8 +139,10 @@ export default function Static_5_Q3() {
       if(confirm){
         const handleUpdateMeter = async () => {
           try {
-            const updates = meters[0];  // Aquí defines el campo que quieres actualizar
-            const response = await apiService.updateMetersPrueba(meters[0].meter_id, updates);  // Llamada a la función updateMeter
+            meters.map(async (item) => {
+              const response = await apiService.updateMetersPrueba(item.meter_id, item);  // Llamada a la función updateMeter
+              console.log('Meter updated:', response);
+            })
             console.log('Meter updated:', response);  
           } catch (error) {
             console.error(error); 
@@ -281,7 +281,7 @@ export default function Static_5_Q3() {
             <Button
               className="mt-2 "
               onClick={()=>{
-                navigate("/client/static_4")
+                navigate("/client/Q3/static_4")
                 //setIsOpenCustomMessage(true)
                 //setIsChanged(!isChanged)
               }}
