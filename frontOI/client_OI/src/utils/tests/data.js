@@ -1,5 +1,5 @@
 const columns = [
-  {name: "ID PRUEBA", uid: "test_id", sortable: true},
+  {name: "ID ORDEN", uid: "test_id", sortable: true},
   {name: "ESTADO", uid: "state", sortable: true},
   {name: "CONCLUSION", uid: "result", sortable: true},
 ];

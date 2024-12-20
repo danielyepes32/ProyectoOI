@@ -1,142 +1,83 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useForm } from "../../hook/useForm"
+import { loginUser } from '../../hook/services/apiService'; // Importa el servicio
 
 function Login() {
-    const [username, setUsername] = useState('');
-    const [contra, setPassword] = useState('');
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const navigate = useNavigate();
-    localStorage.setItem('isAuthenticated', 'false');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
 
-    const {name, email, password, onInputChange, onResetForm} = useForm ({
-        name : '',
-        email: '',
-        password: '',
-    })
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setErrorMessage(''); // Limpiar errores previos
 
-    const handleLogin = (e) => {
-        e.preventDefault();
-        // Aquí deberías hacer una llamada al servidor para verificar las credenciales
-        // Para el ejemplo, usaremos credenciales de prueba:
-        if (username === 'user@example.com' && contra === 'password123') {
-            setIsAuthenticated(true);
-            localStorage.setItem('isAuthenticated', 'true');
-            navigate('/client/'); // Redirigir al usuario a la página /admin
-        } else {
-            alert('Credenciales inválidas');
-        }
-    };
+    try {
+      // Llamar al servicio de autenticación
+      const credentials = { username, password };
+      const data = await loginUser(credentials);
 
-    return (
-        <div className="relative flex flex-col md:flex-row space-y-8 md:space-y-0 bg-white rounded-2xl">
-            {/* left side */}
-            <div className="flex flex-col justify-center lg:mx-20 p-8 md:p-14 w-full lg:w-1/2 md:w-full">
-                <div className="mb-auto">
-                    <NavLink 
-                        to="/"
-                        className="text-custom-blue font-bold text-30px"
-                        >
-                            Medileser
-                    </NavLink>
-                </div>
-                <div className="mb-auto py-8 md:py-14">
-                    <p className="font-open-sans font-bold text-36 text-custom-blue">Bienvenido al sistema de monitoreo</p>
-                    <p className="font-light text-gray-400 mb-8">
-                        Bienvenido de vuelta, por favor ingrese sus datos
-                    </p>
-                    <form onSubmit={handleLogin}>
-                        <div 
-                            className="border p-1 w-full overflow-hidden 
-                                transition-colors 
-                                border-transparent 
-                                hover:border-l-4
-                                hover:border-custom-blue
-                                hover:shadow-lg
-                                hover:transform
-                                hover:scale-101
-                                hover:transition-transform
-                                border-gray-200"
-                            >
-                            <p className="text-xs font-roboto text-black">Cuenta de usuario</p>
-                            <input
-                                type="text"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                className="text-xs font-medium text-custom-blue focus:outline-none w-full"
-                                placeholder="**********"
-                            />
-                        </div>
-                        <div 
-                            className="border p-1 w-full overflow-hidden 
-                                transition-colors 
-                                border-transparent 
-                                hover:border-l-4
-                                hover:border-custom-blue
-                                hover:shadow-lg
-                                hover:transform
-                                hover:scale-101
-                                hover:transition-transform
-                                border-gray-200"
-                            >
-                            <p className="text-xs font-roboto text-black">Contraseña</p>
-                            <input
-                                type="password"
-                                value={contra}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="text-xs font-medium text-custom-blue focus:outline-none w-full"
-                                placeholder="**********"
-                            />
-                        </div>
-                        <div className="py-4">
-                            <button
-                                type="submit"
-                                className="w-full bg-custom-blue text-white p-2 mb-6 hover:bg-white hover:text-black hover:border hover:border-gray-300"
-                            >
-                                Entrar
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            {/* right side */}
-            <div className={`flex justify-end p-10 md:p-14 md:h-screen bg-custom-gray w-1/2 md:w-1/2 flex-shrink-0 hidden md:block`}>
-                <div className="relative lg:mx-10">
-                    <div className="absolute top-0 right-0 space-x-8">
-                        <NavLink 
-                            to="/" 
-                            className={`text-black font-regular text-24px py-3 relative overflow-hidden transition-colors border-b-4 border-transparent hover:border-custom-blue`}
-                            >
-                            Login
-                        </NavLink>
-                        <NavLink
-                            to="https://www.medileser.com.pe/"
-                            className={`text-black font-regular text-24px py-3 relative overflow-hidden transition-colors border-b-4 border-transparent hover:border-custom-blue`}
-                            >
-                            Acerca De
-                        </NavLink>
-                        <NavLink
-                            to="/"
-                            className={`text-black font-regular text-24px py-3 relative overflow-hidden transition-colors border-b-4 border-transparent hover:border-custom-blue`}
-                            >
-                            Notas Version
-                        </NavLink>
-                    </div>
-                    <img
-                        src="engineer_smart.svg"
-                        alt="img"
-                        className="mb-auto md:h-screen py-20 md:py-30"
-                    />
-                </div>
-                {/* text on image */}
-                <div
-                    className="absolute bottom-10 right-6 p-6 bg-white bg-opacity-30 backdrop-blur-sm rounded drop-shadow-lg hidden md:block"
-                >
-                    {/* Contenido del texto sobre la imagen */}
-                </div>
-            </div>
+      // Guardar datos en localStorage
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('refreshToken', data.refreshToken);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('roles', JSON.stringify(data.roles));
+
+      // Redirigir según rol
+      navigate('/client');
+    } catch (error) {
+      // Manejo de errores
+      setErrorMessage(error.detail || 'Credenciales inválidas. Intente de nuevo.');
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="bg-white rounded-lg p-8 w-full max-w-md">
+        <div className='flex min-w-full justify-center mb-2'>
+        <img src='public/logo_medileser.png' alt='Logo_Medileser' style={{height:'8rem'}}/>
         </div>
-    );
+        <p className="text-gray-500 text-center mb-8">
+          Bienvenido, ingrese sus credenciales
+        </p>
+        {errorMessage && (
+          <p className="text-red-500 text-sm mb-4 text-center">Error al autenticarse</p>
+        )}
+        <form onSubmit={handleLogin}>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Usuario
+            </label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-custom-blue"
+              placeholder="Ingrese su usuario"
+            />
+          </div>
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Contraseña
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-custom-blue"
+              placeholder="Ingrese su contraseña"
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-custom-blue text-white py-2 rounded-lg hover:bg-blue-600 transition duration-200"
+          >
+            Ingresar
+          </button>
+        </form>
+      </div>
+    </div>
+  );
 }
 
 export default Login;

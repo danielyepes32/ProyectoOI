@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Cookies from 'js-cookie';
 const baseUrl = 'http://localhost:8000/api/';
 
 // Configuracion comun para las solicitudes para los headers y la informacion por fuera del payload
@@ -26,7 +27,8 @@ export const getAll = async (endpoint, params = {}) => {
 // Servicio general para obtener datos por id para todas las estructuras de datos
 export const getByKey = async (endpoint, key) => {
   try {
-    const response = await axiosInstance.get(`${endpoint}/${key}`)
+    const response = await axiosInstance.get(`${endpoint}/${key}/`)
+    return response.data;
   } catch (error) {
     console.error('Error ocurrido en Get by key: ', error)
     throw error.response ? error.response.data : 'Network Error';
@@ -45,11 +47,11 @@ export const create = async (endpoint, data) => {
 };
 
 // Servicio general para actualizar registros
-export const updateData = async (endpoint, data, method = 'PUT') => {
+export const updateData = async (endpoint, key, data, method = 'PUT') => {
   try {
     const response = await axiosInstance({
       method: method.toUpperCase(),
-      url: endpoint,
+      url: `${endpoint}/${key}`,
       data,
     });
     return response.data;
@@ -120,8 +122,6 @@ export const updateMetersPrueba = async (meterId, updates) => {
   }
 };
 
-
-
 // Servicio para crear una nueva incidencia
 export const postMeters = async (data) => {
   try {
@@ -137,7 +137,31 @@ export const postMeters = async (data) => {
   }
 };
 
+// Servicio para el login del usuario
+export const loginUser = async (credentials) => {
+  try {
+    const response = await axiosInstance.post('usuarios/api/token/', credentials);
+    
+    // Guardar en cookies con opciones seguras
+    Cookies.set('token', response.data.access, { expires: 1, secure: true, sameSite: 'Strict' });
+    Cookies.set('refreshToken', response.data.refresh, { expires: 7, secure: true, sameSite: 'Strict' });
+    Cookies.set('user', JSON.stringify({ id: response.data.id, name: response.data.name, lastName: response.data.lastname, email: response.data.email }), { expires: 1, secure: true, sameSite: 'Strict' });
+
+    return {
+      token: response.data.access,
+      refreshToken: response.data.refresh,
+      user: { id: response.data.id, name: response.data.name, lastName: response.data.lastname, email: response.data.email },
+      roles: [response.data.rol],
+    };
+  } catch (error) {
+    console.error('Error during login:', error);
+    throw error.response ? error.response.data : 'Network Error';
+  }
+};
+
+
 export default {
+  loginUser,
   getAll,
   getByKey,
   create,

@@ -54,7 +54,7 @@ const Client = () => {
   //const [sidebar, setSidebar] = React.useState(false);
 
   return isAuthenticated ? (
-    <div className="min-h-screen flex grid grid-cols-1 lg:grid-cols-7">
+    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-7">
       {/* Sidebar */}
         <Menu sidebar={sidebar} handleSidebar={handleSidebar} />
       {/* Contenido principal */}
