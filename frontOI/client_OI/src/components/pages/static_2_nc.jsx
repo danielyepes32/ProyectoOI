@@ -18,23 +18,30 @@ import {
 import {  
     useDisclosure
 } from "@nextui-org/modal"; //Use disclosure para el manejo del Modal de selección de datos
+import apiService from "../../hook/services/apiService";
 //-------------------------------------------------------------------------------------
 //Elementos externos
 //--------------------------------------------------------------------------------------
 //Para el componente table, hay que definir las columnas totales y los datos o elementos a desplegar
-import {columns, DataPrueba} from "../../utils/tests/data"  //"../../utils/tests/data";
+import {DataPrueba} from "../../utils/tests/data"  //"../../utils/tests/data";
 //Modal para el mensaje de confirmación
 import CustomAlert from "../shared/CustomAlert";
 //Modal para el despliegue de la tabla de selección de medidores
 import ModalData from "../shared/ModalData";
 
 //Esta variable global guarda la selección de columnas que quieres desplegar en cada vista, esto permite delimitar enm reenderizado de variables en el componente table
-const INITIAL_VISIBLE_COLUMNS = ["test_id"];
+const INITIAL_VISIBLE_COLUMNS = ["meter_id"];
+
+const columns = [
+    {name: "ID MEDIDOR", uid: "meter_id", sortable: true},
+    {name: "ESTADO", uid: "state", sortable: true},
+    {name: "CONCLUSION", uid: "result", sortable: true},
+  ];
 
 export default function Static_2_nc() {
 
     //Variable, de tipo set que guarda el valor seleccionado en el dropdown de las ordenes
-    const [selectedKeys, setSelectedKeys] = React.useState(new Set(["text"]));
+    const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
     //Esta variable guarda los identificadortes de los medidores seleccionados en el modal de selección, de tipo set evitando duplicados
     const [selectedMeterKeys, setSelectedMeterKeys] = React.useState(new Set());
     //Variable para abrir el modal de selección de medidores
@@ -58,15 +65,16 @@ export default function Static_2_nc() {
     const loadingState = isLoading === true & metersLength === 0 ? "loading" : "idle";
     //Variable para específicar que datos se quieren mostrar en el modal
     const [popUpData, setPopUpData] = React.useState(null)
+    //Variable que define las pruebas provenientes de la api
+    const[pruebas, setPruebas] = React.useState([])
+    //Variable que define los medidores provenientes de la prueba
+    const[metersPrueba, setMetersPrueba] = React.useState([])
+    //Variable que define los medidores provenientes de la prueba
+    const [updatedPruebas, setUpdatedPruebas] = React.useState([]);
 
     //---------------------------------------------------------------------------------------------------------------------------
     //Aquí se encuentran las funciones usadas en el componente static_2_nc que tienen cambios de reenderizado y caché
     //---------------------------------------------------------------------------------------------------------------------------
-    //Función que agrupa y formatea los campos que se seleccionen en el dropdownBox
-    const selectedValue = React.useMemo(
-      () => Array.from(selectedKeys).join(", ").replaceAll("_", " "),
-      [selectedKeys]
-    );
     //Esta función se usa para calcular las columnas que se etsablecen como visibles en el componente table
     const headerColumns = React.useMemo(() => {
 
@@ -74,6 +82,129 @@ export default function Static_2_nc() {
 
         return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
     }, [visibleColumns]);//Se ejecuta cada que hay un cambio en la constante vsisibleColumns
+
+    // Objeto combinado que se actualiza cuando cambian `selectedKeys` o `selectedMeterKeys
+    // Actualización de la prueba con los medidores seleccionados
+
+    React.useMemo(() => {
+        setUpdatedPruebas(pruebas);
+    }, [pruebas]);
+
+    React.useMemo(() => {
+        
+        console.log("Tamaño de selectedMeterKeys: ", selectedMeterKeys.size);
+        const newUpdatedPruebas = updatedPruebas.map((prueba) =>
+                selectedKeys.has(prueba.identificador)
+                    ? { 
+                        ...prueba, 
+                        medidores: [...(prueba.medidores || []), selectedMeterKeys] 
+                      }
+                    : prueba
+            );
+    
+        setUpdatedPruebas(newUpdatedPruebas);
+    }, [selectedMeterKeys]);
+    
+
+    const medidoresCount = React.useMemo(() => {
+        const prueba = updatedPruebas ? updatedPruebas.find(prueba => selectedKeys.has(prueba.identificador)) : null;
+        return prueba && prueba.medidores ? prueba.medidores.length : 0;
+    }, [selectedKeys, selectedMeterKeys, updatedPruebas]);
+
+    React.useMemo(() => {
+        const prueba = updatedPruebas ? updatedPruebas.find(prueba => selectedKeys.has(prueba.identificador)) : null;
+        console.log("Respuesta Memo: ", prueba)
+    },[selectedKeys])
+    
+    
+
+    console.log("Combined: ", updatedPruebas)
+    //----------------------------------------------------------------------------------------------
+    //Funciones que requieren un manejo de reenderizado y manejo de caché
+    //------------------------------------------------------------------------------------------------
+
+    //Función para obtener los gateways del autocomplete
+    React.useEffect(() => {
+  
+        //Al estar ejecutando el fetch activamos el loading de la data
+            //setIsLoading(true);
+            const fetchOrders = async () => {
+            try {
+            //inizializamos los parametros de consultas a la API de consumo
+            //console.log("No ha salido")
+            //const params = {
+               // q: filterValue,
+                //page:1,
+                //page_size : 10
+            //};
+            
+            const response = await apiService.getOrdenes();
+            // Suponiendo que setPruebas es un setter de un estado que contiene un array
+            setPruebas(response);
+                //usamos el componente "count" de la consulta para establecer el tamaño de los registros
+            } catch (error) {
+                //En caso de error en el llamado a la API se ejecuta un console.error
+                console.error('Error fetching initial meters:', error);
+            } finally {
+                //al finalizar independientemente de haber encontrado o no datos se detiene el circulo de cargue de datos
+                //console.log("salio");
+            }
+            }
+    
+            fetchOrders();
+          }, []);
+    
+        React.useEffect(() => {
+    
+        //Al estar ejecutando el fetch activamos el loading de la data
+            //setIsLoading(true);
+            const fetchMetersPrueba = async () => {
+            try {
+            
+            const response = await apiService.getMedidoresPrueba();
+            // Suponiendo que setPruebas es un setter de un estado que contiene un array
+            setMetersPrueba(response)
+            setMetersLength(response.length);
+                //usamos el componente "count" de la consulta para establecer el tamaño de los registros
+            } catch (error) {
+                //En caso de error en el llamado a la API se ejecuta un console.error
+                console.error('Error fetching initial meters:', error);
+            } finally {
+                //al finalizar independientemente de haber encontrado o no datos se detiene el circulo de cargue de datos
+                //console.log("salio");
+            }
+            }
+    
+            fetchMetersPrueba();
+            }, []);
+    
+    
+        //Se agrupan y formatean los datos seleccionados en el dropdownBox
+        const selectedValue = React.useMemo(
+          () => Array.from(selectedKeys).join(", ").replaceAll("_", " "),
+          [selectedKeys]
+        );
+    
+        // Función para calcular los IDs de las pruebas
+        {/*Agregar esta función después para generar los IDs de prueba de una orden*/}
+        {/*
+        const generateTestIds = () => {
+            const testsCount = Math.ceil(metersLength / maxCapacity); // Redondeo hacia arriba
+    
+            // Generamos el identificador con tantos '-000n' como pruebas necesarias
+            const ids = Array.from({ length: testsCount }, (_, index) => 
+            `${ordenID}-000${index + 1}`
+            );
+    
+            return ids;
+        };
+        */}
+        // useEffect para ejecutar generateTestIds solo al cargar la vista
+        React.useMemo(() => {
+            //const ids = generateTestIds();
+            //setPruebas(ids); // Almacena los IDs en el estad
+            pruebas.length > 0 ? setSelectedKeys(new Set([pruebas[0].identificador])) : null
+        }, [pruebas]); // Arreglo de dependencias vacío
 
     //Componente externo Modal para mostrar los datos del componente Table
     const modal = React.useMemo(() => {
@@ -87,7 +218,7 @@ export default function Static_2_nc() {
                 setSelectedMeterKeys={setSelectedMeterKeys}
                 setSortDescriptor={setSortDescriptor}
                 headerColumns={headerColumns}
-                meters={meters}
+                meters={metersPrueba}
                 loadingState={loadingState}
             />
         );
@@ -101,6 +232,7 @@ export default function Static_2_nc() {
         ) : null
       }, [isOpenCustomMessage]);
 
+    console.log("Pruebas: ", pruebas)
     return(
         <>
         {confirmationMessage}
@@ -132,11 +264,11 @@ export default function Static_2_nc() {
                             selectedKeys={selectedKeys}
                             onSelectionChange={setSelectedKeys}
                         >
-                            <DropdownItem key="text">Text</DropdownItem>
-                            <DropdownItem key="number">Number</DropdownItem>
-                            <DropdownItem key="date">Date</DropdownItem>
-                            <DropdownItem key="single_date">Single Date</DropdownItem>
-                            <DropdownItem key="iteration">Iteration</DropdownItem>
+                        {pruebas.length > 0 ? pruebas.map((prueba, index) => (
+                            <DropdownItem key={prueba.identificador} textValue={`Prueba: ${prueba.identificador}`}>
+                                Prueba: {prueba.identificador}
+                            </DropdownItem>
+                        )) : null}
                         </DropdownMenu>
                     </Dropdown>
                 </div>
@@ -149,7 +281,7 @@ export default function Static_2_nc() {
                 disableAnimation={true}
                 className="flex justify-center place-items-center bg-custom-blue w-full my-[3vh] h-auto py-3"
                 >
-                <span className="font-inter text-[15px] text-center text-white">Medidores disponibles en orden (350ud)</span>
+                <span className="font-inter text-[15px] text-center text-white">Medidores disponibles en orden ({metersLength}uds)</span>
             </Button>
             <div className="bg-white shadow-sm w-full h-auto rounded-[20px] place-items-center flex flex-col">
                 <span className="font-mulish font-semibold text-[24px]">Selección a evaluar</span>
@@ -161,7 +293,7 @@ export default function Static_2_nc() {
                 <div className="w-5/6 flex justify-between place-items-center h-auto">
                     <div className="ml-3 bg-white w-[45%] h-auto rounded-[20px] flex flex-col place-items-center">
                         <span className="font-inter font-semibold text-opacity-text text-center text-[16px] mt-3">Medidores seleccionados</span>
-                        <span className="font-teko font-semibold text-[40px]">6</span>
+                        <span className="font-teko font-semibold text-[40px]">{medidoresCount}</span>
                     </div>
                     <div className="ml-3 bg-white w-[45%] h-auto rounded-[20px] flex flex-col place-items-center">
                         <span className="font-inter font-semibold text-center text-opacity-text text-[16px] mt-3">Modificar selección</span>
