@@ -119,7 +119,7 @@ export default function Meter_nc(
                     //console.log("Datos de consulta", item),
                     <TableRow 
                         className=""
-                        key={item.test_id}
+                        key={item.meter_id}
                         >
                         {(columnKey) => 
                         <TableCell
