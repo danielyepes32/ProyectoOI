@@ -25,7 +25,9 @@ export default function ModalData(
         setSortDescriptor,
         headerColumns,
         meters,
-        loadingState
+        loadingState,
+        selectedKeys,
+        pruebas
     }
     ) {
 
@@ -94,6 +96,8 @@ export default function ModalData(
                                 headerColumns = {headerColumns}
                                 meters = {meters}
                                 loadingState = {loadingState}
+                                selectedKeys={selectedKeys}
+                                pruebas={pruebas}
                             />
                         )
                     }else if(popUpData === 'meter_c'){

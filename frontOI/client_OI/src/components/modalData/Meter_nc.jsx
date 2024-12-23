@@ -22,7 +22,9 @@ export default function Meter_nc(
         headerColumns,
         meters,
         loadingState,
-        selectedMeterKeys
+        selectedMeterKeys,
+        selectedKeys,
+        pruebas,
     }
     ){
 
@@ -31,7 +33,7 @@ export default function Meter_nc(
         () => ({
             wrapper: ["w-full", "h-full flex justify-left items-center"],
             table:["h-full justify-start align-start text-left"],
-            th: ["bg-oi-bg px-1 py-5 h-full", "text-default-500", "", "border-divider","text-center"],
+            th: ["px-1 py-5 h-full", "text-default-500", "", "border-divider","text-center"],
             td: [ 
                 //Agregar las celdas en la mitad del componente
                 "align-middle text-center px-2",
@@ -44,8 +46,39 @@ export default function Meter_nc(
                 // last
                 "group-data-[last=true]:first:before:rounded-none",
                 "group-data-[last=true]:last:before:rounded-none",
+                // Estilo condicional para filas seleccionadas
                 ],
         }),[]);
+
+        const isDisabled = (item) => {
+            // Encuentra la prueba seleccionada.
+            const pruebaSeleccionada = pruebas.find((prueba) => selectedKeys.has(prueba.nombre));
+        
+            // Filtra las demás pruebas, excluyendo la seleccionada.
+            const otrasPruebas = pruebas.filter((prueba) => prueba !== pruebaSeleccionada);
+        
+            // Verifica si `item.numero_serie` coincide con alguno de los medidores de las otras pruebas.
+            return otrasPruebas.some((prueba) =>
+                prueba.medidores?.some((medidor) => medidor.meter_id === item.numero_serie)
+            );
+        };
+
+    const tableRow = React.useMemo(() => {
+
+        return meters.map((item) => (
+            <TableRow 
+                className={`${isDisabled(item) ? "pointer-events-none opacity-40" : ""}`}
+                key={item.numero_serie}
+                >
+                {(columnKey) => 
+                <TableCell
+                    className=''
+                    >
+                        {renderCell(item, columnKey)}</TableCell>}
+            </TableRow>
+        ));
+      }, [meters, headerColumns, selectedMeterKeys, pruebas, selectedKeys])
+
 
     return(
         <div className="mt-5">
@@ -82,7 +115,11 @@ export default function Meter_nc(
                 sortDescriptor={sortDescriptor}
                 //topContent={topContent}
                 //topContentPlacement="outside"
-                onSelectionChange={setSelectedMeterKeys}
+                onSelectionChange={(keys) => {
+                    if (keys.size <= 4) {
+                        setSelectedMeterKeys(keys);
+                    }
+                }}                
                 onSortChange={setSortDescriptor}
                 >
                 {/*{column.uid === "actions" ? "end" : "end"}*/}
@@ -115,19 +152,7 @@ export default function Meter_nc(
                     loadingState={loadingState}
                     isLoading={false} //isLoading
                     >
-                    {(item) => (
-                    //console.log("Datos de consulta", item),
-                    <TableRow 
-                        className=""
-                        key={item.numero_serie}
-                        >
-                        {(columnKey) => 
-                        <TableCell
-                            className=''
-                            >
-                                {renderCell(item, columnKey)}</TableCell>}
-                    </TableRow>
-                    )}
+                    {tableRow}
                 </TableBody>
             </Table>
         </div>
