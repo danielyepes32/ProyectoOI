@@ -122,7 +122,7 @@ export default function Static_10() {
               <span className="font-inter text-center w-full pr-2">Usted se encuentra en la prueba</span>
               <span className="font-teko text-[48px] font-semibold w-auto text-right">Q3</span>
             </div>
-            <div className="col-span-1 w-full flex justify-center place-items-center flex">
+            <div className="col-span-1 w-full justify-center place-items-center flex">
               <Button
                 className="w-[50px] h-[50px] bg-custom-blue p-2 rounded-xl shadow-lg items-center"
                 onClick={

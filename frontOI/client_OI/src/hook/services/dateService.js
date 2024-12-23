@@ -13,7 +13,7 @@ class DateService {
                 const month = monthNames[now.getMonth()]
                 return `${now.getDate().toString().padStart(2, '0')} de ${month}, ${now.getFullYear()}`;
             case 'YYYY-MM-DD':
-                return `${now.getFullYear()}-${now.getMonth().toString().padStart(2, '0')-now.getDate().toString().padStart(2, '0')}`;
+                return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
             case 'MM/DD/YYYY':
                 return `${now.getMonth().toString().padStart(2, '0')} / ${now.getDate().padStart(2, '0')} / ${now.getFullYear()}`
             default:

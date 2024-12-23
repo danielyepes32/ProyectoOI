@@ -33,6 +33,8 @@ import  DateService  from "../../hook/services/dateService.js"
 //Funcionamiento
 import React from "react";
 
+
+
 export default function Static_2_c() {
 
     //Variable para guardar los identificadores seleccionados en el dropdown
@@ -45,16 +47,11 @@ export default function Static_2_c() {
     const [customMessage, setCustomMessage] = React.useState(null);
     //Variable para seleccionar que informaciuón se va a mostrar en el modal
     const [popUpData, setPopUpData] = React.useState(null)
-
-    const[maxCapacity, setMaxCapacity] = React.useState(10)
-
     const[metersPrueba, setMetersPrueba] = React.useState([])
-
     const[metersLength, setMetersLength] = React.useState(null)
-
     const[ordenID, setOrdenID] = React.useState(null)
-
     const[pruebas, setPruebas] = React.useState([])
+    const [capacity, setCapacity] = React.useState(0)
 
     //----------------------------------------------------------------------------------------------
     //Funciones que requieren un manejo de reenderizado y manejo de caché
@@ -62,54 +59,54 @@ export default function Static_2_c() {
 
     //Función para obtener los gateways del autocomplete
     React.useEffect(() => {
-  
-    //Al estar ejecutando el fetch activamos el loading de la data
-        //setIsLoading(true);
-        const fetchOrders = async () => {
-        try {
-        //inizializamos los parametros de consultas a la API de consumo
-        //console.log("No ha salido")
-        //const params = {
-           // q: filterValue,
-            //page:1,
-            //page_size : 10
-        //};
-        
-        const response = await apiService.getOrdenes();
-        // Suponiendo que setPruebas es un setter de un estado que contiene un array
-        setPruebas(prevState => [response[0].identificador]);
-            //usamos el componente "count" de la consulta para establecer el tamaño de los registros
-        } catch (error) {
-            //En caso de error en el llamado a la API se ejecuta un console.error
-            console.error('Error fetching initial meters:', error);
-        } finally {
-            //al finalizar independientemente de haber encontrado o no datos se detiene el circulo de cargue de datos
-            //console.log("salio");
+        const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
+        if (sessionData) {
+            setCapacity(sessionData.selectedOrder.capacidad_banco);
         }
+        const fetchOrders = async () => {
+            try {
+                //Para obtener los medidores se hace abstraccion de la orden de trabajo que esta en el local storage para traer los valores concernientes
+                const response = "001"
+                const params = {identificador: sessionData.selectedOrder.id_orden}
+                const medidores_orden = await apiService.getAll(`ordenes/trabajo/identificador/`, params);
+                if(medidores_orden){
+                    const medidores = medidores_orden.medidores_asociados.map((medidor) => {
+                        return {
+                            id: medidor.id,
+                            medidor: medidor.numero_serie,
+                            estado: medidor.estado,
+                        }
+                    })
+                    console.log(medidores)
+                }
+                // Suponiendo que setPruebas es un setter de un estado que contiene un array
+                // setPruebas(prevState => [response[0].identificador]);
+                // setMetersPrueba(response)
+                // setMetersLength(response.length);
+                //usamos el componente "count" de la consulta para establecer el tamaño de los registros
+            } catch (error) {
+                //En caso de error en el llamado a la API se ejecuta un console.error
+                console.error('Error fetching initial meters:', error);
+            }
         }
 
         fetchOrders();
       }, []);
 
     React.useEffect(() => {
-
-    //Al estar ejecutando el fetch activamos el loading de la data
-        //setIsLoading(true);
+    //Para obtener los medidores se hace abstraccion de la orden de trabajo que esta en el local storage para traer los valores concernientes
         const fetchMetersPrueba = async () => {
-        try {
-        
-        const response = await apiService.getMedidoresPrueba();
-        // Suponiendo que setPruebas es un setter de un estado que contiene un array
-        setMetersPrueba(response)
-        setMetersLength(response.length);
-            //usamos el componente "count" de la consulta para establecer el tamaño de los registros
-        } catch (error) {
-            //En caso de error en el llamado a la API se ejecuta un console.error
-            console.error('Error fetching initial meters:', error);
-        } finally {
-            //al finalizar independientemente de haber encontrado o no datos se detiene el circulo de cargue de datos
-            //console.log("salio");
-        }
+            try {
+            
+            const response = await apiService.getMedidoresPrueba();
+            // Suponiendo que setPruebas es un setter de un estado que contiene un array
+            setMetersPrueba(response)
+            setMetersLength(response.length);
+                //usamos el componente "count" de la consulta para establecer el tamaño de los registros
+            } catch (error) {
+                //En caso de error en el llamado a la API se ejecuta un console.error
+                console.error('Error fetching initial meters:', error);
+            }
         }
 
         fetchMetersPrueba();
@@ -122,20 +119,6 @@ export default function Static_2_c() {
       [selectedKeys]
     );
 
-    // Función para calcular los IDs de las pruebas
-    {/*Agregar esta función después para generar los IDs de prueba de una orden*/}
-    {/*
-    const generateTestIds = () => {
-        const testsCount = Math.ceil(metersLength / maxCapacity); // Redondeo hacia arriba
-
-        // Generamos el identificador con tantos '-000n' como pruebas necesarias
-        const ids = Array.from({ length: testsCount }, (_, index) => 
-        `${ordenID}-000${index + 1}`
-        );
-
-        return ids;
-    };
-    */}
     // useEffect para ejecutar generateTestIds solo al cargar la vista
     React.useEffect(() => {
         //const ids = generateTestIds();
@@ -225,11 +208,11 @@ export default function Static_2_c() {
                             selectedKeys={selectedKeys}
                             onSelectionChange={setSelectedKeys}
                         >
-                        {pruebas.map((prueba, index) => (
+                        {/* {pruebas.map((prueba, index) => (
                             <DropdownItem key={prueba} textValue={`Prueba: ${prueba}`}>
                                 Prueba: {prueba}
                             </DropdownItem>
-                        ))}
+                        ))} */}
                         </DropdownMenu>
                     </Dropdown>
                     <div className="flex">
@@ -249,7 +232,7 @@ export default function Static_2_c() {
                 </div>
                 <div className="ml-3 bg-white w-2/6 h-auto rounded-[20px] flex flex-col justify-center place-items-center">
                     <span className="font-inter font-semibold text-opacity-text text-[16px] mt-3">Capacidad</span>
-                    <span className="font-teko font-semibold text-[40px]">{maxCapacity}</span>
+                    <span className="font-teko font-semibold text-[40px]">{capacity}</span>
                 </div>
             </div>
             <div>
@@ -275,7 +258,7 @@ export default function Static_2_c() {
                     <span className="text-left font-inter text-[18.4px] mt-2" style={{ lineHeight: '0' }}>Realice una selección de medidores para la ejecución de la prueba.</span>
                 </div>
                 <div className="w-5/6 bg-gray-400 h-0.5 my-2"></div>
-                <div className="w-5/6 flex grid grid-cols-4 place-items-center h-auto">
+                <div className="w-5/6 grid grid-cols-4 place-items-center h-auto">
 
                     <div className="ml-3 bg-white col-span-3 w-full h-auto rounded-[20px] flex flex-col place-items-center">
                         <div className="flex w-full justify-between items-center place-items-center space-x-[2vw]">

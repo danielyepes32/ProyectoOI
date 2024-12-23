@@ -7,6 +7,7 @@ import React from "react";import {
 } from "@nextui-org/modal";
 import Banco from "../modalData/banco";
 import Instruments from "../modalData/instruments";
+import InstrumentsNew from "../modalData/InstrumenstNew";
 import Meter_nc from "../modalData/Meter_nc";
 import Meter_c from "../modalData/Meter_c";
 import OrderSelection from "../modalData/OrderSelection";
@@ -15,7 +16,9 @@ export default function ModalData(
     {
         isOpen, 
         onOpenChange, 
-        popUpData, 
+        popUpData,
+        dataBanco,
+        dataInstrumentos,
         selectedMeterKeys, 
         sortDescriptor, 
         setSelectedMeterKeys, 
@@ -62,11 +65,24 @@ export default function ModalData(
                 {React.useMemo(() => {
                     if(popUpData === 'banco'){
                         return (
-                            <Banco/>
+                            <Banco
+                                nBanco={dataBanco?.nBanco}
+                                capacidad={dataBanco?.capacidad}
+                                marca={dataBanco?.marca}
+                                modelo={dataBanco?.modelo}
+                                habilitado={dataBanco?.habilitado}
+                                cert={dataBanco?.cert}
+                            />
                         )
                     }else if(popUpData === 'instrument'){
                         return (
                             <Instruments/>
+                        )
+                    }else if(popUpData === 'instrumentNew'){
+                        return (
+                            <InstrumentsNew
+                                instrumentos={dataInstrumentos}
+                            />
                         )
                     }else if(popUpData === 'meter_nc'){
                         return(

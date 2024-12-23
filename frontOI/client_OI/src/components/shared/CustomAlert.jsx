@@ -48,7 +48,7 @@ const CustomAlert = ({ message, isVisible, setIsVisible, routeRedirect,handleCon
       {(onClose) => (
         <>
           <ModalHeader className="flex flex-col gap-1 text-center font-mulish font-bold text-[30px]">Alerta</ModalHeader>
-          <div className='border border-2 border-gray-400 mx-5 rounded-[20px]'></div>
+          <div className='border-2 border-gray-400 mx-5 rounded-[20px]'></div>
           <ModalBody>
             <div className="w-full h-full flex items-center justify-center place-items-center">
               <span className='px-10 text-center font-inter text-[16px]'>¿Desea continuar con la toma de valores?</span>
