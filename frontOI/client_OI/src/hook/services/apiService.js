@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-const baseUrl = 'http://localhost:8000/api/';
+const baseUrl = 'https://38b4-181-56-8-48.ngrok-free.app/api/';
 
 // Configuracion comun para las solicitudes para los headers y la informacion por fuera del payload
 const axiosInstance = axios.create({
@@ -27,8 +27,7 @@ export const getAll = async (endpoint, params = {}) => {
 // Servicio general para obtener datos por id para todas las estructuras de datos
 export const getByKey = async (endpoint, key) => {
   try {
-    const response = await axiosInstance.get(`${endpoint}/${key}/`)
-    return response.data;
+    const response = await axiosInstance.get(`${endpoint}/${key}`)
   } catch (error) {
     console.error('Error ocurrido en Get by key: ', error)
     throw error.response ? error.response.data : 'Network Error';
@@ -47,11 +46,11 @@ export const create = async (endpoint, data) => {
 };
 
 // Servicio general para actualizar registros
-export const updateData = async (endpoint, key, data, method = 'PUT') => {
+export const updateData = async (endpoint, data, method = 'PUT') => {
   try {
     const response = await axiosInstance({
       method: method.toUpperCase(),
-      url: `${endpoint}/${key}`,
+      url: endpoint,
       data,
     });
     return response.data;
@@ -121,6 +120,8 @@ export const updateMetersPrueba = async (meterId, updates) => {
     throw error.response ? error.response : 'Network Error';
   }
 };
+
+
 
 // Servicio para crear una nueva incidencia
 export const postMeters = async (data) => {

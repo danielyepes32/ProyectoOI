@@ -112,10 +112,11 @@ export default function Static_1() {
       };
 
       // Eliminar Las pruebas creadas anteriormente
-      const pruebas_anterirores = await apiService.getAll("pruebas/orden_servicio/", { orden_servicio_id: sessionData.selectedOrder.nombre_orden });
+      const pruebas_anterirores = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden });
+      // Solo si hay pruebas anteriores 
       if (pruebas_anterirores) {
         for (const prueba of pruebas_anterirores) {
-          await apiService.delete(`pruebas/${prueba.id}/`);
+          await apiService.deleteData('pruebas/pruebas', `${prueba.id}`);
         }
       }
 
@@ -250,7 +251,7 @@ export default function Static_1() {
             </Button>
             <Button 
               className="w-ful bg-gray-but mt-3 mb-5 py-1 rounded-[15px]"
-              onClick={() => handleProceed("/client/static_2_c")}
+              onClick={() => handleProceed("/client/static_2_nc")}
               >
               <span className="font-inter text-[18px] text-white">No correlativos</span>
             </Button>

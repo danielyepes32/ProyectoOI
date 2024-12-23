@@ -30,12 +30,12 @@ import CustomAlert from "../shared/CustomAlert";
 import ModalData from "../shared/ModalData";
 
 //Esta variable global guarda la selección de columnas que quieres desplegar en cada vista, esto permite delimitar enm reenderizado de variables en el componente table
-const INITIAL_VISIBLE_COLUMNS = ["meter_id"];
+const INITIAL_VISIBLE_COLUMNS = ["numero_serie"];
 
 const columns = [
-    {name: "ID MEDIDOR", uid: "meter_id", sortable: true},
-    {name: "ESTADO", uid: "state", sortable: true},
-    {name: "CONCLUSION", uid: "result", sortable: true},
+    {name: "ID MEDIDOR", uid: "numero_serie", sortable: true},
+    {name: "ESTADO", uid: "estado", sortable: true},
+    {name: "MARCA", uid: "marca", sortable: true},
   ];
 
 export default function Static_2_nc() {
@@ -72,6 +72,8 @@ export default function Static_2_nc() {
     //Variable que define los medidores provenientes de la prueba
     const [updatedPruebas, setUpdatedPruebas] = React.useState([]);
 
+    const[selectedOrderId, setSelectedOrderId] = React.useState(localStorage.getItem("selectedOrderId"));
+
     //---------------------------------------------------------------------------------------------------------------------------
     //Aquí se encuentran las funciones usadas en el componente static_2_nc que tienen cambios de reenderizado y caché
     //---------------------------------------------------------------------------------------------------------------------------
@@ -94,7 +96,7 @@ export default function Static_2_nc() {
         
         console.log("Tamaño de selectedMeterKeys: ", selectedMeterKeys.size);
         const newUpdatedPruebas = updatedPruebas.map((prueba) =>
-                selectedKeys.has(prueba.identificador)
+                selectedKeys.has(prueba.nombre)
                     ? { 
                         ...prueba, 
                         medidores: [...(prueba.medidores || []), selectedMeterKeys] 
@@ -116,9 +118,7 @@ export default function Static_2_nc() {
         console.log("Respuesta Memo: ", prueba)
     },[selectedKeys])
     
-    
 
-    console.log("Combined: ", updatedPruebas)
     //----------------------------------------------------------------------------------------------
     //Funciones que requieren un manejo de reenderizado y manejo de caché
     //------------------------------------------------------------------------------------------------
@@ -128,7 +128,7 @@ export default function Static_2_nc() {
   
         //Al estar ejecutando el fetch activamos el loading de la data
             //setIsLoading(true);
-            const fetchOrders = async () => {
+            const fetchPruebas = async () => {
             try {
             //inizializamos los parametros de consultas a la API de consumo
             //console.log("No ha salido")
@@ -137,10 +137,13 @@ export default function Static_2_nc() {
                 //page:1,
                 //page_size : 10
             //};
+
+            const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
             
-            const response = await apiService.getOrdenes();
+            const response = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden });
             // Suponiendo que setPruebas es un setter de un estado que contiene un array
             setPruebas(response);
+            setSelectedKeys(new Set([response[0].nombre]))
                 //usamos el componente "count" de la consulta para establecer el tamaño de los registros
             } catch (error) {
                 //En caso de error en el llamado a la API se ejecuta un console.error
@@ -151,7 +154,7 @@ export default function Static_2_nc() {
             }
             }
     
-            fetchOrders();
+            fetchPruebas();
           }, []);
     
         React.useEffect(() => {
@@ -160,11 +163,13 @@ export default function Static_2_nc() {
             //setIsLoading(true);
             const fetchMetersPrueba = async () => {
             try {
-            
-            const response = await apiService.getMedidoresPrueba();
+
+            const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
+            const response = await apiService.getAll('ordenes/trabajo/identificador/', {identificador: sessionData.selectedOrder.id_orden});
             // Suponiendo que setPruebas es un setter de un estado que contiene un array
-            setMetersPrueba(response)
-            setMetersLength(response.length);
+
+            setMetersPrueba(response.medidores_asociados)
+            setMetersLength(response.medidores_asociados.length);
                 //usamos el componente "count" de la consulta para establecer el tamaño de los registros
             } catch (error) {
                 //En caso de error en el llamado a la API se ejecuta un console.error
@@ -231,8 +236,6 @@ export default function Static_2_nc() {
           <CustomAlert message={customMessage} isVisible={isOpenCustomMessage} setIsVisible={setIsOpenCustomMessage}></CustomAlert>
         ) : null
       }, [isOpenCustomMessage]);
-
-    console.log("Pruebas: ", pruebas)
     return(
         <>
         {confirmationMessage}
@@ -265,8 +268,8 @@ export default function Static_2_nc() {
                             onSelectionChange={setSelectedKeys}
                         >
                         {pruebas.length > 0 ? pruebas.map((prueba, index) => (
-                            <DropdownItem key={prueba.identificador} textValue={`Prueba: ${prueba.identificador}`}>
-                                Prueba: {prueba.identificador}
+                            <DropdownItem key={prueba.nombre} textValue={`${prueba.nombre}`}>
+                                Prueba: {prueba.nombre}
                             </DropdownItem>
                         )) : null}
                         </DropdownMenu>

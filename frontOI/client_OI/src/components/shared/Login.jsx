@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { loginUser } from '../../hook/services/apiService'; // Importa el servicio
+import { loginUser } from '../../hook/services/apiService';
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -35,7 +35,7 @@ function Login() {
     <div className="min-h-screen flex items-center justify-center">
       <div className="bg-white rounded-lg p-8 w-full max-w-md">
         <div className='flex min-w-full justify-center mb-2'>
-        <img src='public/logo_medileser.png' alt='Logo_Medileser' style={{height:'8rem'}}/>
+        <img src='/logo_medileser.png' alt='Logo_Medileser' style={{height:'8rem'}}/>
         </div>
         <p className="text-gray-500 text-center mb-8">
           Bienvenido, ingrese sus credenciales
