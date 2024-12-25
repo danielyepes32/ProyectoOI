@@ -66,9 +66,7 @@ export default function Static_2_c() {
         const fetchOrders = async () => {
             try {
                 //Para obtener los medidores se hace abstraccion de la orden de trabajo que esta en el local storage para traer los valores concernientes
-                const response = "001"
-                const params = {identificador: sessionData.selectedOrder.id_orden}
-                const medidores_orden = await apiService.getAll(`ordenes/trabajo/identificador/`, params);
+                const medidores_orden = await apiService.getAll(`ordenes/trabajo/identificador/`, {identificador: sessionData.selectedOrder.id_orden});
                 if(medidores_orden){
                     const medidores = medidores_orden.medidores_asociados.map((medidor) => {
                         return {
@@ -78,6 +76,19 @@ export default function Static_2_c() {
                         }
                     })
                     console.log(medidores)
+                }
+                
+                const pruebasActuales = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden });
+                if (pruebasActuales) {
+                    const respuestas = pruebasActuales.map((q) => {
+                        return {
+                            id: q.id,
+                            nombre: q.nombre,
+                        }
+                    });
+                    console.log(respuestas)
+                    setPruebas(respuestas)
+                    setSelectedKeys(respuestas[0].nombre)
                 }
                 // Suponiendo que setPruebas es un setter de un estado que contiene un array
                 // setPruebas(prevState => [response[0].identificador]);
@@ -123,7 +134,7 @@ export default function Static_2_c() {
     React.useEffect(() => {
         //const ids = generateTestIds();
         //setPruebas(ids); // Almacena los IDs en el estado
-        setSelectedKeys(new Set([pruebas[0]]))
+        
     }, [pruebas]); // Arreglo de dependencias vacío
 
     //Modal para mostrar datos de medidores disponibles en el correlativo
@@ -208,11 +219,11 @@ export default function Static_2_c() {
                             selectedKeys={selectedKeys}
                             onSelectionChange={setSelectedKeys}
                         >
-                        {/* {pruebas.map((prueba, index) => (
-                            <DropdownItem key={prueba} textValue={`Prueba: ${prueba}`}>
-                                Prueba: {prueba}
+                        {pruebas.map((prueba, id) => (
+                            <DropdownItem key={prueba.nombre} textValue={`Prueba: ${prueba.nombre}`}>
+                                Prueba: {prueba.nombre}
                             </DropdownItem>
-                        ))} */}
+                        ))}
                         </DropdownMenu>
                     </Dropdown>
                     <div className="flex">

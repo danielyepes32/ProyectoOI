@@ -43,7 +43,8 @@ export default function MainClient() {
         try {
           setIsLoading(true);
           const dateTransformed = DateService.getCurrentDate("YYYY-MM-DD");
-          const params = { fecha: dateTransformed, usuario: user.id };
+          // TODO: Cambiar la fecha por la fecha actual dateTransformed porque actualmente estoy usando un string refiriendo al 23 de este mes
+          const params = { fecha: "2024-12-23", usuario: user.id };
           const programacion = await apiService.getAll(`programacion/get/usuario/`, params);
           if (programacion) {
             const mappedOrders = programacion.ordenes_servicio.map(order => ({

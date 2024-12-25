@@ -105,20 +105,21 @@ export default function Static_1() {
     }
 
     try {
-      console.log()
       const payload = {
         orden_servicio_id: sessionData.selectedOrder.nombre_orden,
         capacidad_elegida: parseInt(maxCapacity, 10),
       };
 
       // Eliminar Las pruebas creadas anteriormente
-      const pruebas_anterirores = await apiService.getAll("pruebas/orden_servicio/", { orden_servicio_id: sessionData.selectedOrder.nombre_orden });
+      const pruebas_anterirores = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden });
+      // Solo si hay pruebas anteriores las elimina antes de crear las nuevas
       if (pruebas_anterirores) {
         for (const prueba of pruebas_anterirores) {
-          await apiService.delete(`pruebas/${prueba.id}/`);
+          await apiService.deleteData(`pruebas/pruebas`, `${prueba.id}`);
         }
       }
-
+      
+      // Crear las pruebas automaticamente con la capacidad seleccionada
       await apiService.create("pruebas/auto-creation/", payload);
 
       setCustomMessage("¡Se crearon automáticamente las pruebas con éxito!");
