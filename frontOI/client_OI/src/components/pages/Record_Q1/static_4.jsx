@@ -135,9 +135,9 @@ export default function Static_4() {
           <span className="font-mulish font-bold pt-5 text-[24px] justify-center">Inspección visual</span>
           <span className="font-mulisg font-semibold text-opacity-text ">Sesion iniciada en Julio 24, 2024</span>
           <div className="w-full h-auto grid grid-cols-4 space-x-2 pt-2">
-            <div className="col-span-3 bg-white shadow-lg px-7 flex flex-col space-x-2 rounded-[20px] items-center py-4">
+            <div className="col-span-3 bg-white shadow-lg px-7 h-full flex flex-col space-x-2 rounded-[20px] items-center py-4">
               <span className="font-inter text-center w-full">Usted se encuentra en la orden No.</span>
-              <span className="font-teko text-[32px] font-semibold w-full text-center">VI-001-2024</span>
+              <span className="font-teko text-[32px] font-semibold w-full text-center h-full">VI-001-2024</span>
             </div>
             <div className="col-span-1 w-full flex justify-center place-items-center flex">
               <Button
