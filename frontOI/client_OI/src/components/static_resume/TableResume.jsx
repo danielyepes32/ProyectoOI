@@ -51,7 +51,7 @@ const location = useLocation();
   );
 
   const tableRow = React.useMemo(() => {
-    return meters.map((item) => (
+    return meters ? meters.map((item) => (
       <TableRow
           key={item.meter_id}
           //data-[selected=true]:
@@ -76,7 +76,7 @@ const location = useLocation();
                         handleValidateErrorInput,
                         location)}</TableCell>}
     </TableRow>
-    ));
+    )) : null;
   }, [meters, headerColumns, selectedKeys])
 
     return(

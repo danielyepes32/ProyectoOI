@@ -12,6 +12,8 @@ import { IoSpeedometerOutline } from "react-icons/io5";
 import { MdOutlineWbIncandescent } from "react-icons/md";
 import ModalData from "../shared/ModalData";
 import TableResume from "../static_resume/TableResume";
+import apiService from "../../hook/services/apiService";
+
 //Las columnas se pueden agregar o eliminar de la vista, aquí inicializamos por default las necesarias
 const INITIAL_VISIBLE_COLUMNS = ["checkbox","meter_id", "num", "error"];
 
@@ -30,14 +32,92 @@ export default function Static_9() {
     //Constante para establecer las columnas visibles puesto que estas son dinamicas
     const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
     //En esta variable se guardarán los medidores que se extraigan de la API
-    const [meters, setMeters] = React.useState(meterDataTest);
+    const [meters, setMeters] = React.useState([]);
     //Variable para guardar el tamaño del conteo de medidores totales puesto que los datos se traen por pagination
-    const [metersLength, setMetersLength] = React.useState(meterDataTest.length);
+    const [metersLength, setMetersLength] = React.useState(0);
     //Constante usada para definir si se estan cargando los datos o si en su defecto simplemente no hay datos en la consulta
     const loadingState = isLoading === true & metersLength === 0 ? "loading" : "idle";
 
+    const [pruebas, setPruebas] = React.useState([]);
+
+    const [pruebasUpdated, setPruebasUpdated] = React.useState([]);
+
     //---------------------------------------------------------------------------------------------------------------------------
     //Aquí se encuentran las funciones usadas en el componente MainClient
+
+
+    //Función para obtener los gateways del autocomplete
+    React.useMemo(() => {
+  
+    //Al estar ejecutando el fetch activamos el loading de la data
+      //setIsLoading(true);
+      const fetchPruebas = async () => {
+      try {
+      //inizializamos los parametros de consultas a la API de consumo
+      //console.log("No ha salido")
+      //const params = {
+          // q: filterValue,
+          //page:1,
+          //page_size : 10
+      //};
+
+      const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
+      
+      const response = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden });
+      // Suponiendo que setPruebas es un setter de un estado que contiene un array
+      setPruebas(response);
+      console.log(response)
+      //setSelectedKeys(new Set([response[0].nombre]))
+          //usamos el componente "count" de la consulta para establecer el tamaño de los registros
+      } catch (error) {
+          //En caso de error en el llamado a la API se ejecuta un console.error
+          console.error('Error fetching initial meters:', error);
+      } finally {
+          //al finalizar independientemente de haber encontrado o no datos se detiene el circulo de cargue de datos
+          //console.log("salio");
+      }
+      }
+
+      fetchPruebas();
+      }
+  , []);
+
+  React.useMemo(() => {
+
+    //Al estar ejecutando el fetch activamos el loading de la data
+    setIsLoading(true);
+    const fetchMetersPrueba = async () => {
+    try {
+    
+    const responses = await Promise.all(pruebas.map(async (prueba) => {
+      const medidores = await apiService.getAll(`pruebas/pruebas/${prueba.id}/medidores-asociados/`);
+      
+      return {
+          ...prueba,
+          medidores: medidores
+      };
+
+    }));
+    // Suponiendo que setPruebas es un setter de un estado que contiene un array
+    setPruebasUpdated(responses);
+    setMeters(responses[0] ? responses[0].medidores : null)
+    // Actualizar el estado visualInspection
+    setMetersLength(responses[0] ? responses[0].medidores.length : null);
+    
+        //usamos el componente "count" de la consulta para establecer el tamaño de los registros
+    } catch (error) {
+        //En caso de error en el llamado a la API se ejecuta un console.error
+        console.error('Error fetching initial meters:', error);
+    } finally {
+        //al finalizar independientemente de haber encontrado o no datos se detiene el circulo de cargue de datos
+        //console.log("salio");
+    }
+    }
+
+    fetchMetersPrueba();
+  }, [pruebas]);
+
+
     //Esta función se usa para calcular las columnas que se etsablecen como visibles
     const headerColumns = React.useMemo(() => {
 
@@ -48,7 +128,7 @@ export default function Static_9() {
 
     const handleValidateError = (key) => {
       // Buscar el objeto que coincide con el `meter_id` especificado
-      const err_record = meters.find(item => item.meter_id === key)?.error;
+      const err_record = meters.find(item => item.meter_id === key)?.['q3'].error;
     
       // Validar el valor de `err_record` y retornar el `className` correspondiente
       switch (true) {
@@ -56,7 +136,7 @@ export default function Static_9() {
           return "text-green-500 bg-green-200 transition-colors duration-500"; // Rango de error bajo
         case (+err_record > 4.1 && err_record < 5.0):
           return "text-yellow-500 bg-yellow-100 transition-colors duration-500"; // Rango de error medio
-        case (+err_record >= 5.0):
+        case (+err_record >= 5.0 || err_record < -5.0):
           return "text-red-500 bg-red-200 transition-colors duration-500"; // Rango de error alto
         default:
           return "transition-colors duration-500"; // Sin valor de error o valor desconocido
@@ -65,7 +145,7 @@ export default function Static_9() {
 
     const handleValidateErrorInput = (key) => {
       // Buscar el objeto que coincide con el `meter_id` especificado
-      const err_record = meters.find(item => item.meter_id === key)?.error;
+      const err_record = meters.find(item => item.meter_id === key)?.q2.error;
     
       // Validar el valor de `err_record` y retornar el `className` correspondiente
       switch (true) {
@@ -73,7 +153,7 @@ export default function Static_9() {
           return "w-[17px] h-[17px] flex justify-center place-items-center bg-green-400 rounded-md"; // Rango de error bajo
         case (+err_record > 4.1 && err_record < 5.0):
           return "w-[17px] h-[17px] flex justify-center place-items-center bg-yellow-300 rounded-md"; // Rango de error medio
-        case (+err_record >= 5.0):
+        case (+err_record >= 5.0 || err_record < -5.0):
           return "w-[17px] h-[17px] flex justify-center place-items-center bg-red-400 rounded-md"; // Rango de error alto
         default:
           return "transition-colors duration-500"; // Sin valor de error o valor desconocido

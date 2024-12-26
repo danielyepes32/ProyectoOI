@@ -132,10 +132,25 @@ const meterDataTest = [
     "obs" : "Conforme",
     "result": "Apto",
     "num": "2",
+    "Q1": {
+      "record_li": 498.98,
+      "record_lf": 504.02,
+      "error" : 3.22
+    },
+    "Q2": {
+      "record_li": 498.98,
+      "record_lf": 504.02,
+      "error" : 3.22
+    },
+    "Q3": {
+      "record_li": 498.98,
+      "record_lf": 504.02,
+      "error" : 3.22
+    },
     "record_li": 498.98,
     "record_lf": 504.02,
     "isInvalid": false,
-    "error" : 6.22
+    "error" : 3.22
   },
   {
     "meter_id": "AA23099473",
@@ -144,6 +159,21 @@ const meterDataTest = [
     "obs" : "Conforme",
     "result": "Apto",
     "num": "3",
+    "Q1": {
+      "record_li": 498.98,
+      "record_lf": 504.02,
+      "error" : 3.22
+    },
+    "Q2": {
+      "record_li": 498.98,
+      "record_lf": 504.02,
+      "error" : 3.22
+    },
+    "Q3": {
+      "record_li": 498.98,
+      "record_lf": 504.02,
+      "error" : 3.22
+    },
     "record_li": 498.98,
     "record_lf": 504.02,
     "isInvalid": false,
@@ -156,10 +186,25 @@ const meterDataTest = [
     "obs" : "Conforme",
     "result": "Apto",
     "num": "4",
+    "Q1": {
+      "record_li": 498.98,
+      "record_lf": 504.02,
+      "error" : 3.22
+    },
+    "Q2": {
+      "record_li": 498.98,
+      "record_lf": 504.02,
+      "error" : 3.22
+    },
+    "Q3": {
+      "record_li": 498.98,
+      "record_lf": 504.02,
+      "error" : 3.22
+    },
     "record_li": 498.98,
     "record_lf": 504.02,
     "isInvalid": false,
-    "error" : 4.57
+    "error" : 3.22
   },
   {
     "meter_id": "AA23099475",
@@ -168,10 +213,25 @@ const meterDataTest = [
     "obs" : "Conforme",
     "result": "Apto",
     "num": "5",
+    "Q1": {
+      "record_li": 498.98,
+      "record_lf": 504.02,
+      "error" : 3.22
+    },
+    "Q2": {
+      "record_li": 498.98,
+      "record_lf": 504.02,
+      "error" : 3.22
+    },
+    "Q3": {
+      "record_li": 498.98,
+      "record_lf": 504.02,
+      "error" : 3.22
+    },
     "record_li": 498.98,
     "record_lf": 504.02,
     "isInvalid": false,
-    "error" : 4.32
+    "error" : 3.22
   },
   {
     "meter_id": "AA23099476",
@@ -180,6 +240,21 @@ const meterDataTest = [
     "obs" : "Conforme",
     "result": "Apto",
     "num": "6",
+    "Q1": {
+      "record_li": 498.98,
+      "record_lf": 504.02,
+      "error" : 3.22
+    },
+    "Q2": {
+      "record_li": 498.98,
+      "record_lf": 504.02,
+      "error" : 3.22
+    },
+    "Q3": {
+      "record_li": 498.98,
+      "record_lf": 504.02,
+      "error" : 3.22
+    },
     "record_li": 498.98,
     "record_lf": 504.02,
     "isInvalid": false,
