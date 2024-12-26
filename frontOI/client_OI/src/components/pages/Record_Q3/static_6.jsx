@@ -9,6 +9,8 @@ import {meterColumns, meterDataTest} from "../../../utils/tests/data"  //"../../
 
 import { IoSpeedometerOutline } from "react-icons/io5";
 import { MdOutlineWbIncandescent } from "react-icons/md";
+import { GiConfirmed } from "react-icons/gi";
+
 import ModalData from "../../shared/ModalData";
 import TableRecordInspection from "../../record_inspection/TableRecordInspection";
 
@@ -285,27 +287,27 @@ export default function Static_6_Q3() {
                 </Button>
             </div>
             */}
-          <div className="col-span-3 bg-white shadow-lg px-4 flex justify-between rounded-[15px] items-center mt-5">
+          <div className="col-span-3 py-2 bg-white shadow-lg px-4 flex justify-between rounded-[25px] items-center mt-5">
             <label
               htmlFor="reference_volume_q3"
-              className="text-gray-700 font-medium"
+              className="text-gray-700 font-inter"
             >
               Volumen de referencia
             </label>
-            <div className="flex items-center w-full space-x-2">
+            <div className="flex items-center w-full place-content-center justify-center">
               <input
                 id="reference_volume_q3"
                 type="number"
-                className="flex justify-center text-center w-full whitespace-pre-wrap z-[0] border-none px-0 shadow-none"
+                className="flex text-left w-full whitespace-pre-wrap z-[0] border-none px-0 shadow-none"
                 placeholder="Ingrese su volumen"
                 value={volumeValue} // Vincula al estado
                 onChange={handleVolumeChange} // Actualiza el estado
               />
               <button
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-all"
+                className="bg-custom-blue text-center text-white w-1/3 h-1/2 rounded-2xl hover:bg-blue-600 transition-all"
                 onClick={applyVolumeToMeters} // Aplica el cambio
               >
-                OK
+                <GiConfirmed className="text-center w-full h-1/6 p-2"/>
               </button>
             </div>
           </div>
