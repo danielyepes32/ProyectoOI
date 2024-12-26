@@ -25,20 +25,150 @@ import {
 import CustomAlert from "../shared/CustomAlert";
 import  DateService  from "../../hook/services/dateService.js"
 import ModalData from "../shared/ModalData";
-
+import apiService from "../../hook/services/apiService.js";
 
 export default function Static_3_nc() {
 
-    const [selectedKeys, setSelectedKeys] = React.useState(new Set(["text"]));
+    console.log("LocalStorage: ", JSON.parse(localStorage.getItem("selectedOrderData")))
+
+    const [bancoCapacity, setBancoCapacity] = React.useState(JSON.parse(localStorage.getItem("selectedOrderData")).selectedOrder.capacidad_banco);
+    const [instrumentsData, setInstrumentsData] = React.useState(JSON.parse(localStorage.getItem("instrumentsAsociated")));
+    //const [selectedKeys, setSelectedKeys] = React.useState(new Set(["text"]));
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [isOpenCustomMessage, setIsOpenCustomMessage] = React.useState(false);
     const [customMessage, setCustomMessage] = React.useState(null);
     const [popUpData, setPopUpData] = React.useState(null);
+    const [pruebas, setPruebas] = React.useState([]);
+    const [totalSelectedMeters, setTotalSelectedMeters] = React.useState(0);
+    const [pruebasUpdated, setPruebasUpdated] = React.useState([]);
+    const [meters, setMeters] = React.useState([]);
+    const [metersLength, setMetersLength] = React.useState(0);
 
-    const selectedValue = React.useMemo(
-      () => Array.from(selectedKeys).join(", ").replaceAll("_", " "),
-      [selectedKeys]
-    );
+    //Función para obtener los gateways del autocomplete
+    React.useMemo(() => {
+  
+    //Al estar ejecutando el fetch activamos el loading de la data
+        //setIsLoading(true);
+        const fetchPruebas = async () => {
+        try {
+        //inizializamos los parametros de consultas a la API de consumo
+        //console.log("No ha salido")
+        //const params = {
+            // q: filterValue,
+            //page:1,
+            //page_size : 10
+        //};
+
+        const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
+        
+        const response = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden });
+        // Suponiendo que setPruebas es un setter de un estado que contiene un array
+        setPruebas(response);
+        console.log(response)
+        //setSelectedKeys(new Set([response[0].nombre]))
+            //usamos el componente "count" de la consulta para establecer el tamaño de los registros
+        } catch (error) {
+            //En caso de error en el llamado a la API se ejecuta un console.error
+            console.error('Error fetching initial meters:', error);
+        } finally {
+            //al finalizar independientemente de haber encontrado o no datos se detiene el circulo de cargue de datos
+            //console.log("salio");
+        }
+        }
+
+        fetchPruebas();
+        }
+    , []);
+
+    //Función para obtener los gateways del autocomplete
+    React.useMemo(() => {
+  
+        //Al estar ejecutando el fetch activamos el loading de la data
+            //setIsLoading(true);
+            const fetchMedidoresAsociados = async () => {
+            try {
+            //inizializamos los parametros de consultas a la API de consumo
+            //console.log("No ha salido")
+            //const params = {
+                // q: filterValue,
+                //page:1,
+                //page_size : 10
+            //};
+            
+            const responses = await Promise.all(pruebas.map(async (prueba) => {
+                const medidores = await apiService.getAll(`pruebas/pruebas/${prueba.id}/medidores-asociados/`);
+                
+                return {
+                    ...prueba,
+                    medidores: medidores
+                };
+            }));
+            console.log("Prueba: ", responses);
+            setPruebasUpdated(responses);
+
+            } catch (error) {
+                //En caso de error en el llamado a la API se ejecuta un console.error
+                console.error('Error fetching initial meters:', error);
+            } finally {
+                //al finalizar independientemente de haber encontrado o no datos se detiene el circulo de cargue de datos
+                //console.log("salio");
+            }
+            }
+    
+            fetchMedidoresAsociados();
+            }
+    , [pruebas]);
+
+    React.useEffect(() => {
+
+    //Al estar ejecutando el fetch activamos el loading de la data
+        //setIsLoading(true);
+        const fetchMetersPrueba = async () => {
+        try {
+
+        const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
+        const response = await apiService.getAll('ordenes/trabajo/identificador/', {identificador: sessionData.selectedOrder.id_orden});
+        // Suponiendo que setPruebas es un setter de un estado que contiene un array
+
+        setMeters(response.medidores_asociados)
+        setMetersLength(response.medidores_asociados.length);
+            //usamos el componente "count" de la consulta para establecer el tamaño de los registros
+        } catch (error) {
+            //En caso de error en el llamado a la API se ejecuta un console.error
+            console.error('Error fetching initial meters:', error);
+        } finally {
+            //al finalizar independientemente de haber encontrado o no datos se detiene el circulo de cargue de datos
+            //console.log("salio");
+        }
+        }
+
+        fetchMetersPrueba();
+    }, []);
+
+    const validateInstrument = React.useMemo(() => {
+        // Obtener la fecha actual en formato yyyy-mm-dd
+        const currentDate = new Date().toISOString().split('T')[0]; // Obtiene solo la fecha en formato yyyy-mm-dd
+    
+        // Validar que la fecha de vencimiento de todos los instrumentos sea mayor a la fecha actual
+        const isValid = instrumentsData.every(instrument => {
+            // Comprobar si la fecha de vencimiento es mayor a la fecha actual
+            return instrument.fecha_vencimiento_certificado > currentDate;
+        });
+    
+        return isValid; 
+    }, [instrumentsData]);
+
+    const totalSelected = React.useMemo(() => {
+         // Calcular la suma de todos los medidores de updatedPruebas, validando la existencia de medidores
+         const totalMedidores = pruebasUpdated.reduce((acc, prueba) => {
+            if (prueba.medidores && Array.isArray(prueba.medidores)) {
+                return acc + prueba.medidores.length;
+            }
+            return acc; // Ignorar si prueba.medidores es undefined o no es un array
+        }, 0);
+
+        return totalMedidores;
+    },[pruebasUpdated])
 
     const modal = React.useMemo(() => {
         return (
@@ -75,22 +205,22 @@ export default function Static_3_nc() {
                 <div className="w-5/6 bg-gray-400 h-0.5 mb-2"></div>
                 <div className="w-5/6 justify-between full flex place-items-center">
                     <span className="font-inter text-left text-[18.4px] w-full">Capacidad seleccionada en banco</span>
-                    <span className="font-teko font-semibold text-[40px] w-full text-right">10</span>
+                    <span className="font-teko font-semibold text-[40px] w-full text-right">{bancoCapacity}</span>
                 </div>
                 <div className="w-5/6 my-5 justify-between full flex place-items-center">
                     <span className="font-inter text-left text-[18.4px] w-full mr-3">Tipo de análisis</span>
-                    <span className="font-teko font-semibold text-[32px] w-full text-right">Correlativo</span>
+                    <span className="font-teko font-semibold text-[32px] w-full text-right">No correlativo</span>
                 </div>
                 <div className="w-5/6 mb-5 justify-between full flex place-items-center">
                     <span className="font-inter text-left text-[18.4px] w-full">Instrumentos en vigencia</span>
-                    <span className="font-teko font-semibold text-[32px] w-full text-right">Si</span>
+                    <span className="font-teko font-semibold text-[32px] w-full text-right">{validateInstrument ? 'Si': 'No'}</span>
                 </div>
             </div>
             <div className="w-full h-auto flex justify-center py-4 mt-4 bg-white rounded-[40px] shadow-sm">
                 <div className="w-5/6 justify-between full flex place-items-center">
                     <span className="font-inter text-center text-[18.4px] w-full">Total de medidores seleccionados</span>
                     <div className="flex flex-col w-full justify-center place-items-center" style={{ lineHeight: '0.7' }}>
-                        <span className="text-center font-teko font-semibold text-[64px]">50</span>
+                        <span className="text-center font-teko font-semibold text-[64px]">{totalSelected}</span>
                         <span className="text-center font-inter text-[18.4px]">Medidores</span>
                     </div>
                 </div>
@@ -108,7 +238,7 @@ export default function Static_3_nc() {
                         startContent: "bg-red-100"
                     }}
                     >
-                    <span className="font-inter text-[14px] text-center text-white py-2">Medidores disponibles en orden (8ud)</span>
+                    <span className="font-inter text-[14px] text-center text-white py-2">Medidores disponibles en orden ({metersLength}ud)</span>
                 </Button>
             </div>
             <div className="flex-grow flex flex-col w-full justify-between place-items-center rounded-[20px] my-[8vw] bg-white shadow-sm">

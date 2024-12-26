@@ -290,34 +290,6 @@ export default function Static_2_nc() {
         );
     }, [isOpen,selectedMeterKeys, sortDescriptor, popUpData, selectedKeys, updatedPruebas]); //Variables de reenderizado
 
-    const validatePruebas = () => {
-        // Calcular la suma de todos los medidores de updatedPruebas, validando la existencia de medidores
-        const totalMedidores = updatedPruebas.reduce((acc, prueba) => {
-            if (prueba.medidores && Array.isArray(prueba.medidores)) {
-                return acc + prueba.medidores.length;
-            }
-            return acc; // Ignorar si prueba.medidores es undefined o no es un array
-        }, 0);
-    
-        // Validar que todas las pruebas tengan al menos un medidor
-        const allPruebasHaveMedidores = updatedPruebas.every(
-            prueba => prueba.medidores && Array.isArray(prueba.medidores) && prueba.medidores.length > 0
-        );
-    
-        // Validar condiciones
-        if (totalMedidores !== metersLength) {
-            return false;
-        }
-    
-        if (!allPruebasHaveMedidores) {
-            return false;
-        }
-    
-        return true;
-    };
-
-    const [apiResult, setApiResult] = React.useState(false);
-
     // Crear un closure de enrichUpdatedPruebas con updatedPruebas
     const handleConfirm = React.useCallback(async () => {
         // Calcular la suma de todos los medidores de updatedPruebas, validando la existencia de medidores
