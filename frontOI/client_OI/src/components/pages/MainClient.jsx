@@ -43,7 +43,7 @@ export default function MainClient() {
         try {
           setIsLoading(true);
           const dateTransformed = DateService.getCurrentDate("YYYY-MM-DD");
-          const params = { fecha: dateTransformed, usuario: user.id };
+          const params = { fecha: '2024-12-23', usuario: user.id }; //{/*dateTransformed*/}
           const programacion = await apiService.getAll(`programacion/get/usuario/`, params);
           if (programacion) {
             const mappedOrders = programacion.ordenes_servicio.map(order => ({

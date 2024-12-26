@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-const baseUrl = 'https://38b4-181-56-8-48.ngrok-free.app/api/';
+const baseUrl = 'https://fab6-181-56-8-48.ngrok-free.app/api/';
 
 // Configuracion comun para las solicitudes para los headers y la informacion por fuera del payload
 const axiosInstance = axios.create({
@@ -121,6 +121,21 @@ export const updateMetersPrueba = async (meterId, updates) => {
   }
 };
 
+// Servicio para actualizar los valores de un medidor
+export const postMetersPrueba = async (pruebaId, meters) => {
+  try {
+    const response = await axios.post(`${baseUrl}pruebas/pruebas/${pruebaId}/assign-medidores/`, meters, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error updating meter:', error);
+    throw error.response ? error.response : 'Network Error';
+  }
+};
+
 
 
 // Servicio para crear una nueva incidencia
@@ -172,4 +187,5 @@ export default {
   getMedidoresPrueba,
   updateMetersPrueba,
   postMeters,
+  postMetersPrueba
 };

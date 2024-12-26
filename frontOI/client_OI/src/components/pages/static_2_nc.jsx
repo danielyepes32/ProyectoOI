@@ -79,38 +79,46 @@ export default function Static_2_nc() {
     //Aquí se encuentran las funciones usadas en el componente static_2_nc que tienen cambios de reenderizado y caché
     //---------------------------------------------------------------------------------------------------------------------------
     const enrichUpdatedPruebas = (updatedPruebas) => {
-        // Definir los campos adicionales para cada medidor
-        const additionalFields = {
-            medidor: 15,
-            num: 1,
-            state: "Sin inspección",
-            drain: "Sin inspección",
-            obs: "Conforme",
-            result: "Apto",
-            q1: {
-                record_li: 0.0,
-                record_lf: 0.0,
-                reference_volume: 0.0
-            },
-            q2: {
-                record_li: 0.0,
-                record_lf: 0.0,
-                reference_volume: 0.0
-            },
-            q3: {
-                record_li: 0.0,
-                record_lf: 0.0,
-                reference_volume: 0.0
-            }
-        };
-    
         // Mapear cada objeto en updatedPruebas
         return updatedPruebas.map(prueba => {
             // Enriquecer cada medidor con los campos adicionales
-            const enrichedMedidores = prueba.medidores.map(medidor => ({
-                ...medidor,
-                ...additionalFields // Agregar los nuevos campos
-            }));
+            const enrichedMedidores = prueba.medidores.map(medidor => {
+                // Buscar el medidor en metersPrueba que coincida en numero_serie y meter_id
+                const matchingMeter = metersPrueba.find(
+                    meter => meter.numero_serie === medidor.meter_id
+                );
+    
+                // Construir los campos adicionales dinámicamente
+                const additionalFields = {
+                    medidor: matchingMeter ? matchingMeter.id : null, // Asignar el id del medidor si coincide, o null si no
+                    num: 1,
+                    state: "Sin inspección",
+                    drain: "Sin inspección",
+                    obs: "Conforme",
+                    result: "Apto",
+                    q1: {
+                        record_li: 0.0,
+                        record_lf: 0.0,
+                        reference_volume: 1.0
+                    },
+                    q2: {
+                        record_li: 0.0,
+                        record_lf: 0.0,
+                        reference_volume: 1.0
+                    },
+                    q3: {
+                        record_li: 0.0,
+                        record_lf: 0.0,
+                        reference_volume: 1.0
+                    }
+                };
+    
+                // Retornar el medidor enriquecido
+                return {
+                    ...medidor,
+                    ...additionalFields
+                };
+            });
     
             // Retornar el objeto actualizado
             return {
@@ -118,10 +126,11 @@ export default function Static_2_nc() {
                 medidores: enrichedMedidores // Reemplazar los medidores originales
             };
         });
-    }
+    };
     
     
     
+    console.log("Medidores: ", metersPrueba)
     //Esta función se usa para calcular las columnas que se etsablecen como visibles en el componente table
     const headerColumns = React.useMemo(() => {
 
@@ -281,20 +290,106 @@ export default function Static_2_nc() {
         );
     }, [isOpen,selectedMeterKeys, sortDescriptor, popUpData, selectedKeys, updatedPruebas]); //Variables de reenderizado
 
+    const validatePruebas = () => {
+        // Calcular la suma de todos los medidores de updatedPruebas, validando la existencia de medidores
+        const totalMedidores = updatedPruebas.reduce((acc, prueba) => {
+            if (prueba.medidores && Array.isArray(prueba.medidores)) {
+                return acc + prueba.medidores.length;
+            }
+            return acc; // Ignorar si prueba.medidores es undefined o no es un array
+        }, 0);
+    
+        // Validar que todas las pruebas tengan al menos un medidor
+        const allPruebasHaveMedidores = updatedPruebas.every(
+            prueba => prueba.medidores && Array.isArray(prueba.medidores) && prueba.medidores.length > 0
+        );
+    
+        // Validar condiciones
+        if (totalMedidores !== metersLength) {
+            return false;
+        }
+    
+        if (!allPruebasHaveMedidores) {
+            return false;
+        }
+    
+        return true;
+    };
+
+    const [apiResult, setApiResult] = React.useState(false);
+
     // Crear un closure de enrichUpdatedPruebas con updatedPruebas
-    const handleConfirm = React.useCallback(() => {
+    const handleConfirm = React.useCallback(async () => {
+        // Calcular la suma de todos los medidores de updatedPruebas, validando la existencia de medidores
+        const totalMedidores = updatedPruebas.reduce((acc, prueba) => {
+            if (prueba.medidores && Array.isArray(prueba.medidores)) {
+                return acc + prueba.medidores.length;
+            }
+            return acc; // Ignorar si prueba.medidores es undefined o no es un array
+        }, 0);
+
+        // Validar que todas las pruebas tengan al menos un medidor
+        const allPruebasHaveMedidores = updatedPruebas.every(
+            prueba => prueba.medidores && Array.isArray(prueba.medidores) && prueba.medidores.length > 0
+        );
+
+        // Validar condiciones antes de proceder
+        if (totalMedidores !== metersLength) {
+            alert(
+                `La suma total de medidores (${totalMedidores}) no es igual a metersLength (${metersLength}).`
+            );
+            return null; // O cualquier acción deseada en caso de que no se cumpla
+        }
+
+        if (!allPruebasHaveMedidores) {
+            alert(`Una o más pruebas no tienen medidores seleccionados.`);
+            return null; // O cualquier acción deseada en caso de que no se cumpla
+        }
+
         const enrichedPruebas = enrichUpdatedPruebas(updatedPruebas);
         console.log("Enriched Pruebas:", enrichedPruebas);
-        return enrichedPruebas;
-    }, [updatedPruebas]);
 
-    //Ejecución de componente externo modal para confirmación
-    //El funcionamiento es el mismo que en static_1
+        // Enviar los medidores de cada prueba al endpoint
+        try {
+            const promises = enrichedPruebas.map(prueba => {
+                const pruebaId = prueba.id; // Asegúrate de que `id` está presente en cada prueba
+                const metersPayload = {
+                    medidores: prueba.medidores, // Enviar directamente el array completo
+                };
+                return apiService.postMetersPrueba(pruebaId, metersPayload);
+            });
+
+            // Esperar a que todas las solicitudes se completen
+            const results = await Promise.all(promises);
+            console.log("Resultados de la actualización:", results);
+
+            // Acción adicional tras la actualización exitosa (opcional)
+            alert("Los medidores se asignaron exitosamente a las pruebas.");
+            return true;
+
+        } catch (error) {
+            console.error("Error al enviar los medidores:", error);
+            alert("Ocurrió un error al asignar los medidores. Intenta nuevamente.");
+            return false;
+        }
+
+    }, [updatedPruebas, metersLength]); // Agregar metersLength como dependencia
+
+
+    
+    // Ejecución de componente externo modal para confirmación
     const confirmationMessage = React.useMemo(() => {
         return isOpenCustomMessage === true ? (
-          <CustomAlert routeRedirect={"/client/static_3"} handleConfirm={handleConfirm} message={customMessage} isVisible={isOpenCustomMessage} setIsVisible={setIsOpenCustomMessage}></CustomAlert>
-        ) : null
-      }, [isOpenCustomMessage]);
+            <CustomAlert 
+                routeRedirect={"/client/static_3_nc"} 
+                handleConfirm={handleConfirm} 
+                message={customMessage} 
+                isVisible={isOpenCustomMessage} 
+                setIsVisible={setIsOpenCustomMessage}
+            ></CustomAlert>
+        ) : null;
+    }, [isOpenCustomMessage]);
+    
     return(
         <>
         {confirmationMessage}

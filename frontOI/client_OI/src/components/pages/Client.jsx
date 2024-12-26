@@ -10,6 +10,7 @@ import MainClient from './MainClient';
 import Static_2_nc from './static_2_nc';
 import Static_2_c from './static_2_c';
 import Static_3 from './static_3';
+import Static_3_nc from './static_3_nc';
 //Importaciones para Q1
 import Static_4 from './Record_Q1/static_4';
 import Static_5 from './Record_Q1/static_5';
@@ -64,6 +65,7 @@ const Client = () => {
         <Route path="/static_2_c" element={<Static_2_c/>}/>
         <Route path="/static_2_nc" element={<Static_2_nc/>}/>
         <Route path="/static_3" element={<Static_3/>}/>
+        <Route path="/static_3_nc" element={<Static_3_nc/>}/>
         {/*No la vayas a cagar en el futuro agrega un enrutador*/}
         <Route path="/Q1/static_4" element={<Static_4/>}/>
         <Route path="/Q1/static_5" element={<Static_5/>}/>
