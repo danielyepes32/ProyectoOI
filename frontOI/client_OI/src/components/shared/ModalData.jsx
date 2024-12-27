@@ -11,6 +11,7 @@ import InstrumentsNew from "../modalData/InstrumenstNew";
 import Meter_nc from "../modalData/Meter_nc";
 import Meter_c from "../modalData/Meter_c";
 import OrderSelection from "../modalData/OrderSelection";
+import PartialMeterSelection from "../modalData/PartialMeters";
 
 export default function ModalData(
     {
@@ -19,13 +20,16 @@ export default function ModalData(
         popUpData,
         dataBanco,
         dataInstrumentos,
+        dataPartialMeters,
         selectedMeterKeys, 
         sortDescriptor, 
         setSelectedMeterKeys, 
         setSortDescriptor,
         headerColumns,
         meters,
-        loadingState
+        loadingState,
+        selectedKeys,
+        pruebas
     }
     ) {
 
@@ -39,6 +43,8 @@ export default function ModalData(
                 return 'Selección Correlativos';
             case 'order':
                 return 'Ordenes seleccionadas';
+            case 'meter_partial':
+                return 'Selección de medidores';
             default:
                 return 'Instrumentos';
         }
@@ -94,6 +100,8 @@ export default function ModalData(
                                 headerColumns = {headerColumns}
                                 meters = {meters}
                                 loadingState = {loadingState}
+                                selectedKeys={selectedKeys}
+                                pruebas={pruebas}
                             />
                         )
                     }else if(popUpData === 'meter_c'){
@@ -105,6 +113,18 @@ export default function ModalData(
                     }else if(popUpData === 'order'){
                         return(
                             <OrderSelection/>
+                        )
+                    }else if(popUpData === 'meter_partial'){
+                        return(
+                            <PartialMeterSelection
+                                meters={meters}
+                                selectedMeterKeys={selectedMeterKeys}
+                                setSelectedMeterKeys={setSelectedMeterKeys}
+                                sortDescriptor={sortDescriptor}
+                                setSortDescriptor={setSortDescriptor}
+                                headerColumns={headerColumns}
+                                pruebas={pruebas}
+                            />
                         )
                     }
                 }, [popUpData, selectedMeterKeys])

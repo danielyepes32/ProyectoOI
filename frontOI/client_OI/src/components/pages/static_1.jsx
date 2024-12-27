@@ -44,6 +44,8 @@ export default function Static_1() {
 
   const [navigateRoute, setNavigateRoute] = React.useState(null)
 
+  const [isProcessing, setIsProcessing] = React.useState(false);
+
   useEffect(() => {
     const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
     if (sessionData) {
@@ -94,6 +96,8 @@ export default function Static_1() {
   // Funcion encargada de manejar el cambio de las anotaciones especiales
   // En este punto hemos de tener en cuenta que las anotaciones especiales son obligatorias cuando no colocan el numero maximo de medidores permitidos para ese banco
   const handleProceed = async (route) => {
+    setIsProcessing(true); // Activar estado de procesamiento
+
     if (maxCapacity < dataModal.capacidad && (!specialAnotations || specialAnotations.trim() === "")) {
       alert("Por favor, deje una descripción en el campo de anotaciones especiales.");
       return;
@@ -129,6 +133,8 @@ export default function Static_1() {
     } catch (error) {
       console.log("Error al crear las pruebas automáticamente:", error);
       alert("Ocurrió un error creando las pruebas. Revisa la consola.");
+    } finally {
+      setIsProcessing(false); // Desactivar estado de procesamiento
     }
   };
 
@@ -251,7 +257,8 @@ export default function Static_1() {
             </Button>
             <Button 
               className="w-ful bg-gray-but mt-3 mb-5 py-1 rounded-[15px]"
-              onClick={() => handleProceed("/client/static_2_c")}
+              onClick={() => handleProceed("/client/static_2_nc")}
+              isDisabled={isProcessing}
               >
               <span className="font-inter text-[18px] text-white">No correlativos</span>
             </Button>
