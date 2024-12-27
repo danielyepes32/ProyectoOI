@@ -29,7 +29,11 @@ export default function ModalData(
         meters,
         loadingState,
         selectedKeys,
-        pruebas
+        pruebas,
+        pruebaCapacity,
+        selectedPruebaKey,
+        onConfirmSelection,
+
     }
     ) {
 
@@ -124,6 +128,9 @@ export default function ModalData(
                                 setSortDescriptor={setSortDescriptor}
                                 headerColumns={headerColumns}
                                 pruebas={pruebas}
+                                selectedPruebaKey={selectedPruebaKey}
+                                onConfirmSelection={onConfirmSelection} // Callback al confirmar selección
+                                pruebaCapacity={pruebaCapacity}
                             />
                         )
                     }

@@ -48,8 +48,9 @@ export default function TableVisualInspection(
     );
 
     const tableRow = React.useMemo(() => {
+        console.dir(meters, {depth: null});
 
-        return meters.map((item) => (
+        return meters ? meters.map((item) => (
           <TableRow
               key={item.meter_id}
               className={`${
@@ -77,7 +78,7 @@ export default function TableVisualInspection(
                 )}
             </TableCell>}
         </TableRow>
-        ));
+        )) : null;
       }, [meters, headerColumns, visualInspection])
 
 

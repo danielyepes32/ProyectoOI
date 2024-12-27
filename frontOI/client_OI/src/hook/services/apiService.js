@@ -121,6 +121,21 @@ export const updateMetersPrueba = async (meterId, updates) => {
   }
 };
 
+// Servicio para actualizar los valores de un medidor
+export const postMetersPrueba = async (pruebaId, meters) => {
+  try {
+    const response = await axios.post(`${baseUrl}pruebas/pruebas/${pruebaId}/assign-medidores/`, meters, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error updating meter:', error);
+    throw error.response ? error.response : 'Network Error';
+  }
+};
+
 
 
 // Servicio para crear una nueva incidencia
@@ -172,4 +187,5 @@ export default {
   getMedidoresPrueba,
   updateMetersPrueba,
   postMeters,
+  postMetersPrueba
 };

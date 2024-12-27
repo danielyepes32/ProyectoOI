@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { CgSearch } from "react-icons/cg";
 import { RiPlayListAddFill } from "react-icons/ri";
 import {
@@ -12,6 +12,7 @@ import {
   Input,
   Button,
 } from "@nextui-org/react";
+import renderCell from "../shared/table/renderCell";
 
 export default function PartialMeterSelection({
   meters,
@@ -21,9 +22,12 @@ export default function PartialMeterSelection({
   setSortDescriptor,
   headerColumns,
   pruebas,
+  selectedPruebaKey, // Prueba actualmente seleccionada
+  onConfirmSelection, // Callback para manejar la confirmación
+  pruebaCapacity, // Capacidad de la prueba activa
 }) {
   // Estilo de las tablas y celdas
-  const classNames = React.useMemo(
+  const classNames = useMemo(
     () => ({
       wrapper: ["w-full", "h-full flex justify-left items-center"],
       table: ["h-full justify-start align-start text-left"],
@@ -38,33 +42,39 @@ export default function PartialMeterSelection({
     []
   );
 
-  // Verificar si un medidor está deshabilitado
+  // Determinar si un medidor está deshabilitado
   const isDisabled = (item) => {
-    const pruebaSeleccionada = pruebas.find((prueba) =>
-      selectedMeterKeys.has(prueba.nombre)
+    const otrasPruebas = pruebas?.filter(
+      (prueba) => prueba.nombre !== selectedPruebaKey
     );
-    const otrasPruebas = pruebas.filter((prueba) => prueba !== pruebaSeleccionada);
-    return otrasPruebas.some((prueba) =>
+    return otrasPruebas?.some((prueba) =>
       prueba.medidores?.some((medidor) => medidor.meter_id === item.numero_serie)
     );
   };
 
   // Crear filas de la tabla
-  const tableRow = React.useMemo(() => {
-    if (!meters) return null;
-    return meters?.map((item) => (
+  const tableRow = useMemo(() => {
+    return meters.map((item) => (
       <TableRow
-        key={item.numero_serie}
         className={`${isDisabled(item) ? "pointer-events-none opacity-40" : ""}`}
+        key={item.id}
       >
-        {(columnKey) => (
-          <TableCell className="text-center">{item[columnKey]}</TableCell>
-        )}
+        {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
       </TableRow>
     ));
-  }, [meters, selectedMeterKeys, pruebas]);
+  }, [meters, selectedMeterKeys, pruebas, selectedPruebaKey]);
 
-  // Renderización principal del componente
+  // Manejar confirmación de selección
+  const handleConfirmSelection = () => {
+    if (selectedMeterKeys.size > pruebaCapacity) {
+      alert(`Solo puedes seleccionar hasta ${pruebaCapacity} medidores.`);
+      return;
+    }
+
+    // Llamar al callback con los medidores seleccionados
+    onConfirmSelection(Array.from(selectedMeterKeys));
+  };
+
   return (
     <div className="mt-5">
       {/* Input para búsqueda */}
@@ -82,24 +92,24 @@ export default function PartialMeterSelection({
 
       {/* Tabla de medidores */}
       <div className="w-full flex-grow bg-white mb-3">
-        <Table
-          isCompact
-          removeWrapper
-          color="primary"
-          aria-label="Tabla de selección parcial"
-          className="bg-white py-4 rounded-lg h-full flex flex-col w-full overflow-x-auto"
-          checkboxesProps={{
-            classNames: {
-              wrapper: "bg-gray-200 mt-1 rounded-lg p-1",
-            },
-          }}
-          classNames={classNames}
-          selectedKeys={selectedMeterKeys}
-          selectionMode="multiple"
-          sortDescriptor={sortDescriptor}
-          onSelectionChange={setSelectedMeterKeys}
-          onSortChange={setSortDescriptor}
-        >
+      <Table
+        isCompact
+        removeWrapper
+        color="primary"
+        aria-label="Tabla de selección parcial"
+        className="bg-white py-4 rounded-lg h-full flex flex-col w-full overflow-x-auto"
+        selectionMode="multiple" // Permite selección múltiple
+        selectedKeys={selectedMeterKeys} // Llave vinculada al estado
+        onSelectionChange={(keys) => setSelectedMeterKeys(keys)} // Manejo del cambio
+        checkboxesProps={{
+          classNames: {
+            wrapper: "bg-gray-200 mt-1 rounded-lg p-1",
+          },
+        }}
+        sortDescriptor={sortDescriptor}
+        onSortChange={setSortDescriptor}
+      >
+
           <TableHeader columns={headerColumns}>
             {(column) => (
               <TableColumn
@@ -118,7 +128,7 @@ export default function PartialMeterSelection({
             loadingContent={
               <Spinner label="Cargando medidores..." className="flex top-[200px]" />
             }
-            loadingState={false} // Cambiar a true mientras se cargan los datos
+            loadingState={false}
           >
             {tableRow}
           </TableBody>
@@ -130,10 +140,7 @@ export default function PartialMeterSelection({
         auto
         color="primary"
         className="w-full mt-4"
-        onPress={() => {
-          // Confirmar selección
-          alert("Medidores seleccionados confirmados");
-        }}
+        onPress={handleConfirmSelection}
       >
         Confirmar selección
       </Button>

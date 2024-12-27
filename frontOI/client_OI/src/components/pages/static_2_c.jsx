@@ -31,6 +31,15 @@ import  DateService  from "../../hook/services/dateService.js"
 //Funcionamiento
 import React, { useState, useEffect, useMemo } from "react";
 
+const INITIAL_VISIBLE_COLUMNS = ["medidor"];
+
+const columns = [
+  {name: "ID MEDIDOR", uid: "medidor", sortable: true},
+  {name: "ESTADO", uid: "estado", sortable: true},
+  {name: "MARCA", uid: "marca", sortable: true},
+];
+
+
 export default function Static_2_c() {
 
     // -- Estados, modals y variables --
@@ -51,105 +60,164 @@ export default function Static_2_c() {
     const [rangeStart, setRangeStart] = useState(null);
     const [rangeEnd, setRangeEnd] = useState(null);
 
+    const [visibleColumns, setVisibleColumns] = useState(new Set(INITIAL_VISIBLE_COLUMNS));
+
     //----------------------------------------------------------------------------------------------
     //Funciones que requieren un manejo de reenderizado y manejo de caché
     //------------------------------------------------------------------------------------------------
 
-    useEffect(() => {
-        const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
-        if (sessionData) {
-            setCapacity(sessionData.selectedOrder.capacidad_banco);
-            setOrdenID(sessionData.selectedOrder.id_orden);
-        }
-        const fetchOrders = async () => {
-            try {
-                const medidores_orden = await apiService.getAll(`ordenes/trabajo/identificador/`, {identificador: sessionData.selectedOrder.id_orden});
-                if(medidores_orden){
-                    const medidores = medidores_orden.medidores_asociados.map((medidor) => {
-                        return {
-                            id: medidor.id,
-                            medidor: medidor.numero_serie,
-                            estado: medidor.estado,
-                        }
-                    });
-                    setMetersPrueba(medidores);
-                    setMetersLength(medidores.length);
-                }
-                
-                const pruebasActuales = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden });
-                if (pruebasActuales) {
-                    const filtradas = pruebasActuales.filter(p => p.estado === "ABIERTA");
-                    setPruebas(filtradas);
+    const headerColumns = React.useMemo(() => {
+      if (visibleColumns === "all") return columns;
+      return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
+    }, [visibleColumns]);
 
-                    if (filtradas.length > 0) {
-                        setSelectedKeys(new Set([filtradas[0].nombre]));
-                    }
-                }
-            } catch (error) {
-                console.error('Error fetching initial meters:', error);
-            }
-        };
-        fetchOrders();
-    }, []);
-
-    const handleSelectAll = () => {
-        const all = metersPrueba.map(m => m.id);
-        setSelectedMedidores(all);
-        if (all.length > 0) {
-            setRangeStart(metersPrueba[0].medidor);
-            setRangeEnd(metersPrueba[all.length - 1].medidor);
-        }
-    };
-
-    const handleSelectPartial = () => {
-        setPopUpData("meter_partial");
-        onOpen();
-    };
-
-    const handleConfirmSelection = async () => {
+        // Carga inicial
+        useEffect(() => {
+          const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
+          if (sessionData) {
+              setCapacity(sessionData.selectedOrder.capacidad_banco);
+              setOrdenID(sessionData.selectedOrder.id_orden);
+          }
+          const fetchOrders = async () => {
+              try {
+                  const medidores_orden = await apiService.getAll(`ordenes/trabajo/identificador/`, {identificador: sessionData.selectedOrder.id_orden});
+                  if(medidores_orden){
+                      const medidores = medidores_orden.medidores_asociados.map((medidor) => ({
+                          id: medidor.id,
+                          medidor: medidor.numero_serie,
+                          estado: medidor.estado,
+                      }));
+                      setMetersPrueba(medidores);
+                      setMetersLength(medidores.length);
+                  }
+                  
+                  const pruebasActuales = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden });
+                  if (pruebasActuales) {
+                      const filtradas = pruebasActuales.filter(p => p.estado === "ABIERTA");
+                      setPruebas(filtradas);
+  
+                      if (filtradas.length > 0) {
+                          setSelectedKeys(new Set([filtradas[0].nombre]));
+                      }
+                  }
+              } catch (error) {
+                  console.error('Error fetching initial meters:', error);
+              }
+          };
+          fetchOrders();
+      }, []);
+  
+      // Selección total
+      const handleSelectAll = () => {
+          const all = metersPrueba.map(m => m.id);
+          setSelectedMedidores(all);
+          if (all.length > 0) {
+              setRangeStart(metersPrueba[0].medidor);
+              setRangeEnd(metersPrueba[all.length - 1].medidor);
+          }
+      };
+  
+      // Selección parcial
+      const handleSelectPartial = () => {
+          setPopUpData("meter_partial");
+          onOpen();
+      };
+  
+      const handlePartialSelectionConfirm = (selected) => {
+        let selectedTransformed = [...new Set(selected.map(Number))];;
+        let sorted = selectedTransformed.sort((a, b) => a - b)
+          setSelectedMedidores(sorted);
+          const selectedMeters = metersPrueba.filter(m => selected.includes(m.id));
+          if (selectedMeters.length > 0) {
+              setRangeStart(selectedMeters[0].medidor);
+              setRangeEnd(selectedMeters[selectedMeters.length - 1].medidor);
+          } else {
+              setRangeStart(null);
+              setRangeEnd(null);
+          }
+          
+      };
+  
+      const handleConfirmSelection = async () => {
         if (selectedMedidores.length === 0) {
-            alert("No has seleccionado ningún medidor.");
-            return;
+          alert("No has seleccionado ningún medidor.");
+          return;
         }
-
+      
         let remaining = [...selectedMedidores];
         const assignedSummary = [];
-
-        pruebas.forEach(prueba => {
-            if (remaining.length === 0) return;
-
-            const pruebaCapacity = Math.min(remaining.length, capacity);
+        let success = true;
+      
+        try {
+          for (const prueba of pruebas) {
+            if (remaining.length === 0) break;
+      
+            // Determinar el número máximo de medidores que se pueden asignar
+            const alreadyAssigned = 0; // Puedes ajustar si necesitas verificar cuántos ya están asignados
+            const availableCapacity = prueba.n_medidores_seleccionados - alreadyAssigned;
+            const pruebaCapacity = Math.min(remaining.length, availableCapacity);
+      
             const assignedToPrueba = remaining.splice(0, pruebaCapacity);
-
-            assignedSummary.push({
+      
+            // Construir el payload para cada medidor
+            const payload = {
+              medidores: assignedToPrueba.map((id, index) => ({
+                medidor: id,
+                state: "En Evaluación",
+                num: index + 1,
+                q1: { record_li: 0.0, record_lf: 0.0, reference_volume: 1.0 },
+                q2: { record_li: 0.0, record_lf: 0.0, reference_volume: 1.0 },
+                q3: { record_li: 0.0, record_lf: 0.0, reference_volume: 1.0 },
+              })),
+            };
+      
+            // Llamada a la API para asignar los medidores a la prueba
+            const response = await apiService.create(
+              `pruebas/pruebas/${prueba.id}/assign-medidores/`,
+              payload
+            );
+      
+            if (response.status === 201) {
+              assignedSummary.push({
                 prueba: prueba.nombre,
                 medidoresAsignados: assignedToPrueba.length,
-            });
-        });
-
-        const medidoresPendientes = remaining.length;
-        const message = `
+              });
+            } else {
+              success = false;
+              console.error(`Error asignando medidores a la prueba ${prueba.nombre}`);
+            }
+          }
+      
+          const medidoresPendientes = remaining.length;
+          const message = `
+            ${success ? "Asignación completada con éxito." : "Algunos lotes no se pudieron asignar."}
             Se asignaron medidores a las siguientes pruebas:
-            ${assignedSummary.map(s => `Prueba ${s.prueba}: ${s.medidoresAsignados} medidores`).join("\n")}
+            ${assignedSummary.map((s) => `Prueba ${s.prueba}: ${s.medidoresAsignados} medidores`).join("\n")}
             ${medidoresPendientes > 0 ? `Medidores pendientes: ${medidoresPendientes}` : ""}
-        `;
+          `;
+      
+          setCustomMessage(message);
+          setIsOpenCustomMessage(true);
+        } catch (error) {
+          console.error("Error en la asignación de medidores:", error);
+          setCustomMessage("Ocurrió un error al intentar asignar los medidores.");
+          setIsOpenCustomMessage(true);
+        }
+      };
+      
 
-        setCustomMessage(message);
-        setIsOpenCustomMessage(true);
-    };
-
-    const modal = useMemo(() => {
-        return (
-        <ModalData
-            isOpen={isOpen}
-            onOpenChange={onOpenChange}
-            popUpData={popUpData}
-            meters={metersPrueba}
-            selectedMeterKeys={selectedMedidores}
-            setSelectedMeterKeys={setSelectedMedidores} 
-        />
-        );
-    }, [isOpen, popUpData, metersPrueba, selectedMedidores]);
+      const modal = useMemo(() => (
+          <ModalData
+              isOpen={isOpen}
+              onOpenChange={onOpenChange}
+              popUpData={popUpData}
+              meters={metersPrueba}
+              selectedMeterKeys={selectedMedidores}
+              setSelectedMeterKeys={setSelectedMedidores}
+              headerColumns={headerColumns}
+              onConfirmSelection={handlePartialSelectionConfirm}
+          />
+      ), [isOpen, popUpData, metersPrueba, selectedMedidores]);
 
     const confirmationMessage = useMemo(() => {
         return isOpenCustomMessage ? (
@@ -157,7 +225,7 @@ export default function Static_2_c() {
             message={customMessage} 
             isVisible={isOpenCustomMessage} 
             setIsVisible={setIsOpenCustomMessage}
-            routeRedirect={"/client/static_3"}
+            routeRedirect={"/client/static_3_c"}
         />
         ) : null;
     }, [isOpenCustomMessage, customMessage]);
@@ -231,7 +299,7 @@ export default function Static_2_c() {
 
               <div className="flex flex-col space-y-4 items-start w-full">
                 <div className="flex flex-row w-full justify-between">
-                  <div className="flex flex-col">
+                  <div className="flex flex-col justify-center items-center">
                     <span className="font-inter font-semibold text-opacity-text text-[16px]">
                       Seleccionar todos
                     </span>
@@ -246,7 +314,7 @@ export default function Static_2_c() {
                     </Button>
                   </div>
 
-                  <div className="flex flex-col">
+                  <div className="flex flex-col justify-center items-center">
                     <span className="font-inter font-semibold text-opacity-text text-[16px]">
                       Seleccionar parcial
                     </span>
@@ -257,21 +325,6 @@ export default function Static_2_c() {
                     >
                       <div className="w-[40px] h-[40px] bg-custom-blue rounded-[10px] shadow-sm flex justify-center items-center">
                         <RiPlayListAddFill className="text-white p-1 w-[28px] h-[28px]" />
-                      </div>
-                    </Button>
-                  </div>
-
-                  <div className="flex flex-col">
-                    <span className="font-inter font-semibold text-opacity-text text-[16px]">
-                      Confirmar selección
-                    </span>
-                    <Button
-                      isIconOnly
-                      className="my-2 bg-white"
-                      onClick={handleConfirmSelection}
-                    >
-                      <div className="w-[40px] h-[40px] bg-custom-blue rounded-[10px] shadow-sm flex justify-center items-center">
-                        <IoMdAddCircleOutline className="text-white p-1 w-[28px] h-[28px]" />
                       </div>
                     </Button>
                   </div>
@@ -307,6 +360,20 @@ export default function Static_2_c() {
                   {selectedMedidores.length}
                 </span>
               </div>
+              <div className="flex flex-col">
+                    <span className="font-inter font-semibold text-opacity-text text-[16px]">
+                      Confirmar selección
+                    </span>
+                    <Button
+                      isIconOnly
+                      className="my-2 bg-white"
+                      onClick={handleConfirmSelection}
+                    >
+                      <div className="w-[40px] h-[40px] bg-custom-blue rounded-[10px] shadow-sm flex justify-center items-center">
+                        <IoMdAddCircleOutline className="text-white p-1 w-[28px] h-[28px]" />
+                      </div>
+                    </Button>
+                  </div>
             </div>
           </div>
         </>

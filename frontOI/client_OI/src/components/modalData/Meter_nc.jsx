@@ -116,7 +116,7 @@ export default function Meter_nc(
                 //topContent={topContent}
                 //topContentPlacement="outside"
                 onSelectionChange={(keys) => {
-                    if (keys.size <= 4) {
+                    if (keys.size <= pruebas.find((prueba) => selectedKeys.has(prueba.nombre)).n_medidores_seleccionados) {
                         setSelectedMeterKeys(keys);
                     }
                 }}                

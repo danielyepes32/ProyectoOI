@@ -44,12 +44,14 @@ export default function Static_4_Q3() {
     const loadingState = isLoading === true & metersLength === 0 ? "loading" : "idle";
 
     const [confirm , setConfirm] = React.useState(false)
+    const [pruebasUpdated, setPruebasUpdated] = React.useState([]);
 
     const [pruebas, setPruebas] = React.useState([])
 
     //---------------------------------------------------------------------------------------------------------------------------
     //Aquí se encuentran las funciones usadas en el componente MainClient
     //Función para obtener los gateways del autocomplete
+    {/*
     React.useEffect(() => {
   
       //Al estar ejecutando el fetch activamos el loading de la data
@@ -60,7 +62,6 @@ export default function Static_4_Q3() {
       const response = await apiService.getOrdenes();
       // Suponiendo que setPruebas es un setter de un estado que contiene un array
       setPruebas(prevState => [response[0].identificador]);
-          //usamos el componente "count" de la consulta para establecer el tamaño de los registros
       } catch (error) {
           //En caso de error en el llamado a la API se ejecuta un console.error
           console.error('Error fetching initial meters:', error);
@@ -72,11 +73,95 @@ export default function Static_4_Q3() {
 
       fetchPruebas();
   }, []);
+  */}
 
+    //Función para obtener los gateways del autocomplete
+    React.useMemo(() => {
+  
+    //Al estar ejecutando el fetch activamos el loading de la data
+        //setIsLoading(true);
+        const fetchPruebas = async () => {
+        try {
+        //inizializamos los parametros de consultas a la API de consumo
+        //console.log("No ha salido")
+        //const params = {
+            // q: filterValue,
+            //page:1,
+            //page_size : 10
+        //};
 
-      React.useEffect(() => {
+        const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
+        
+        const response = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden });
+        // Suponiendo que setPruebas es un setter de un estado que contiene un array
+        setPruebas(response);
+        console.log(response)
+        //setSelectedKeys(new Set([response[0].nombre]))
+            //usamos el componente "count" de la consulta para establecer el tamaño de los registros
+        } catch (error) {
+            //En caso de error en el llamado a la API se ejecuta un console.error
+            console.error('Error fetching initial meters:', error);
+        } finally {
+            //al finalizar independientemente de haber encontrado o no datos se detiene el circulo de cargue de datos
+            //console.log("salio");
+        }
+        }
 
-        console.log('Entra')
+        fetchPruebas();
+        }
+    , []);
+
+    //Función para obtener los gateways del autocomplete
+    React.useMemo(() => {
+  
+      //Al estar ejecutando el fetch activamos el loading de la data
+      //setIsLoading(true);
+      const fetchMedidoresAsociados = async () => {
+      try {
+      //inizializamos los parametros de consultas a la API de consumo
+      //console.log("No ha salido")
+      //const params = {
+          // q: filterValue,
+          //page:1,
+          //page_size : 10
+      //};
+      
+      const responses = await Promise.all(pruebas.map(async (prueba) => {
+          const medidores = await apiService.getAll(`pruebas/pruebas/${prueba.id}/medidores-asociados/`);
+          
+          return {
+              ...prueba,
+              medidores: medidores
+          };
+      }));
+      console.log("Prueba: ", responses);
+      setPruebasUpdated(responses);
+      setMeters(responses[0] ? responses[0].medidores : null)
+      const visualInspectionObj = responses[0] ? responses[0].medidores.reduce((acc, item) => {
+        acc[item.meter_id] = { value: item.state}; // Establecer valor por defecto
+        return acc;
+      }, {}):null;
+      // Actualizar el estado visualInspection
+      setVisualInspection(visualInspectionObj);
+
+      setMetersLength(responses[0] ? responses[0].medidores.length : null);
+
+      } catch (error) {
+          //En caso de error en el llamado a la API se ejecuta un console.error
+          console.error('Error fetching initial meters:', error);
+      } finally {
+          //al finalizar independientemente de haber encontrado o no datos se detiene el circulo de cargue de datos
+          //console.log("salio");
+      }
+      }
+
+      fetchMedidoresAsociados();
+      }
+    ,[pruebas]);
+
+{/*
+      React.useMemo(() => {
+
         //Al estar ejecutando el fetch activamos el loading de la data
         setIsLoading(true);
         const fetchMetersPrueba = async () => {
@@ -105,7 +190,7 @@ export default function Static_4_Q3() {
         }
 
         fetchMetersPrueba();
-      }, []);
+      }, []);¨*/}
 
     React.useMemo(()=>{
     if(confirm){
@@ -169,8 +254,6 @@ export default function Static_4_Q3() {
         );
     }, [isOpen]);
 
-    console.log(meters)
-
     const handleConfirm = () => {
       console.log("Entra")
       // Actualizar todos los medidores con el valor de `visualInspection` correspondiente
@@ -223,7 +306,7 @@ export default function Static_4_Q3() {
           <div className="w-full h-auto grid grid-cols-4 space-x-2 pt-2">
             <div className="col-span-3 bg-white shadow-lg px-7 flex flex-col space-x-2 rounded-[20px] items-center py-4">
               <span className="font-inter text-center w-full">Usted se encuentra en la prueba No.</span>
-              <span className="font-teko text-[32px] font-semibold w-full text-center">{pruebas[0]}</span>
+              <span className="font-teko text-[32px] font-semibold w-full text-center">{pruebas[0] ? pruebas[0].nombre : ''}</span>
             </div>
             <div className="col-span-1 w-full flex justify-center place-items-center flex">
               <Button
