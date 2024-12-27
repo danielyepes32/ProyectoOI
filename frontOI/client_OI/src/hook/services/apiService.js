@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-const baseUrl = 'https://fab6-181-56-8-48.ngrok-free.app/api/';
+const baseUrl = 'https://0400-181-56-8-48.ngrok-free.app/api/';
 
 // Configuracion comun para las solicitudes para los headers y la informacion por fuera del payload
 const axiosInstance = axios.create({
@@ -107,9 +107,9 @@ const getMedidoresPrueba = async (params) => {
 };
 
 // Servicio para actualizar los valores de un medidor
-export const updateMetersPrueba = async (meterId, updates) => {
+export const updateMetersPrueba = async (pruebaId, updates) => {
   try {
-    const response = await axios.put(`${baseUrl}pruebas/update/${meterId}/`, updates, {
+    const response = await axios.put(`${baseUrl}pruebas/pruebas/${pruebaId}/update-medidores/`, updates, {
       headers: {
         'Content-Type': 'application/json',
       },

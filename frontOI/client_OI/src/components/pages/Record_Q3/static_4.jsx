@@ -137,6 +137,14 @@ export default function Static_4_Q3() {
       console.log("Prueba: ", responses);
       setPruebasUpdated(responses);
       setMeters(responses[0] ? responses[0].medidores : null)
+      setMeters(
+        responses[0]
+          ? responses[0].medidores.map((meter) => ({
+              ...meter,
+              result: meter.state === "Sin observaciones" || meter.state === "En Evaluación" ? "Apto" : "No Apto",
+            }))
+          : null
+      );
       const visualInspectionObj = responses[0] ? responses[0].medidores.reduce((acc, item) => {
         acc[item.meter_id] = { value: item.state}; // Establecer valor por defecto
         return acc;
@@ -192,22 +200,55 @@ export default function Static_4_Q3() {
         fetchMetersPrueba();
       }, []);¨*/}
 
-    React.useMemo(()=>{
-    if(confirm){
-      const handleUpdateMeter = async () => {
-        try {
-          meters.map(async (item) => {
-            const response = await apiService.updateMetersPrueba(item.meter_id, item);  // Llamada a la función updateMeter
-            console.log('Meter updated:', response);
-          })
-        } catch (error) {
-          console.error(error); 
-        } 
-        }
-  
-        handleUpdateMeter()
-    }else{null}
-    },[confirm])
+    React.useMemo(() => {
+      if (confirm) {
+        const handleUpdateMeter = async () => {
+          try {
+            console.log("meters: ", meters)
+            // Construir el payload con los medidores
+            const payload = {
+              medidores: meters.map((item) => ({
+                id: item.id, // Asegúrate de que 'meter_id' corresponde a 'id' en el payload
+                state: item.state || "En Evaluación", // Estado por defecto
+                obs: item.obs || "Sin observaciones", // Observación por defecto
+                result: item.result || "Apto", // Resultado por defecto
+                q1: {
+                  record_li: item.q1?.record_li || 0, // Valor por defecto
+                  record_lf: item.q1?.record_lf || 0, // Valor por defecto
+                  reference_volume: item.q1?.reference_volume || 0, // Valor por defecto
+                },                
+                q2: {
+                  record_li: item.q2?.record_li || 0, // Valor por defecto
+                  record_lf: item.q2?.record_lf || 0, // Valor por defecto
+                  reference_volume: item.q2?.reference_volume || 0, // Valor por defecto
+                },
+                q3: {
+                  record_li: item.q3?.record_li || 0, // Valor por defecto
+                  record_lf: item.q3?.record_lf || 0, // Valor por defecto
+                  reference_volume: item.q3?.reference_volume || 0, // Valor por defecto
+                },
+              })),
+            };
+
+            payload.medidores.map(async (item, index) => {
+              const singlePayload = { medidores: [item] };
+              await apiService.updateMetersPrueba(pruebas[0].id, singlePayload);
+              console.log(`Payload for index ${index}: `, singlePayload);
+            })
+
+            console.log("Payload: ", payload)    
+            // Llamada al servicio de la API 
+          } catch (error) {
+            console.error('Error updating meters:', error);
+          }
+        };
+    
+        handleUpdateMeter();
+      } else {
+        return null;
+      }
+    }, [confirm, meters, pruebas]);
+      
 
     //Esta función se usa para calcular las columnas que se etsablecen como visibles
     const headerColumns = React.useMemo(() => {
@@ -254,16 +295,61 @@ export default function Static_4_Q3() {
         );
     }, [isOpen]);
 
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
       console.log("Entra")
       // Actualizar todos los medidores con el valor de `visualInspection` correspondiente
-      setMeters((prevMeters) =>
-        prevMeters.map((meter) => ({
-          ...meter,
-          state: visualInspection[meter.meter_id].value, // Asigna el valor de visualInspection para cada meter
-        }))
-      )
-      setConfirm(true)
+      const medidores = meters.map((meter) => ({
+        ...meter,
+        state: visualInspection[meter.meter_id].value, // Asigna el valor de visualInspection para cada meter
+      }))
+      const apiResult = await handleUpdateMeter(medidores); // Llama a handleUpdateMeter como callback
+
+      return apiResult; //Validar avanzar de vista
+    };
+
+    const handleUpdateMeter = async (medidores) => {
+      try {
+
+      // Construir el payload con los medidores
+      const payload = {
+        medidores: medidores.map((item) => ({
+        id: item.id, // Asegúrate de que 'meter_id' corresponde a 'id' en el payload
+        state: item.state || "En Evaluación", // Estado por defecto
+        obs: item.obs || "Sin observaciones", // Observación por defecto
+        result: item.result || "Apto", // Resultado por defecto
+        q1: {
+          record_li: item.q1?.record_li || 0, // Valor por defecto
+          record_lf: item.q1?.record_lf || 0, // Valor por defecto
+          reference_volume: item.q1?.reference_volume || 0, // Valor por defecto
+        },                
+        q2: {
+          record_li: item.q2?.record_li || 0, // Valor por defecto
+          record_lf: item.q2?.record_lf || 0, // Valor por defecto
+          reference_volume: item.q2?.reference_volume || 0, // Valor por defecto
+        },
+        q3: {
+          record_li: item.q3?.record_li || 0, // Valor por defecto
+          record_lf: item.q3?.record_lf || 0, // Valor por defecto
+          reference_volume: item.q3?.reference_volume || 0, // Valor por defecto
+        },
+        })),
+      };
+
+      payload.medidores.map(async (item, index) => {
+        const singlePayload = { medidores: [item] };
+        await apiService.updateMetersPrueba(pruebas[0].id, singlePayload);
+        console.log(`Payload for index ${index}: `, singlePayload);
+      })
+
+      console.log("Payload: ", payload)
+      alert("Medidores actualizados correctamente");
+      return true;    
+      // Llamada al servicio de la API 
+      } catch (error) {
+      console.error('Error updating meters:', error);
+      alert("Error al actualizar los medidores, intente de nuevo");
+      return false;
+      }
     };
 
     const confirmationMessage = React.useMemo(() => {

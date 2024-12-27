@@ -256,7 +256,7 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
 
         return(
           <span>{`${user[Q].error} %`}</span>
-        )
+        );
     default:
       return cellValue || 'NO DATA';
   }
