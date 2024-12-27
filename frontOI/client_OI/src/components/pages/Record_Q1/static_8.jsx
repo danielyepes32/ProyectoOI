@@ -55,24 +55,61 @@ export default function Static_8() {
     const [metersLength, setMetersLength] = React.useState();
     //Constante usada para definir si se estan cargando los datos o si en su defecto simplemente no hay datos en la consulta
     const loadingState = isLoading === true & metersLength === 0 ? "loading" : "idle";
+    const [pruebas, setPruebas] = React.useState([])
 
     //---------------------------------------------------------------------------------------------------------------------------
     //Aquí se encuentran las funciones usadas en el componente MainClient
+    React.useMemo(() => {
+  
+    //Al estar ejecutando el fetch activamos el loading de la data
+      //setIsLoading(true);
+      const fetchPruebas = async () => {
+      try {
+      //inizializamos los parametros de consultas a la API de consumo
+        const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
+        
+        const response = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden });
+        // Suponiendo que setPruebas es un setter de un estado que contiene un array
+        setPruebas(response);
+        console.log(response)
+        //setSelectedKeys(new Set([response[0].nombre]))
+            //usamos el componente "count" de la consulta para establecer el tamaño de los registros
+        } catch (error) {
+            //En caso de error en el llamado a la API se ejecuta un console.error
+            console.error('Error fetching initial meters:', error);
+        } finally {
+            //al finalizar independientemente de haber encontrado o no datos se detiene el circulo de cargue de datos
+            //console.log("salio");
+        }
+      }
 
-    React.useEffect(() => {
+      fetchPruebas();
+      }
+  , []);
+
+    React.useMemo(() => {
 
       //Al estar ejecutando el fetch activamos el loading de la data
       setIsLoading(true);
       const fetchMetersPrueba = async () => {
       try {
       
-      const response = await apiService.getMedidoresPrueba();
-      // Suponiendo que setPruebas es un setter de un estado que contiene un array
-      const filtrados = response.filter(item => item.result !== "No apto" && item.obs !== "No conforme");
+      const responses = await Promise.all(pruebas.map(async (prueba) => {
+        const medidores = await apiService.getAll(`pruebas/pruebas/${prueba.id}/medidores-asociados/`);
+        
+        return {
+            ...prueba,
+            medidores: medidores
+        };
 
+      }));
+      const filtrados = responses[0] ? responses[0].medidores.filter(item => item.result !== "No apto" && item.obs !== "No conforme") : null;
       // Suponiendo que setPruebas es un setter de un estado que contiene un array
-      setMeters(filtrados)  
-      setMetersLength(filtrados.length)
+      console.log(filtrados)
+      setMeters(filtrados ? filtrados : null)
+      // Actualizar el estado visualInspection
+      setMetersLength(filtrados ? filtrados.length : null);
+
           //usamos el componente "count" de la consulta para establecer el tamaño de los registros
       } catch (error) {
           //En caso de error en el llamado a la API se ejecuta un console.error
@@ -82,9 +119,9 @@ export default function Static_8() {
           //console.log("salio");
       }
       }
-  
+
       fetchMetersPrueba();
-    }, []);
+    }, [pruebas]);
 
     //Esta función se usa para calcular las columnas que se etsablecen como visibles
     const headerColumns = React.useMemo(() => {

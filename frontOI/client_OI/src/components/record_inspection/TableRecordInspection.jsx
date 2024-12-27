@@ -19,7 +19,7 @@ export default function TableRecordInspection(
         updateResult,
         updateValidate,
         handleEnterAction,
-        Q
+        selectedQ
     }
 ){
 
@@ -48,7 +48,7 @@ export default function TableRecordInspection(
     );
 
     const tableRow = React.useMemo(() => {
-        return meters.map((item) => (
+        return meters ? meters.map((item) => (
           <TableRow
               key={item.meter_id}
               //className={isChanged && item.test_id === '001' ? 'data-[selected=true]:bg-green-600 transition-colors duration-500' : 'transition-colors duration-500'}
@@ -56,25 +56,26 @@ export default function TableRecordInspection(
             {(columnKey) => 
             <TableCell
                 >
-                    {renderCell(
-                        item, // Asegúrate de pasar el item correctamente
-                        columnKey, // Pasa columnKey directamente
-                        null, // Añade setSelectedMeter si es necesario en renderCell
-                        null, // Añade setActionKey si es necesario
-                        null,
-                        null,
-                        updateResult,
-                        null,
-                        null,
-                        updateValidate,
-                        meters,
-                        null,
-                        null,
-                        handleEnterAction,
-                        Q
-                         )}</TableCell>}
+                {renderCell(
+                    item, // Asegúrate de pasar el item correctamente
+                    columnKey, // Pasa columnKey directamente
+                    null, // Añade setSelectedMeter si es necesario en renderCell
+                    null, // Añade setActionKey si es necesario
+                    null,
+                    null,
+                    updateResult,
+                    null,
+                    null,
+                    updateValidate,
+                    meters,
+                    null,
+                    null,
+                    handleEnterAction,
+                    selectedQ
+                )}
+            </TableCell>}
         </TableRow>
-        ));
+        )) : null;
       }, [meters, headerColumns])
 
 
