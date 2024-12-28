@@ -11,7 +11,7 @@ const statusColorMap = {
   pending: 'yellow',
 };
 
-const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, visualInspection, updateResult, updateValue, addKey, updateValidate, meters, handleValidateErrorInput, location, handleEnterAction, Q) => {
+const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, visualInspection, updateResult, updateValue, addKey, updateValidate, meters, handleValidateErrorInput, location, handleEnterAction, selectedQ) => {
   const cellValue = user[columnKey];
   switch (columnKey) {
     case "status":
@@ -149,7 +149,6 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
     );
     case "record_li":
       const pointerMeter = meters.find(item => item.meter_id === user.meter_id);
-      const selectedQ = Q || "q2"; // Define selectedQ antes de usarlo
 
       return (
         <Input
@@ -157,8 +156,9 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
           value={
             pointerMeter?.[selectedQ]?.record_li === 0
               ? ""
-              : pointerMeter?.[selectedQ]?.record_l5i
+              : pointerMeter?.[selectedQ]?.record_li
           }
+          maxLength={5}
           variant="underlined"
           type="number"
           isInvalid={pointerMeter?.isInvalid}
@@ -174,14 +174,19 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
               : "danger"
           }
           onValueChange={(value) => {
-            updateResult(user.meter_id, value);
-            updateValidate(user.meter_id, value);
+            value.length < 7 ? updateResult(user.meter_id, value) : null;
+            value.length < 7 ? updateValidate(user.meter_id, value) : null;
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               const inputValue = e.target.value;
               console.log("Enter", inputValue);
               handleEnterAction(user.meter_id, inputValue);
+            }
+            if (e.key === "Backspace") {
+              console.log("Backspace", 0);
+              updateResult(user.meter_id, 0);
+              updateValidate(user.meter_id, 0);
             }
           }}
           onPointerDown={(e) => {
@@ -193,15 +198,14 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
 
     case "record_lf":
       const pointerRecordlf = meters.find(item => item.meter_id === user.meter_id);
-      const selectedQlf = Q || "q1"; // Define selectedQlf antes de usarlo
 
       return (
         <Input
           className="flex justify-center text-center w-full whitespace-pre-wrap z-[0] border-none px-0 shadow-none"
           value={
-            pointerRecordlf?.[selectedQlf]?.record_lf === 0
+            pointerRecordlf?.[selectedQ]?.record_lf === 0
               ? ""
-              : pointerRecordlf?.[selectedQlf]?.record_lf
+              : pointerRecordlf?.[selectedQ]?.record_lf
           }
           variant="underlined"
           type="number"
@@ -211,9 +215,9 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
             input: "text-center bg-green-100",
           }}
           color={
-            pointerRecordlf?.[selectedQlf]?.record_lf === ""
+            pointerRecordlf?.[selectedQ]?.record_lf === ""
               ? "danger"
-              : pointerRecordlf?.[selectedQlf]?.record_lf
+              : pointerRecordlf?.[selectedQ]?.record_lf
               ? "primary"
               : "danger"
           }
@@ -226,6 +230,11 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
               const inputValue = e.target.value;
               console.log("Enter", inputValue);
               handleEnterAction(user.meter_id, inputValue);
+            }
+            if (e.key === "Backspace") {
+              console.log("Backspace", 0);
+              updateResult(user.meter_id, 0);
+              updateValidate(user.meter_id, 0);
             }
           }}
           onPointerDown={(e) => {
@@ -256,7 +265,7 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
 
         return(
           <span>{`${user[Q].error} %`}</span>
-        )
+        );
     default:
       return cellValue || 'NO DATA';
   }

@@ -27,7 +27,7 @@ export default function Banco({ nBanco, capacidad, marca, modelo, habilitado, ce
             )}
             {habilitado && (
                 <>
-                    <p className="font-semibold">Certificados vigentes</p>
+                    <p className="font-semibold">Mantenimiento</p>
                     <p className="text-right">{habilitado}</p>
                 </>
             )}

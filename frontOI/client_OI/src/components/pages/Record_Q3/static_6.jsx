@@ -5,7 +5,7 @@ import {
 } from "@nextui-org/modal";
 import React, { useState } from "react";
 import CustomAlert from "../../shared/CustomAlert";
-import {meterColumns, meterDataTest} from "../../../utils/tests/data"  //"../../utils/tests/data";
+import {meterColumns} from "../../../utils/tests/data"  //"../../utils/tests/data";
 
 import { IoSpeedometerOutline } from "react-icons/io5";
 import { MdOutlineWbIncandescent } from "react-icons/md";
@@ -24,7 +24,6 @@ export default function Static_6_Q3() {
     const [isChanged, setIsChanged] = useState(false)
     const [volumeValue, setVolumeValue] = useState()
     const [seconds, setSeconds] = useState(0);
-
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [popUpData,setPopUpData] = React.useState(null);
     const [customMessage, setCustomMessage] = React.useState(null);
@@ -44,17 +43,47 @@ export default function Static_6_Q3() {
 
     const[confirm , setConfirm] = React.useState(false)
 
+    const [pruebas, setPruebas] = React.useState([])
+
     //---------------------------------------------------------------------------------------------------------------------------
     //Aquí se encuentran las funciones usadas en el componente MainClient
-    React.useEffect(() => {
+    React.useMemo(() => {
       // Inicia un intervalo que incrementa el tiempo cada segundo
-      const interval = setInterval(() => {
-        setSeconds((prevSeconds) => prevSeconds + 1);
-      }, 1000);
+      //const interval = setInterval(() => {
+        //setSeconds((prevSeconds) => prevSeconds + 1);
+      //}, 1000);
   
       // Limpia el intervalo al desmontar el componente
-      return () => clearInterval(interval);
+      //return () => clearInterval(interval);
     }, []);
+
+    React.useMemo(() => {
+  
+    //Al estar ejecutando el fetch activamos el loading de la data
+      //setIsLoading(true);
+      const fetchPruebas = async () => {
+      try {
+      //inizializamos los parametros de consultas a la API de consumo
+        const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
+        
+        const response = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden });
+        // Suponiendo que setPruebas es un setter de un estado que contiene un array
+        setPruebas(response);
+        console.log(response)
+        //setSelectedKeys(new Set([response[0].nombre]))
+            //usamos el componente "count" de la consulta para establecer el tamaño de los registros
+        } catch (error) {
+            //En caso de error en el llamado a la API se ejecuta un console.error
+            console.error('Error fetching initial meters:', error);
+        } finally {
+            //al finalizar independientemente de haber encontrado o no datos se detiene el circulo de cargue de datos
+            //console.log("salio");
+        }
+      }
+
+      fetchPruebas();
+      }
+  , []);
 
     React.useMemo(() => {
 
@@ -63,13 +92,22 @@ export default function Static_6_Q3() {
       const fetchMetersPrueba = async () => {
       try {
       
-      const response = await apiService.getMedidoresPrueba();
-      // Suponiendo que setPruebas es un setter de un estado que contiene un array
-      const filtrados = response.filter(item => item.result !== "No apto" && item.obs !== "No conforme");
+      const responses = await Promise.all(pruebas.map(async (prueba) => {
+        const medidores = await apiService.getAll(`pruebas/pruebas/${prueba.id}/medidores-asociados/`);
+        
+        return {
+            ...prueba,
+            medidores: medidores
+        };
 
+      }));
+      const filtrados = responses[0] ? responses[0].medidores.filter(item => item.result !== "No apto" && item.obs !== "No conforme") : null;
       // Suponiendo que setPruebas es un setter de un estado que contiene un array
-      setMeters(filtrados)  
-      setMetersLength(filtrados.length);
+      console.log(filtrados)
+      setMeters(filtrados ? filtrados : null)
+      // Actualizar el estado visualInspection
+      setMetersLength(filtrados ? filtrados.length : null);
+
           //usamos el componente "count" de la consulta para establecer el tamaño de los registros
       } catch (error) {
           //En caso de error en el llamado a la API se ejecuta un console.error
@@ -79,9 +117,9 @@ export default function Static_6_Q3() {
           //console.log("salio");
       }
       }
-  
+
       fetchMetersPrueba();
-    }, []);
+    }, [pruebas]);
 
     // Calcula los minutos y segundos a partir del total de segundos
     const minutes = Math.floor(seconds / 60);
@@ -100,16 +138,14 @@ export default function Static_6_Q3() {
     // Función para actualizar el value de un objeto específico
     const updateResult = (key, newValue) => {
       setMeters((prevMeters) =>
-        prevMeters.map((meter) =>
-          meter.meter_id === key
+        prevMeters.map(({ meter_id, q3, ...rest }) =>
+          meter_id === key
             ? {
-                ...meter,
-                q3: {
-                  ...meter.q3, // Copia el objeto q3 existente
-                  record_li: Number(newValue), // Actualiza solo record_li
-                },
+                ...rest,
+                meter_id,
+                q3: { ...q3, record_li: Number(newValue) }, // Actualiza solo record_li
               }
-            : meter // Deja el resto de los medidores igual
+            : { meter_id, q3, ...rest } // Devuelve el medidor sin cambios
         )
       );
     };
@@ -154,25 +190,59 @@ export default function Static_6_Q3() {
       });
     };
     
-    React.useMemo(()=>{
-      if(confirm){
-        const handleUpdateMeter = async () => {
-          try {
-            meters.map(async (item) => {
-              const response = await apiService.updateMetersPrueba(item.meter_id, item);  // Llamada a la función updateMeter
-              console.log('Meter updated:', response);
-            })
-          } catch (error) {
-            console.error(error); 
-          }
-        }
-          handleUpdateMeter()
-      }else{null}
-      },[confirm])
-  
-      const handleConfirm = () => {
-        setConfirm(true)
+    const handleConfirm = async () => {
+      console.log("Entra")
+      // Actualizar todos los medidores con el valor de `visualInspection` correspondiente
+      const apiResult = await handleUpdateMeter(meters); // Llama a handleUpdateMeter como callback
+
+      return apiResult; //Validar avanzar de vista
+    };
+
+    const handleUpdateMeter = async (medidores) => {
+      try {
+
+      // Construir el payload con los medidores
+      const payload = {
+        medidores: medidores.map((item) => ({
+        id: item.id, // Asegúrate de que 'meter_id' corresponde a 'id' en el payload
+        state: item.state || "En Evaluación", // Estado por defecto
+        obs: item.obs || "Sin observaciones", // Observación por defecto
+        result: item.result || "Apto", // Resultado por defecto
+        drain: item.drain || 'En Evaluación', // Valor por defecto,
+        q1: {
+          record_li: item.q1?.record_li || 0, // Valor por defecto
+          record_lf: item.q1?.record_lf || 0, // Valor por defecto
+          reference_volume: item.q1?.reference_volume || 0, // Valor por defecto
+        },                
+        q2: {
+          record_li: item.q2?.record_li || 0, // Valor por defecto
+          record_lf: item.q2?.record_lf || 0, // Valor por defecto
+          reference_volume: item.q2?.reference_volume || 0, // Valor por defecto
+        },
+        q3: {
+          record_li: item.q3?.record_li || 0, // Valor por defecto
+          record_lf: item.q3?.record_lf || 0, // Valor por defecto
+          reference_volume: item.q3?.reference_volume || 0, // Valor por defecto
+        },
+        })),
       };
+
+      payload.medidores.map(async (item, index) => {
+        const singlePayload = { medidores: [item] };
+        await apiService.updateMetersPrueba(pruebas[0].id, singlePayload);
+        console.log(`Payload for index ${index}: `, singlePayload);
+      })
+
+      console.log("Payload: ", payload)
+      alert("Medidores actualizados correctamente");
+      return true;    
+      // Llamada al servicio de la API 
+      } catch (error) {
+      console.error('Error updating meters:', error);
+      alert("Error al actualizar los medidores, intente de nuevo");
+      return false;
+      }
+    };
 
   
     //Usamos memo para describir la parte superior de la tabla como el buscador y los filtros
@@ -212,12 +282,10 @@ export default function Static_6_Q3() {
         //addKey={addKey}
         handleEnterAction = {handleEnterAction}
         updateValidate={updateValidate}
-        Q={"q3"}
+        selectedQ={'q3'}
       />
     );
   }, [meters, headerColumns ,selectedKeys])
-
-  console.log(meters)
 
   const handleVolumeChange = (event) => {
     const newValue = event.target.value;

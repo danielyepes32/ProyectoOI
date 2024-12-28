@@ -43,7 +43,6 @@ export default function Static_4_Q3() {
     //Constante usada para definir si se estan cargando los datos o si en su defecto simplemente no hay datos en la consulta
     const loadingState = isLoading === true & metersLength === 0 ? "loading" : "idle";
 
-    const [confirm , setConfirm] = React.useState(false)
     const [pruebasUpdated, setPruebasUpdated] = React.useState([]);
 
     const [pruebas, setPruebas] = React.useState([])
@@ -51,29 +50,6 @@ export default function Static_4_Q3() {
     //---------------------------------------------------------------------------------------------------------------------------
     //Aquí se encuentran las funciones usadas en el componente MainClient
     //Función para obtener los gateways del autocomplete
-    {/*
-    React.useEffect(() => {
-  
-      //Al estar ejecutando el fetch activamos el loading de la data
-      //setIsLoading(true);
-      const fetchPruebas = async () => {
-      try {
-      
-      const response = await apiService.getOrdenes();
-      // Suponiendo que setPruebas es un setter de un estado que contiene un array
-      setPruebas(prevState => [response[0].identificador]);
-      } catch (error) {
-          //En caso de error en el llamado a la API se ejecuta un console.error
-          console.error('Error fetching initial meters:', error);
-      } finally {
-          //al finalizar independientemente de haber encontrado o no datos se detiene el circulo de cargue de datos
-          //console.log("salio");
-      }
-      }
-
-      fetchPruebas();
-  }, []);
-  */}
 
     //Función para obtener los gateways del autocomplete
     React.useMemo(() => {
@@ -137,6 +113,14 @@ export default function Static_4_Q3() {
       console.log("Prueba: ", responses);
       setPruebasUpdated(responses);
       setMeters(responses[0] ? responses[0].medidores : null)
+      setMeters(
+        responses[0]
+          ? responses[0].medidores.map((meter) => ({
+              ...meter,
+              result: meter.state === "Sin observaciones" || meter.state === "En Evaluación" ? "Apto" : "No Apto",
+            }))
+          : null
+      );
       const visualInspectionObj = responses[0] ? responses[0].medidores.reduce((acc, item) => {
         acc[item.meter_id] = { value: item.state}; // Establecer valor por defecto
         return acc;
@@ -158,56 +142,6 @@ export default function Static_4_Q3() {
       fetchMedidoresAsociados();
       }
     ,[pruebas]);
-
-{/*
-      React.useMemo(() => {
-
-        //Al estar ejecutando el fetch activamos el loading de la data
-        setIsLoading(true);
-        const fetchMetersPrueba = async () => {
-        try {
-        
-        const response = await apiService.getMedidoresPrueba();
-        // Suponiendo que setPruebas es un setter de un estado que contiene un array
-        setMeters(response)
-        const visualInspectionObj = response.reduce((acc, item) => {
-          acc[item.meter_id] = { value: item.state}; // Establecer valor por defecto
-          return acc;
-        }, {});
-        // Actualizar el estado visualInspection
-        setVisualInspection(visualInspectionObj);
-
-
-        setMetersLength(response.length);
-            //usamos el componente "count" de la consulta para establecer el tamaño de los registros
-        } catch (error) {
-            //En caso de error en el llamado a la API se ejecuta un console.error
-            console.error('Error fetching initial meters:', error);
-        } finally {
-            //al finalizar independientemente de haber encontrado o no datos se detiene el circulo de cargue de datos
-            //console.log("salio");
-        }
-        }
-
-        fetchMetersPrueba();
-      }, []);¨*/}
-
-    React.useMemo(()=>{
-    if(confirm){
-      const handleUpdateMeter = async () => {
-        try {
-          meters.map(async (item) => {
-            const response = await apiService.updateMetersPrueba(item.meter_id, item);  // Llamada a la función updateMeter
-            console.log('Meter updated:', response);
-          })
-        } catch (error) {
-          console.error(error); 
-        } 
-        }
-  
-        handleUpdateMeter()
-    }else{null}
-    },[confirm])
 
     //Esta función se usa para calcular las columnas que se etsablecen como visibles
     const headerColumns = React.useMemo(() => {
@@ -254,16 +188,60 @@ export default function Static_4_Q3() {
         );
     }, [isOpen]);
 
-    const handleConfirm = () => {
-      console.log("Entra")
+    const handleConfirm = async () => {
       // Actualizar todos los medidores con el valor de `visualInspection` correspondiente
-      setMeters((prevMeters) =>
-        prevMeters.map((meter) => ({
-          ...meter,
-          state: visualInspection[meter.meter_id].value, // Asigna el valor de visualInspection para cada meter
-        }))
-      )
-      setConfirm(true)
+      const medidores = meters.map((meter) => ({
+        ...meter,
+        state: visualInspection[meter.meter_id].value, // Asigna el valor de visualInspection para cada meter
+      }))
+      const apiResult = await handleUpdateMeter(medidores); // Llama a handleUpdateMeter como callback
+
+      return apiResult; //Validar avanzar de vista
+    };
+
+    const handleUpdateMeter = async (medidores) => {
+      try {
+
+      // Construir el payload con los medidores
+      const payload = {
+        medidores: medidores.map((item) => ({
+        id: item.id, // Asegúrate de que 'meter_id' corresponde a 'id' en el payload
+        state: item.state || "En Evaluación", // Estado por defecto
+        obs: item.obs || "Sin observaciones", // Observación por defecto
+        result: item.result || "Apto", // Resultado por defecto
+        q1: {
+          record_li: item.q1?.record_li || 0, // Valor por defecto
+          record_lf: item.q1?.record_lf || 0, // Valor por defecto
+          reference_volume: item.q1?.reference_volume || 0, // Valor por defecto
+        },                
+        q2: {
+          record_li: item.q2?.record_li || 0, // Valor por defecto
+          record_lf: item.q2?.record_lf || 0, // Valor por defecto
+          reference_volume: item.q2?.reference_volume || 0, // Valor por defecto
+        },
+        q3: {
+          record_li: item.q3?.record_li || 0, // Valor por defecto
+          record_lf: item.q3?.record_lf || 0, // Valor por defecto
+          reference_volume: item.q3?.reference_volume || 0, // Valor por defecto
+        },
+        })),
+      };
+
+      payload.medidores.map(async (item, index) => {
+        const singlePayload = { medidores: [item] };
+        await apiService.updateMetersPrueba(pruebas[0].id, singlePayload);
+        console.log(`Payload for index ${index}: `, singlePayload);
+      })
+
+      console.log("Payload: ", payload)
+      alert("Medidores actualizados correctamente");
+      return true;    
+      // Llamada al servicio de la API 
+      } catch (error) {
+      console.error('Error updating meters:', error);
+      alert("Error al actualizar los medidores, intente de nuevo");
+      return false;
+      }
     };
 
     const confirmationMessage = React.useMemo(() => {
@@ -308,7 +286,7 @@ export default function Static_4_Q3() {
               <span className="font-inter text-center w-full">Usted se encuentra en la prueba No.</span>
               <span className="font-teko text-[32px] font-semibold w-full text-center">{pruebas[0] ? pruebas[0].nombre : ''}</span>
             </div>
-            <div className="col-span-1 w-full flex justify-center place-items-center flex">
+            <div className="col-span-1 w-full justify-center place-items-center flex">
               <Button
                 className="w-[50px] h-[50px] bg-custom-blue p-2 rounded-xl shadow-lg items-center"
                 onClick={

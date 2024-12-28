@@ -158,13 +158,15 @@ export default function Static_2_c() {
             const pruebaCapacity = Math.min(remaining.length, availableCapacity);
       
             const assignedToPrueba = remaining.splice(0, pruebaCapacity);
+            console.log(assignedToPrueba)
       
             // Construir el payload para cada medidor
             const payload = {
-              medidores: assignedToPrueba.map((id, index) => ({
+              medidores: assignedToPrueba.map((id) => ({
                 medidor: id,
+                meter_id: `${1}`,
                 state: "En Evaluación",
-                num: index + 1,
+                num: 1,
                 q1: { record_li: 0.0, record_lf: 0.0, reference_volume: 1.0 },
                 q2: { record_li: 0.0, record_lf: 0.0, reference_volume: 1.0 },
                 q3: { record_li: 0.0, record_lf: 0.0, reference_volume: 1.0 },
@@ -176,8 +178,11 @@ export default function Static_2_c() {
               `pruebas/pruebas/${prueba.id}/assign-medidores/`,
               payload
             );
-      
             if (response.status === 201) {
+              console.log(response)
+            }
+      
+            if (response.status === 204) {
               assignedSummary.push({
                 prueba: prueba.nombre,
                 medidoresAsignados: assignedToPrueba.length,
