@@ -10,7 +10,7 @@ import { IoSpeedometerOutline } from "react-icons/io5";
 import { MdOutlineWbIncandescent } from "react-icons/md";
 import TableRecordInspection from "../../record_inspection/TableRecordInspection";
 import ModalData from "../../shared/ModalData";
-
+import { GiConfirmed } from "react-icons/gi";
 import apiService from "../../../hook/services/apiService";
 import  DateService  from "../../../hook/services/dateService.js"
 
@@ -41,6 +41,8 @@ export default function static_7() {
     const [confirm, setConfirm] = React.useState(false)
 
     const [pruebas, setPruebas] = React.useState([])
+
+    const [volumeValue, setVolumeValue] = React.useState()
 
     //---------------------------------------------------------------------------------------------------------------------------
     //Aquí se encuentran las funciones usadas en el componente MainClient
@@ -269,6 +271,30 @@ export default function static_7() {
     );
   }, [meters, headerColumns ,selectedKeys])
 
+  const handleVolumeChange = (event) => {
+    const newValue = event.target.value;
+    setVolumeValue(newValue);
+  };
+
+    // Función para aplicar el valor del input a todos los medidores visibles
+    const applyVolumeToMeters = () => {
+      if (!volumeValue || isNaN(volumeValue)) return; // Validación simple
+  
+      setMeters((prevMeters) =>
+        prevMeters.map((meter) =>
+          meter.meter_id === meter.meter_id
+            ? {
+                ...meter,
+                q1: {
+                  ...meter.q1,
+                  reference_volume: Number(volumeValue),
+                },
+              }
+            : meter
+        )
+      );
+    };
+
     return (
         <div className="w-screen h-screen bg-oi-bg flex flex-col px-[5vw] overflow-y-auto">
             {modal}
@@ -294,6 +320,30 @@ export default function static_7() {
                   className="text-white w-[50px] h-[50px]"
                 />
               </Button>
+            </div>
+          </div>
+          <div className="col-span-3 py-2 bg-white shadow-lg px-4 flex justify-between rounded-[25px] items-center mt-5">
+            <label
+              htmlFor="reference_volume_q3"
+              className="text-gray-700 font-inter"
+            >
+              Volumen de referencia
+            </label>
+            <div className="flex items-center w-full place-content-center justify-center">
+              <input
+                id="reference_volume_q3"
+                type="number"
+                className="flex text-left w-full whitespace-pre-wrap z-[0] border-none px-0 shadow-none"
+                placeholder="Ingrese su volumen"
+                value={volumeValue} // Vincula al estado
+                onChange={handleVolumeChange} // Actualiza el estado
+              />
+              <button
+                className="bg-custom-blue text-center text-white w-1/3 h-1/2 rounded-2xl hover:bg-blue-600 transition-all"
+                onClick={applyVolumeToMeters} // Aplica el cambio
+              >
+                <GiConfirmed className="text-center w-full h-1/6 p-2"/>
+              </button>
             </div>
           </div>
             <div>
