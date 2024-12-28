@@ -88,6 +88,7 @@ export default function Static_2_c() {
                           estado: medidor.estado,
                       }));
                       setMetersPrueba(medidores);
+
                       setMetersLength(medidores.length);
                   }
                   
@@ -106,6 +107,18 @@ export default function Static_2_c() {
           };
           fetchOrders();
       }, []);
+
+      useEffect(() => {
+        if (selectedMedidores.length > 0) {
+          const selectedMeters = metersPrueba.filter(m => selectedMedidores.includes(m.id));
+          setRangeStart(selectedMeters[0]?.medidor || null);
+          setRangeEnd(selectedMeters[selectedMeters.length - 1]?.medidor || null);
+        } else {
+          setRangeStart(null);
+          setRangeEnd(null);
+        }
+      }, [selectedMedidores, metersPrueba]);
+      
   
       // Selección total
       const handleSelectAll = () => {
@@ -123,92 +136,93 @@ export default function Static_2_c() {
           onOpen();
       };
   
-      const handlePartialSelectionConfirm = (selected) => {
-        let selectedTransformed = [...new Set(selected.map(Number))];;
-        let sorted = selectedTransformed.sort((a, b) => a - b)
-          setSelectedMedidores(sorted);
-          const selectedMeters = metersPrueba.filter(m => selected.includes(m.id));
-          if (selectedMeters.length > 0) {
-              setRangeStart(selectedMeters[0].medidor);
-              setRangeEnd(selectedMeters[selectedMeters.length - 1].medidor);
-          } else {
-              setRangeStart(null);
-              setRangeEnd(null);
-          }
-          
-      };
-  
-      const handleConfirmSelection = async () => {
-        if (selectedMedidores.length === 0) {
+    const handlePartialSelectionConfirm = (selected) => {
+      let selectedTransformed = [...new Set(selected.map(Number))];
+      let sorted = selectedTransformed.sort((a, b) => a - b);
+      
+      const selectedMeters = metersPrueba.filter(m => selected.includes(m.id));
+      const start = selectedMeters.length > 0 ? selectedMeters[0].medidor : null;
+      const end = selectedMeters.length > 0 ? selectedMeters[selectedMeters.length - 1].medidor : null;
+    
+      // Combinar actualizaciones relacionadas
+      setSelectedMedidores(sorted);
+      setRangeStart(start);
+      setRangeEnd(end);
+    
+      onOpenChange(false); // Cerrar el modal explícitamente
+    };
+
+    const handleConfirmSelection = async () => {
+      if (selectedMedidores.length === 0) {
           alert("No has seleccionado ningún medidor.");
           return;
-        }
+      }
       
-        let remaining = [...selectedMedidores];
-        const assignedSummary = [];
-        let success = true;
-      
-        try {
+      let remaining = [...selectedMedidores];
+      const assignedSummary = [];
+      let success = true;
+      const selectedMeters = metersPrueba.filter(m => selectedMedidores.includes(m.id));
+  
+      try {
           for (const prueba of pruebas) {
-            if (remaining.length === 0) break;
-      
-            // Determinar el número máximo de medidores que se pueden asignar
-            const alreadyAssigned = 0; // Puedes ajustar si necesitas verificar cuántos ya están asignados
-            const availableCapacity = prueba.n_medidores_seleccionados - alreadyAssigned;
-            const pruebaCapacity = Math.min(remaining.length, availableCapacity);
-      
-            const assignedToPrueba = remaining.splice(0, pruebaCapacity);
-            console.log(assignedToPrueba)
-      
-            // Construir el payload para cada medidor
-            const payload = {
-              medidores: assignedToPrueba.map((id) => ({
-                medidor: id,
-                meter_id: `${1}`,
-                state: "En Evaluación",
-                num: 1,
-                q1: { record_li: 0.0, record_lf: 0.0, reference_volume: 1.0 },
-                q2: { record_li: 0.0, record_lf: 0.0, reference_volume: 1.0 },
-                q3: { record_li: 0.0, record_lf: 0.0, reference_volume: 1.0 },
-              })),
-            };
-      
-            // Llamada a la API para asignar los medidores a la prueba
-            const response = await apiService.create(
-              `pruebas/pruebas/${prueba.id}/assign-medidores/`,
-              payload
-            );
-            if (response.status === 201) {
+              if (remaining.length === 0) break;
+  
+              const availableCapacity = prueba.n_medidores_seleccionados;
+              const pruebaCapacity = Math.min(remaining.length, availableCapacity);
+  
+              const assignedToPrueba = remaining.splice(0, pruebaCapacity);
+              const payload = {
+                  medidores: assignedToPrueba.map((id) => {
+                    const data = {
+                        medidor: id,
+                        meter_id: metersPrueba[id-1]?.medidor,
+                        state: "Sin observaciones",
+                        drain: "Sin observaciones",
+                        obs: "Conforme",
+                        result: "Apto",
+                        num: 1,
+                        q1: { record_li: 0.0, record_lf: 0.0, reference_volume: 1.0 },
+                        q2: { record_li: 0.0, record_lf: 0.0, reference_volume: 1.0 },
+                        q3: { record_li: 0.0, record_lf: 0.0, reference_volume: 1.0 },
+                        }
+                    return data
+                  }),
+              };
+              console.log(payload)
+  
+              const response = await apiService.create(
+                  `pruebas/pruebas/${prueba.id}/assign-medidores/`,
+                  payload
+              );
+
               console.log(response)
-            }
-      
-            if (response.status === 204) {
-              assignedSummary.push({
-                prueba: prueba.nombre,
-                medidoresAsignados: assignedToPrueba.length,
-              });
-            } else {
-              success = false;
-              console.error(`Error asignando medidores a la prueba ${prueba.nombre}`);
-            }
+  
+              if (response) {
+                  assignedSummary.push({
+                      prueba: prueba.nombre,
+                      medidoresAsignados: assignedToPrueba.length,
+                  });
+              } else {
+                  success = false;
+                  console.error(`Error asignando medidores a la prueba ${prueba.nombre}`);
+              }
           }
-      
-          const medidoresPendientes = remaining.length;
-          const message = `
-            ${success ? "Asignación completada con éxito." : "Algunos lotes no se pudieron asignar."}
-            Se asignaron medidores a las siguientes pruebas:
-            ${assignedSummary.map((s) => `Prueba ${s.prueba}: ${s.medidoresAsignados} medidores`).join("\n")}
-            ${medidoresPendientes > 0 ? `Medidores pendientes: ${medidoresPendientes}` : ""}
-          `;
-      
-          setCustomMessage(message);
+  
+          if (success) {
+              // Forzar recarga de datos tras confirmación exitosa
+              // const updatedMeters = await apiService.getAll('ruta/actualizacion');
+              // setMetersPrueba(updatedMeters);
+          }
+  
+          setCustomMessage("Asignación completada con éxito.");
           setIsOpenCustomMessage(true);
-        } catch (error) {
+      } catch (error) {
           console.error("Error en la asignación de medidores:", error);
           setCustomMessage("Ocurrió un error al intentar asignar los medidores.");
           setIsOpenCustomMessage(true);
-        }
-      };
+      }
+  };
+  
       
 
       const modal = useMemo(() => (
@@ -223,6 +237,28 @@ export default function Static_2_c() {
               onConfirmSelection={handlePartialSelectionConfirm}
           />
       ), [isOpen, popUpData, metersPrueba, selectedMedidores]);
+
+    const rangePresentation = useMemo(() => {
+      return (
+      <div className="mt-4 w-full flex flex-col space-y-2">
+        <div className="flex items-center">
+          <span className="font-inter font-semibold text-opacity-text text-[16px] mr-2">
+            Desde:
+          </span>
+          <span className="font-teko font-semibold text-[20px]">
+            {rangeStart || "N/A"}
+          </span>
+        </div>
+        <div className="flex items-center">
+          <span className="font-inter font-semibold text-opacity-text text-[16px] mr-2">
+            Hasta:
+          </span>
+          <span className="font-teko font-semibold text-[20px]">
+            {rangeEnd || "N/A"}
+          </span>
+        </div>
+      </div>)
+    }, [rangeStart, rangeEnd])
 
     const confirmationMessage = useMemo(() => {
         return isOpenCustomMessage ? (
@@ -336,24 +372,8 @@ export default function Static_2_c() {
                 </div>
               </div>
 
-              <div className="mt-4 w-full flex flex-col space-y-2">
-                <div className="flex items-center">
-                  <span className="font-inter font-semibold text-opacity-text text-[16px] mr-2">
-                    Desde:
-                  </span>
-                  <span className="font-teko font-semibold text-[20px]">
-                    {rangeStart || "N/A"}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <span className="font-inter font-semibold text-opacity-text text-[16px] mr-2">
-                    Hasta:
-                  </span>
-                  <span className="font-teko font-semibold text-[20px]">
-                    {rangeEnd || "N/A"}
-                  </span>
-                </div>
-              </div>
+              {/* Aqui se ajusta el componente de renderizacion por rango */}
+              {rangePresentation}
             </div>
 
             <div className="flex-grow flex w-full justify-between place-items-center space-x-2 rounded-[20px] my-[4vh] bg-white shadow-sm p-3">

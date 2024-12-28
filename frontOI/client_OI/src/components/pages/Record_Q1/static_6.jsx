@@ -233,7 +233,7 @@ export default function Static_6() {
       })
 
       console.log("Payload: ", payload)
-      alert("Medidores actualizados correctamente");
+      // alert("Medidores actualizados correctamente");
       return true;    
       // Llamada al servicio de la API 
       } catch (error) {
@@ -298,7 +298,7 @@ export default function Static_6() {
               <span className="font-inter text-center w-full pr-2">Usted se encuentra en la prueba</span>
               <span className="font-teko text-[48px] font-semibold w-auto text-right">Q1</span>
             </div>
-            <div className="col-span-1 w-full flex justify-center place-items-center flex">
+            <div className="col-span-1 w-full flex justify-center place-items-center">
               <Button
                 className="w-[50px] h-[50px] bg-custom-blue p-2 rounded-xl shadow-lg items-center"
                 onClick={
@@ -327,10 +327,10 @@ export default function Static_6() {
                     <span className="font-inter text-[20px] text-center text-white py-2">Estatus de prueba</span>
                 </Button>
             </div>
-          <div className="w-full flex flex-col flex-grow mb-5 h-[300px] bg-white shadow-lg items-center place-items-center mt-5 rounded-[20px]">
+          <div className="w-full flex flex-col flex-grow mb-5 h-[600px] bg-white shadow-lg items-center place-items-center mt-5 rounded-[20px]">
             <span className="font-mulish justify-center font-semibold text-[20px] mt-3 text-center">Primela lectura</span>
             <div className="w-5/6 rounded-[20px] bg-custom-blue h-2 mb-2 text-white">'</div>
-            <div className="w-full flex h-[30svh] my-3">
+            <div className="w-full flex h-[60svh] my-3">
                 {tableRow}
             </div>
           </div>

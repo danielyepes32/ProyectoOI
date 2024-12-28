@@ -92,8 +92,8 @@ export default function Static_2_nc() {
                 const additionalFields = {
                     medidor: matchingMeter ? matchingMeter.id : null, // Asignar el id del medidor si coincide, o null si no
                     num: 1,
-                    state: "Sin inspección",
-                    drain: "Sin inspección",
+                    state: "Sin observaciones",
+                    drain: "Sin observaciones",
                     obs: "Conforme",
                     result: "Apto",
                     q1: {
