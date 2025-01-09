@@ -11,6 +11,7 @@ import { IoSpeedometerOutline } from "react-icons/io5";
 import { MdOutlineWbIncandescent } from "react-icons/md";
 import ModalData from "../../shared/ModalData";
 import TableRecordInspection from "../../record_inspection/TableRecordInspection";
+import { Input } from "@nextui-org/react";
 
 import apiService from "../../../hook/services/apiService";
 import  DateService  from "../../../hook/services/dateService.js"
@@ -22,6 +23,9 @@ export default function Static_6() {
     const [isChanged, setIsChanged] = useState(false)
     const [pruebaValue, setPruebaValue] = useState()
     const [seconds, setSeconds] = useState(0);
+
+    const [initialPreassure, setInitialPreassure] = React.useState(null);
+    const [endPreassure, setEndPreassure] = React.useState(null);
 
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [popUpData,setPopUpData] = React.useState(null);
@@ -212,6 +216,7 @@ export default function Static_6() {
           record_li: item.q1?.record_li || 0, // Valor por defecto
           record_lf: item.q1?.record_lf || 0, // Valor por defecto
           reference_volume: item.q1?.reference_volume || 0, // Valor por defecto
+          presion_inicial: item.q1?.presion_inicial
         },                
         q2: {
           record_li: item.q2?.record_li || 0, // Valor por defecto
@@ -332,35 +337,6 @@ export default function Static_6() {
             <div className="w-5/6 rounded-[20px] bg-custom-blue h-2 mb-2 text-white">'</div>
             <div className="w-full flex h-[60svh] my-3">
                 {tableRow}
-            </div>
-          </div>
-          <div className="flex justify-between w-full mb-4 h-auto space-x-2">
-            <div className="w-full h-auto bg-white rounded-[20px] shadow-sm flex flex-col justify-between py-2">
-              <span className="font-inter text-center w-full text-[15px] h-auto">Presiones estáticas</span>
-              <div className="flex justify-between">
-                <IoSpeedometerOutline className="w-full h-auto p-4"/>
-                <div className="flex flex-col w-full">
-                  <span className="text-[15px] font-inter text-gray-300">Entrada</span>
-                  <span className="text-[15px] font-teko font-semibold">6,001</span>
-                  <span className="text-[15px] font-inter text-gray-300">Salida</span>
-                  <span className="text-[15px] font-teko font-semibold">6,000</span>
-                </div>
-              </div>
-            </div>
-            <div className="w-full flex flex-col justify-betweenh-auto bg-white rounded-[20px] shadow-sm px-2 py-2">
-              <div className="ml-2 w-full h-auto flex justify-left place-items-end">
-                <span className="font-teko font-semibold text-[32px]">
-                  {String(minutes).padStart(2, '0')}:{String(displaySeconds).padStart(2, '0')}
-                </span>
-                <span className="font-teko font-semibold text-[20px]">min</span>
-              </div>
-              <div className="flex justify-between w-full">
-                <img src="../../../public/sandClock.svg" alt="" className="w-2/5 p-2 h-auto"/>
-                <div className="flex flex-col justify-between ml-2 w-3/5">
-                  <span className="font-inter ml-2 ">/22min</span>
-                  <span className="font-poppins font-bold text-[14px]">Duración de la prueba</span>
-                </div>
-              </div>
             </div>
           </div>
           <div className="flex flex-grow flex-col bg-white rounded-[20px] px-5 py-5 shadow-sm mb-5">

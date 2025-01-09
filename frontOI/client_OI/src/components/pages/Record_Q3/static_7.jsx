@@ -11,7 +11,7 @@ import { MdOutlineWbIncandescent } from "react-icons/md";
 import { GiConfirmed } from "react-icons/gi";
 import TableRecordInspection from "../../record_inspection/TableRecordInspection";
 import ModalData from "../../shared/ModalData";
-
+import { Input } from "@nextui-org/react";
 import apiService from "../../../hook/services/apiService";
 import DateService  from "../../../hook/services/dateService.js"
 //Las columnas se pueden agregar o eliminar de la vista, aquí inicializamos por default las necesarias
@@ -20,7 +20,8 @@ const INITIAL_VISIBLE_COLUMNS = ["meter_id", "num", "record_lf"];
 export default function static_7_Q3() {
 
     const [isChanged, setIsChanged] = useState(false)
-
+    const [initialPreassure, setInitialPreassure] = React.useState(null);
+    const [endPreassure, setEndPreassure] = React.useState(null);
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [popUpData,setPopUpData] = React.useState(null);
     const [customMessage, setCustomMessage] = React.useState(null);
@@ -210,16 +211,22 @@ export default function static_7_Q3() {
           record_li: item.q1?.record_li || 0, // Valor por defecto
           record_lf: item.q1?.record_lf || 0, // Valor por defecto
           reference_volume: item.q1?.reference_volume || 0, // Valor por defecto
+          presion_entrada: initialPreassure ? initialPreassure : 0, // Valor por defecto
+          presion_salida: endPreassure ? endPreassure : 0, // Valor por defecto
         },                
         q2: {
           record_li: item.q2?.record_li || 0, // Valor por defecto
           record_lf: item.q2?.record_lf || 0, // Valor por defecto
           reference_volume: item.q2?.reference_volume || 0, // Valor por defecto
+          presion_entrada: item.q2?.presion_entrada || 0, // Valor por defecto
+          presion_salida: item.q2?.presion_salida || 0, // Valor por defecto
         },
         q3: {
           record_li: item.q3?.record_li || 0, // Valor por defecto
           record_lf: item.q3?.record_lf || 0, // Valor por defecto
           reference_volume: item.q3?.reference_volume || 0, // Valor por defecto
+          presion_entrada: item.q3?.presion_entrada || 0, // Valor por defecto
+          presion_salida: item.q3?.presion_salida || 0, // Valor por defecto
         },
         })),
       };
@@ -370,27 +377,40 @@ export default function static_7_Q3() {
           </div>
           <div className="flex justify-between w-full mb-4 h-auto space-x-2">
             <div className="w-full h-auto bg-white rounded-[20px] shadow-sm flex flex-col justify-between py-2">
-              <span className="font-inter text-center w-full text-[15px] h-auto">Presiones estáticas</span>
+              <span className="font-inter font-bold text-center w-full text-[15px] h-auto">Presiones estáticas</span>
               <div className="flex justify-between">
-                <IoSpeedometerOutline className="w-full h-auto p-4"/>
-                <div className="flex flex-col w-full">
-                  <span className="text-[15px] font-inter text-gray-300">Entrada</span>
-                  <span className="text-[15px] font-teko font-semibold">6,001</span>
-                  <span className="text-[15px] font-inter text-gray-300">Salida</span>
-                  <span className="text-[15px] font-teko font-semibold">6,000</span>
-                </div>
-              </div>
-            </div>
-            <div className="w-full flex flex-col justify-betweenh-auto bg-white rounded-[20px] shadow-sm px-2 py-2">
-              <div className="ml-2 w-full h-auto flex justify-left place-items-end">
-                <span className="font-teko font-semibold text-[32px]">18:53</span>
-                <span className="font-teko font-semibold text-[20px]">min</span>
-              </div>
-              <div className="flex justify-between w-full">
-                <img src="../../../public/sandClock.svg" alt="" className="w-2/5 p-2 h-auto"/>
-                <div className="flex flex-col justify-between ml-2 w-3/5">
-                  <span className="font-inter ml-2 ">/22min</span>
-                  <span className="font-poppins font-bold text-[14px]">Duración de la prueba</span>
+                <IoSpeedometerOutline className="w-full h-[12vh] p-4"/>
+                <div className="flex flex-col w-full place-items-center justify-center px-4">
+                  <span className="text-[18px] font-inter text-gray-300">Entrada</span>
+                  <Input 
+                    className="text-[16px] font-teko font-semibold"
+                    placeholder="Presión de entrada"
+                    type="number"
+                    value={initialPreassure}
+                    onValueChange={(value) => {
+                      value.length < 5 ? setInitialPreassure(value) : null;
+                    }}
+                    classNames={
+                      {
+                        input: "w-full h-auto text-center bg-white border-none text-[16px] font-teko font-semibold",
+                      }
+                    }
+                  />
+                  <span className="text-[18px] font-inter text-gray-300">Salida</span>
+                  <Input 
+                    className="text-[16px] font-teko font-semibold"
+                    placeholder="Presión de entrada"
+                    type="number"
+                    value={endPreassure}
+                    onValueChange={(value) => {
+                      value.length < 5 ? setEndPreassure(value) : null;
+                    }}
+                    classNames={
+                      {
+                        input: "w-full h-auto text-center bg-white border-none text-[16px] font-teko font-semibold",
+                      }
+                    }
+                  />
                 </div>
               </div>
             </div>
