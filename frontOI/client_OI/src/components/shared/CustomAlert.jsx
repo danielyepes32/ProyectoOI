@@ -72,11 +72,16 @@ const CustomAlert = ({ message, isVisible, setIsVisible, routeRedirect,handleCon
                 className='bg-custom-blue text-white'
                 onPress={async () => {
                   if (handleConfirm) {
-                    api = await handleConfirm(); // Espera a que handleConfirm termine
+                    api_recall = await handleConfirm(); // Espera a que handleConfirm termine
+                  } else {
+                    navigate(routeRedirect)
+                    setIsVisible(false)
+                    onClose()
+                    return;
                   }
                   setIsVisible(false);
                   onClose();
-                  api ? navigate(routeRedirect) : null; // Navega solo después de que todo lo anterior haya terminado
+                  api_recall ? navigate(routeRedirect) : null; // Navega solo después de que todo lo anterior haya terminado
                 }}
                 >
                 Confirmar
