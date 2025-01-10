@@ -5,4 +5,4 @@ on:
 
 jobs:
   build:
-    runs-on:
+    runs-on: "self-hosted"
