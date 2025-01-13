@@ -339,6 +339,46 @@ export default function Static_6() {
                 {tableRow}
             </div>
           </div>
+          <div className="flex justify-between w-full mb-4 h-auto space-x-2">
+            <div className="w-full h-auto bg-white rounded-[20px] shadow-sm flex flex-col justify-between py-2">
+              <span className="font-inter font-bold text-center w-full text-[15px] h-auto">Presiones estáticas</span>
+              <div className="flex justify-between">
+                <IoSpeedometerOutline className="w-full h-[12vh] p-4"/>
+                <div className="flex flex-col w-full place-items-center justify-center px-4">
+                  <span className="text-[18px] font-inter text-gray-300">Entrada</span>
+                  <Input 
+                    className="text-[16px] font-teko font-semibold"
+                    placeholder="Presión de entrada"
+                    type="number"
+                    value={initialPreassure}
+                    onValueChange={(value) => {
+                      value.length < 5 ? setInitialPreassure(value) : null;
+                    }}
+                    classNames={
+                      {
+                        input: "w-full h-auto text-center bg-white border-none text-[16px] font-teko font-semibold",
+                      }
+                    }
+                  />
+                  <span className="text-[18px] font-inter text-gray-300">Salida</span>
+                  <Input 
+                    className="text-[16px] font-teko font-semibold"
+                    placeholder="Presión de entrada"
+                    type="number"
+                    value={endPreassure}
+                    onValueChange={(value) => {
+                      value.length < 5 ? setEndPreassure(value) : null;
+                    }}
+                    classNames={
+                      {
+                        input: "w-full h-auto text-center bg-white border-none text-[16px] font-teko font-semibold",
+                      }
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+          </div> 
           <div className="flex flex-grow flex-col bg-white rounded-[20px] px-5 py-5 shadow-sm mb-5">
             <span className="font-mulish font-semibold text-center text-[24px]">Pasar a presiones dinámicas</span>
             <Button

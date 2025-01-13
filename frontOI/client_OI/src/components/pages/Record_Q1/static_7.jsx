@@ -366,33 +366,6 @@ export default function static_7() {
                 {tableRow}
             </div>
           </div>
-          <div className="flex justify-between w-full mb-4 h-auto space-x-2">
-            <div className="w-full h-auto bg-white rounded-[20px] shadow-sm flex flex-col justify-between py-2">
-              <span className="font-inter text-center w-full text-[15px] h-auto">Presiones estáticas</span>
-              <div className="flex justify-between">
-                <IoSpeedometerOutline className="w-full h-auto p-4"/>
-                <div className="flex flex-col w-full">
-                  <span className="text-[15px] font-inter text-gray-300">Entrada</span>
-                  <span className="text-[15px] font-teko font-semibold">6,001</span>
-                  <span className="text-[15px] font-inter text-gray-300">Salida</span>
-                  <span className="text-[15px] font-teko font-semibold">6,000</span>
-                </div>
-              </div>
-            </div>
-            <div className="w-full flex flex-col justify-betweenh-auto bg-white rounded-[20px] shadow-sm px-2 py-2">
-              <div className="ml-2 w-full h-auto flex justify-left place-items-end">
-                <span className="font-teko font-semibold text-[32px]">18:53</span>
-                <span className="font-teko font-semibold text-[20px]">min</span>
-              </div>
-              <div className="flex justify-between w-full">
-                <img src="../../../public/sandClock.svg" alt="" className="w-2/5 p-2 h-auto"/>
-                <div className="flex flex-col justify-between ml-2 w-3/5">
-                  <span className="font-inter ml-2 ">/22min</span>
-                  <span className="font-poppins font-bold text-[14px]">Duración de la prueba</span>
-                </div>
-              </div>
-            </div>
-          </div>
           <div className="flex flex-grow flex-col bg-white rounded-[20px] px-5 py-5 shadow-sm mb-5">
             <span className="font-mulish font-semibold text-center text-[24px]">Terminar prueba de error Q</span>
             <Button
