@@ -6,12 +6,9 @@ import {
 import React, { useState } from "react";
 import CustomAlert from "../../shared/CustomAlert";
 import {meterColumns, meterDataTest} from "../../../utils/tests/data"  //"../../utils/tests/data";
-import { IoSpeedometerOutline } from "react-icons/io5";
-import { MdOutlineWbIncandescent } from "react-icons/md";
 import { GiConfirmed } from "react-icons/gi";
 import TableRecordInspection from "../../record_inspection/TableRecordInspection";
 import ModalData from "../../shared/ModalData";
-import { Input } from "@nextui-org/react";
 import apiService from "../../../hook/services/apiService";
 import DateService  from "../../../hook/services/dateService.js"
 //Las columnas se pueden agregar o eliminar de la vista, aquí inicializamos por default las necesarias
@@ -211,8 +208,8 @@ export default function static_7_Q3() {
           record_li: item.q1?.record_li || 0, // Valor por defecto
           record_lf: item.q1?.record_lf || 0, // Valor por defecto
           reference_volume: item.q1?.reference_volume || 0, // Valor por defecto
-          presion_entrada: initialPreassure ? initialPreassure : 0, // Valor por defecto
-          presion_salida: endPreassure ? endPreassure : 0, // Valor por defecto
+          presion_entrada: item.q1?.presion_entrada || 0, // Valor por defecto
+          presion_salida: item.q1?.presion_entrada || 0, // Valor por defecto
         },                
         q2: {
           record_li: item.q2?.record_li || 0, // Valor por defecto

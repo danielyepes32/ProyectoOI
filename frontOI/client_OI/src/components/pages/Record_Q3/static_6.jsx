@@ -227,8 +227,8 @@ export default function Static_6_Q3() {
           record_li: item.q3?.record_li || 0, // Valor por defecto
           record_lf: item.q3?.record_lf || 0, // Valor por defecto
           reference_volume: item.q3?.reference_volume || 0, // Valor por defecto
-          presion_entrada: item.q3?.presion_entrada || 0, // Valor por defecto
-          presion_salida: item.q3?.presion_salida || 0, // Valor por defecto
+          presion_entrada: initialPreassure ? initialPreassure : 0, // Valor por defecto
+          presion_salida: endPreassure ? endPreassure : 0, // Valor por defecto
         },
         })),
       };

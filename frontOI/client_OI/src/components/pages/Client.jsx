@@ -33,6 +33,8 @@ import Static_8_Q3 from './Record_Q3/static_8';
 import Static_9 from './static_9';
 import Static_10 from './static_10';
 
+import Static_end from './static_end';
+
 import { useNavigate } from 'react-router-dom';
 
 const Client = () => {
@@ -84,6 +86,7 @@ const Client = () => {
         {/**/}
         <Route path="/static_9" element={<Static_9/>}/>
         <Route path="/static_10" element={<Static_10/>}/>
+        <Route path="/static_end" element={<Static_end/>}/>
       </Routes>
       {/* Botón del menú móvil */}
       <Button

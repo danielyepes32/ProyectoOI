@@ -57,6 +57,33 @@ export default function Static_8_Q2() {
     const loadingState = isLoading === true & metersLength === 0 ? "loading" : "idle";
     const [pruebas, setPruebas] = React.useState([])
 
+    const [minutes, setMinutes] = useState("");
+    const [seconds, setSeconds] = useState("");
+    const [miliseconds, setMiliseconds] = useState("");
+  
+    // Validar y actualizar minutos
+    const handleMinutesChange = (e) => {
+      const value = e.target.value;
+      if (value === "" || (/^\d+$/.test(value) && parseInt(value) <= 59)) {
+        setMinutes(value);
+      }
+    };
+  
+    // Validar y actualizar segundos
+    const handleSecondsChange = (e) => {
+      const value = e.target.value;
+      if (value === "" || (/^\d+$/.test(value) && parseInt(value) <= 59)) {
+        setSeconds(value);
+      }
+    };
+    // Validar y actualizar segundos
+    const handleMiliSecondsChange = (e) => {
+      const value = e.target.value;
+      if (value === "" || (/^\d+$/.test(value) && parseInt(value) <= 59)) {
+        setMiliseconds(value);
+      }
+    };
+
     //---------------------------------------------------------------------------------------------------------------------------
     //Aquí se encuentran las funciones usadas en el componente MainClient
     React.useMemo(() => {
@@ -251,12 +278,74 @@ export default function Static_8_Q2() {
         );
     }, [isOpen]);
 
+    const handleConfirm = async () => {
+      console.log("Entra")
+      // Actualizar todos los medidores con el valor de `visualInspection` correspondiente
+      const apiResult = await handleUpdateMeter(meters); // Llama a handleUpdateMeter como callback
+
+      return apiResult; //Validar avanzar de vista
+    };
+
+    const handleUpdateMeter = async (medidores) => {
+      try {
+
+      // Construir el payload con los medidores
+      const payload = {
+        medidores: medidores.map((item) => ({
+        id: item.id, // Asegúrate de que 'meter_id' corresponde a 'id' en el payload
+        state: item.state || "En Evaluación", // Estado por defecto
+        obs: item.obs || "Sin observaciones", // Observación por defecto
+        result: item.result || "Apto", // Resultado por defecto
+        drain: item.drain || 'En Evaluación', // Valor por defecto,
+        q1: {
+          record_li: item.q1?.record_li || 0, // Valor por defecto
+          record_lf: item.q1?.record_lf || 0, // Valor por defecto
+          reference_volume: item.q1?.reference_volume || 0, // Valor por defecto
+          presion_entrada: item.q1?.presion_entrada || 0, // Valor por defecto
+          presion_salida: item.q1?.presion_entrada || 0, // Valor por defecto
+        },                
+        q2: {
+          record_li: item.q2?.record_li || 0, // Valor por defecto
+          record_lf: item.q2?.record_lf || 0, // Valor por defecto
+          reference_volume: item.q2?.reference_volume || 0, // Valor por defecto
+          presion_entrada: item.q2?.presion_entrada || 0, // Valor por defecto
+          presion_salida: item.q2?.presion_salida || 0, // Valor por defecto
+          duration: minutes && seconds && miliseconds ? minutes + ":" + seconds + ":" + miliseconds : "00:00:00"
+        },
+        q3: {
+          record_li: item.q3?.record_li || 0, // Valor por defecto
+          record_lf: item.q3?.record_lf || 0, // Valor por defecto
+          reference_volume: item.q3?.reference_volume || 0, // Valor por defecto
+          presion_entrada: item.q3?.presion_entrada || 0, // Valor por defecto
+          presion_salida: item.q3?.presion_salida || 0, // Valor por defecto
+        },
+        })),
+      };
+
+      payload.medidores.map(async (item, index) => {
+        const singlePayload = { medidores: [item] };
+        await apiService.updateMetersPrueba(pruebas[0].id, singlePayload);
+        console.log(`Payload for index ${index}: `, singlePayload);
+      })
+
+      console.log("Payload: ", payload)
+      // alert("Medidores actualizados correctamente");
+      return true;    
+      // Llamada al servicio de la API 
+      } catch (error) {
+      console.error('Error updating meters:', error);
+      alert("Error al actualizar los medidores, intente de nuevo");
+      return false;
+      }
+    };
+
     const confirmationMessage = React.useMemo(() => {
         //console.log("CustomMessage: ", isOpenCustomMessage)
         return isOpenCustomMessage === true ? (
           <CustomAlert 
             message={customMessage} 
             isVisible={isOpenCustomMessage} 
+            handleConfirm={handleConfirm}
             setIsVisible={setIsOpenCustomMessage}
             routeRedirect={"/client/Q1/static_6"}
             />
@@ -579,29 +668,45 @@ export default function Static_8_Q2() {
                 </Table>
             </div>
           </div>
-          <div className="flex justify-between w-full mb-4 h-auto space-x-2">
-            <div className="w-full h-auto bg-white rounded-[20px] shadow-sm flex flex-col justify-between py-2">
-              <span className="font-inter text-center w-full text-[15px] h-auto">Presiones estáticas</span>
-              <div className="flex justify-between">
-                <IoSpeedometerOutline className="w-full h-auto p-4"/>
-                <div className="flex flex-col w-full">
-                  <span className="text-[15px] font-inter text-gray-300">Entrada</span>
-                  <span className="text-[15px] font-teko font-semibold">6,001</span>
-                  <span className="text-[15px] font-inter text-gray-300">Salida</span>
-                  <span className="text-[15px] font-teko font-semibold">6,000</span>
+          <div className="flex-col justify-between w-full mb-4 space-x-2 h-full">
+            <div className="w-full flex justify-center place-items-center h-auto bg-white rounded-[20px] shadow-sm px-2 py-2">
+              <div className="flex justify-center place-items-center w-1/3 h-full">
+                <img src="../../../public/sandClock.svg" alt="" className="w-2/5 text-center flex justofy-center place-items-center h-full"/>
+              </div>
+              <div className="w-2/3 h-auto flex flex-col justify-center place-items-center">
+                {/* Input de minutos */}
+                <div className="flex flex-col justify-center place-items-center ml-2 w-3/5">
+                  <span className="font-poppins font-bold text-[14px] text-center">Duración de la prueba</span>
                 </div>
-              </div>
-            </div>
-            <div className="w-full flex flex-col justify-betweenh-auto bg-white rounded-[20px] shadow-sm px-2 py-2">
-              <div className="ml-2 w-full h-auto flex justify-left place-items-end">
-                <span className="font-teko font-semibold text-[32px]">18:53</span>
-                <span className="font-teko font-semibold text-[20px]">min</span>
-              </div>
-              <div className="flex justify-between w-full">
-                <img src="../../../public/sandClock.svg" alt="" className="w-2/5 p-2 h-auto"/>
-                <div className="flex flex-col justify-between ml-2 w-3/5">
-                  <span className="font-inter ml-2 ">/22min</span>
-                  <span className="font-poppins font-bold text-[14px]">Duración de la prueba</span>
+                <div className="flex place-items-center justify-center w-full h-full">
+                  <input
+                    type="text"
+                    value={minutes}
+                    onChange={handleMinutesChange}
+                    placeholder="MM"
+                    maxLength={2}
+                    className="w-14 p-2 text-center border-b border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none"
+                  />
+                  <span className="text-xl font-bold">:</span>
+                  {/* Input de segundos */}
+                  <input
+                    type="text"
+                    value={seconds}
+                    onChange={handleSecondsChange}
+                    placeholder="SS"
+                    maxLength={2}
+                    className="w-14 p-2 ml-1 text-center border-b border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none"
+                  />
+                  <span className="text-xl font-bold">:</span>
+                  <input
+                    type="text"
+                    value={miliseconds}
+                    onChange={handleMiliSecondsChange}
+                    placeholder="MS"
+                    maxLength={2}
+                    className="w-14 p-2 ml-1 text-center border-b border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none"
+                  />
+                  <span className="font-teko font-semibold text-[20px] ml-1">min</span>
                 </div>
               </div>
             </div>
