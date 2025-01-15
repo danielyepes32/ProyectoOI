@@ -6,12 +6,12 @@ import {
 import React, { useState } from "react";
 import CustomAlert from "../shared/CustomAlert.jsx";
 import {meterColumns, meterDataTest} from "../../utils/tests/data"  //"../../utils/tests/data";
-import TableRecordInspection from "../record_inspection/TableRecordInspection";
+import TableResumeInspection from "../resume/TableResumeInspections.jsx";
 import ModalData from "../shared/ModalData";
 import apiService from "../../hook/services/apiService";
 import DateService  from "../../hook/services/dateService.js"
 //Las columnas se pueden agregar o eliminar de la vista, aquí inicializamos por default las necesarias
-const INITIAL_VISIBLE_COLUMNS = ["meter_id", "num", "actions"];
+const INITIAL_VISIBLE_COLUMNS = ["meter_id", "q1", "q2", "q3", "result", "actions"];
 
 export default function Static_end() {
 
@@ -21,6 +21,7 @@ export default function Static_end() {
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [popUpData,setPopUpData] = React.useState(null);
     const [customMessage, setCustomMessage] = React.useState(null);
+    const [selectedMeter, setSelectedMeter] = React.useState(null);
     const [isOpenCustomMessage, setIsOpenCustomMessage] = React.useState(false);
     //Variable para activar el circulo de carga de datos en caso de estar ejecutando acciones de API
     const [isLoading, setIsLoading] = React.useState(true);
@@ -180,6 +181,7 @@ export default function Static_end() {
             isOpen={isOpen}
             onOpenChange={onOpenChange}
             popUpData={popUpData}
+            selectedMeter={selectedMeter}
           />
         );
     }, [isOpen]);
@@ -258,7 +260,7 @@ export default function Static_end() {
 
   const tableRow = React.useMemo(() => {
     return (
-      <TableRecordInspection
+      <TableResumeInspection
         selectedKeys={selectedKeys}
         headerColumns={headerColumns}
         meters={meters}
@@ -267,9 +269,12 @@ export default function Static_end() {
         updateResult={updateResult}
         //updateValue={updateValue}
         //addKey={addKey}
+        setPopUpData={setPopUpData}
+        onOpen={onOpen}
         updateValidate={updateValidate}
         handleEnterAction={handleEnterAction}
         selectedQ={"q3"}
+        setSelectedMeter={setSelectedMeter}
       />
     );
   }, [meters, headerColumns ,selectedKeys])
@@ -306,8 +311,7 @@ export default function Static_end() {
           <span className="font-mulisg font-semibold text-opacity-text ">Sesion iniciada en {DateService.getCurrentDate()}</span>
           <div className="w-full h-auto grid grid-cols-4 space-x-2 pt-2">
             <div className="col-span-3 bg-white shadow-lg px-4 flex justify-between rounded-[30px] items-center">
-              <span className="font-inter text-center w-full pr-2">Usted se encuentra en la prueba</span>
-              <span className="font-teko text-[48px] font-semibold w-auto text-right">Q3</span>
+              <span className="font-bold text-[18px] text-center w-full pr-2 py-2">Usted se encuentra en el resumen de la prueba</span>
             </div>
             <div className="col-span-1 w-full justify-center place-items-center flex">
               <Button
@@ -366,15 +370,15 @@ export default function Static_end() {
             </div>
           </div>
           */}
-          <div className="w-full flex flex-col flex-grow mb-5 h-[600px] bg-white shadow-lg items-center place-items-center mt-5 rounded-[20px]">
-            <span className="font-mulish justify-center font-semibold text-[20px] mt-3 text-center">Segunda lectura</span>
-            <div className="w-5/6 rounded-[20px] bg-custom-blue h-2 mb-2 text-white">'</div>
-            <div className="w-full flex h-[60svh] my-3">
+          <div className="w-full flex flex-col mb-5 max-h-[60vh] bg-white shadow-lg items-center place-items-center mt-5 rounded-[20px]">
+            <span className="font-mulish justify-center font-semibold text-[20px] mt-3 text-center">Inspección final</span>
+            <div className="w-5/6 rounded-[20px] bg-custom-blue h-2 mb-2 text-white"></div>
+            <div className="w-full flex h-auto my-3">
                 {tableRow}
             </div>
           </div>
-          <div className="flex flex-grow flex-col bg-white rounded-[20px] px-5 py-5 shadow-sm mb-5">
-            <span className="font-mulish font-semibold text-center text-[24px]">Terminar prueba de error Q</span>
+          <div className="flex flex-col bg-white rounded-[20px] px-5 py-5 shadow-sm mb-5">
+            <span className="font-mulish font-semibold text-center text-[24px]">Terminar secuencia de la orden</span>
             <Button
               className="bg-custom-blue mt-1"
               onClick={()=>{

@@ -2,7 +2,8 @@
 import React from 'react';
 import { FaCheck } from "react-icons/fa";
 import { Chip, Dropdown, DropdownMenu, DropdownTrigger, Button, DropdownItem, Input} from '@nextui-org/react';
-//import { VerticalDotsIcon } from "react-icons/your-icons"; // Asegúrate de importar tus íconos correctamente
+import { HiDotsVertical } from "react-icons/hi";
+
 // El mapa de colores de status
 const statusColorMap = {
   // Define los colores según tus necesidades
@@ -45,7 +46,7 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
           >
             <DropdownTrigger>
               <Button isIconOnly radius="full" size="sm" variant="light">
-                <VerticalDotsIcon className="text-default-400" />
+                <HiDotsVertical className="text-default-400" />
               </Button>
             </DropdownTrigger>
             <DropdownMenu
@@ -53,14 +54,12 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
               aria-label="MenuActionKey"
               variant="bordered"
               onAction={(key) => {
+                onOpen();
                 setActionKey(key);
                 setSelectedMeter(user);
-                onOpen();
               }}
             >
               <DropdownItem key="details" className="hover:bg-default-100">Ver Detalles</DropdownItem>
-              <DropdownItem key="edit" className="hover:bg-default-100">Editar Datos</DropdownItem>
-              <DropdownItem key="delete" className="text-danger hover:bg-red-200" color="danger">Eliminar Status</DropdownItem>
             </DropdownMenu>
           </Dropdown>
         </div>
@@ -251,21 +250,40 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
           {cellValue}
         </span>
       );
-      case "checkbox":
-        return(
-          <div className="h-auto w-auto flex justify-center place-items-center">
-            <div className={handleValidateErrorInput(user.meter_id)}>
-              <FaCheck className="p-0.5 text-white"/>
-            </div>
-          </div>
-        );
-      case "error":
-        
-        const Q = 'q2';
 
-        return(
-          <span>{`${user[Q].error} %`}</span>
-        );
+    case "checkbox":
+      return(
+        <div className="h-auto w-auto flex justify-center place-items-center">
+          <div className={handleValidateErrorInput(user.meter_id)}>
+            <FaCheck className="p-0.5 text-white"/>
+          </div>
+        </div>
+      );
+    case "error":
+      
+      const Q = 'q2';
+
+      return(
+        <span>{`${user[Q].error} %`}</span>
+      );
+
+    case "q1":
+    return(
+      <span>{`${user["q1"].error} %`}</span>
+    );
+
+    case "q2":
+    
+    return(
+      <span>{`${user["q2"].error} %`}</span>
+    );
+
+    case "q3":
+    
+    return(
+      <span>{`${user["q3"].error} %`}</span>
+    );
+
     default:
       return cellValue || 'NO DATA';
   }

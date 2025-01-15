@@ -2,7 +2,7 @@ import { useState } from "react"; // Asegúrate de importar useState
 import { MdDashboard } from "react-icons/md";
 import { RiCalendarScheduleLine } from "react-icons/ri";
 import { PiChatTeardropTextBold } from "react-icons/pi";
-import { LuPieChart } from "react-icons/lu";
+import { FaChartPie } from "react-icons/fa";
 import { TbSettings } from "react-icons/tb";
 import { BiExit } from "react-icons/bi";
 
@@ -29,7 +29,7 @@ const Menu = ({ sidebar, handleSidebar }) => {
                     { Icon: MdDashboard, label: 'Dashboard' },
                     { Icon: RiCalendarScheduleLine, label: 'Calendar' },
                     { Icon: PiChatTeardropTextBold, label: 'Chat' },
-                    { Icon: LuPieChart, label: 'Chart' },
+                    { Icon: FaChartPie, label: 'Chart' },
                     { Icon: TbSettings, label: 'Settings' },
                     { Icon: BiExit, label: 'Exit' },
                 ].map((item, index) => (

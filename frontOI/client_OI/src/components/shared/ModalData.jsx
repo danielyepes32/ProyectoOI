@@ -33,7 +33,7 @@ export default function ModalData(
         pruebaCapacity,
         selectedPruebaKey,
         onConfirmSelection,
-
+        selectedMeter
     }
     ) {
 
@@ -49,6 +49,8 @@ export default function ModalData(
                 return 'Ordenes seleccionadas';
             case 'meter_partial':
                 return 'Selección de medidores';
+            case 'details':
+                return 'Detalles del medidor'
             default:
                 return 'Instrumentos';
         }
@@ -132,6 +134,44 @@ export default function ModalData(
                                 onConfirmSelection={onConfirmSelection} // Callback al confirmar selección
                                 pruebaCapacity={pruebaCapacity}
                             />
+                        )
+                    }else if(popUpData === 'details'){
+                        console.log("Medidor seleccionado: ", selectedMeter)
+                        return(
+                            <div className="flex flex-col w-full space-y-3 h-full place-items-center justify-center mb-3">
+                                <div className="w-full flex justify-between h-auto space-x-2">
+                                    <div className="w-1/2 flex place-items-center">
+                                        <span>Detalles de Inspección</span> 
+                                    </div>
+                                    <div className="w-1/2 flex justify-end place-items-center">
+                                        <span className="text-right">{selectedMeter.medidor.observaciones}</span>
+                                    </div> 
+                                </div>
+                                <div className="w-full flex justify-between h-auto space-x-2">
+                                    <div className="w-1/2 flex place-items-center">
+                                        <span>Detalles de Fugas</span> 
+                                    </div>
+                                    <div className="w-1/2 flex justify-end place-items-center">
+                                        <span className="text-right">{selectedMeter.drain}</span>
+                                    </div> 
+                                </div>
+                                <div className="w-full flex justify-between h-auto space-x-2">
+                                    <div className="w-1/2 flex place-items-center">
+                                        <span>Volumen de referencia</span> 
+                                    </div>
+                                    <div className="w-1/2 flex justify-end place-items-center">
+                                        <span className="text-right">{selectedMeter.q1.reference_volume}</span>
+                                    </div> 
+                                </div>
+                                <div className="w-full flex justify-between h-auto space-x-2">
+                                    <div className="w-1/2">
+                                        <span>Estado final del medidor</span> 
+                                    </div>
+                                    <div className="w-1/2 flex justify-end place-items-center">
+                                        <span className="text-right">{selectedMeter.state}</span>
+                                    </div> 
+                                </div>
+                            </div>
                         )
                     }
                 }, [popUpData, selectedMeterKeys])
