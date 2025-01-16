@@ -5,6 +5,7 @@ import React from "react";import {
     ModalBody,   
     ModalFooter,
 } from "@nextui-org/modal";
+import { Button, Textarea } from "@nextui-org/react";
 import Banco from "../modalData/banco";
 import Instruments from "../modalData/instruments";
 import InstrumentsNew from "../modalData/InstrumenstNew";
@@ -12,6 +13,7 @@ import Meter_nc from "../modalData/Meter_nc";
 import Meter_c from "../modalData/Meter_c";
 import OrderSelection from "../modalData/OrderSelection";
 import PartialMeterSelection from "../modalData/PartialMeters";
+import { useNavigate } from "react-router-dom";
 
 export default function ModalData(
     {
@@ -37,6 +39,8 @@ export default function ModalData(
     }
     ) {
 
+    const navigate = useNavigate()
+
     const getPopUpTitle = (popUpData) => {
         switch (popUpData) {
             case 'banco':
@@ -51,6 +55,8 @@ export default function ModalData(
                 return 'Selección de medidores';
             case 'details':
                 return 'Detalles del medidor'
+            case 'cancelForm':
+                return 'Formulario de Cancelación de prueba';
             default:
                 return 'Instrumentos';
         }
@@ -173,20 +179,27 @@ export default function ModalData(
                                 </div>
                             </div>
                         )
+                    } else if(popUpData === 'cancelForm'){
+                        return(
+                            <div className="flex flex-col w-full space-y-3 h-full place-items-center justify-center mb-3">
+                                <Textarea className="max-w-xs" label="Por favor agrega detalles de la operación" placeholder="Ingresa el motivo de cancelación" />
+                            </div>
+                        )
                     }
                 }, [popUpData, selectedMeterKeys])
                 }
-                </ModalBody>
-                {/*   
-                <ModalFooter>
-                  <Button color="danger" variant="light" onPress={onClose}>
-                    Close
-                  </Button>
-                  <Button color="primary" onPress={onClose}>
-                    Action
+                </ModalBody>  
+                <ModalFooter className={`${popUpData != 'cancelForm' ? 'hidden': ''} w-full flex justify-center place-items-center`}>
+                  <Button 
+                    color="danger" 
+                    variant="solid" 
+                    onPress={()=>{
+                        onClose()
+                        navigate("/client/")
+                    }}>
+                    Cancelar prueba
                   </Button>
                 </ModalFooter>
-              */}
             </>
             )}
             </ModalContent>

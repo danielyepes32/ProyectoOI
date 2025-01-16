@@ -1,11 +1,11 @@
 import React from 'react';
 import { RiMenuSearchLine } from 'react-icons/ri';
-import { BrowserRouter as Router, Route, Routes , useLocation} from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes , useLocation, useNavigate} from 'react-router-dom';
 import { MdCancel } from "react-icons/md";
 
 import Menu from '../shared/menu';
 import Static_1 from './static_1';
-import { Button } from '@nextui-org/react';
+import { Button, divider } from '@nextui-org/react';
 import MainClient from './MainClient';
 import Static_2_nc from './static_2_nc';
 import Static_2_c from './static_2_c';
@@ -35,15 +35,33 @@ import Static_10 from './static_10';
 
 import Static_end from './static_end';
 
-import { useNavigate } from 'react-router-dom';
+
+import ModalData from '../shared/ModalData';
+import {  
+  useDisclosure
+} from "@nextui-org/modal";
+//Elementos de react necesarios
 
 const Client = () => {
 
   const navigate = useNavigate()
+  const location = useLocation();
   //const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
   const isAuthenticated = true
   console.log(isAuthenticated)
   const [sidebar, setSidebar] = React.useState(false);
+  const {isOpen, onOpen, onOpenChange} = useDisclosure()
+
+  const modal = React.useMemo(() => {
+    return(
+      <ModalData
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        popUpData={'cancelForm'}
+      />
+    )
+  },
+  [isOpen])
 
   const handleSidebar = () => {
     setSidebar(!sidebar);
@@ -55,6 +73,7 @@ const Client = () => {
 
   return isAuthenticated ? (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-7">
+      {modal}
       {/* Sidebar */}
         <Menu sidebar={sidebar} handleSidebar={handleSidebar} />
       {/* Contenido principal */}
@@ -90,9 +109,11 @@ const Client = () => {
       </Routes>
       {/* Botón del menú móvil */}
       <Button
-        className="z-[200] fixed bottom-4 right-4 mb-12 bg-red-400 border border-gray-400 text-white py-2 px-0 rounded-full shadow-lg text-2xl"
+        className={`${location.pathname !== "/client/" ? '' : 'hidden'} z-[200] fixed bottom-4 right-4 mb-12 bg-red-400 border border-gray-400 text-white py-2 px-0 rounded-full shadow-lg text-2xl`}
         onClick={()=>{
-          navigate("/client/")
+          if (location.pathname !== "/client/") {
+            onOpen();
+          }
         }}
       >
         <MdCancel className='w-full h-full'/>
