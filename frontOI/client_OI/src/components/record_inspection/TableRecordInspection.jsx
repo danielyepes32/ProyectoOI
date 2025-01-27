@@ -19,7 +19,10 @@ export default function TableRecordInspection(
         updateResult,
         updateValidate,
         handleEnterAction,
-        selectedQ
+        selectedQ,
+        onOpen,
+        setPopUpData,
+        setSelectedMeter
     }
 ){
 
@@ -59,9 +62,9 @@ export default function TableRecordInspection(
                 {renderCell(
                     item, // Asegúrate de pasar el item correctamente
                     columnKey, // Pasa columnKey directamente
-                    null, // Añade setSelectedMeter si es necesario en renderCell
+                    setSelectedMeter, // Añade setSelectedMeter si es necesario en renderCell
                     null, // Añade setActionKey si es necesario
-                    null,
+                    onOpen,
                     null,
                     updateResult,
                     null,
@@ -71,7 +74,9 @@ export default function TableRecordInspection(
                     null,
                     null,
                     handleEnterAction,
-                    selectedQ
+                    selectedQ,
+                    selectedKeys,
+                    setPopUpData
                 )}
             </TableCell>}
         </TableRow>

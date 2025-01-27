@@ -5,7 +5,7 @@ import React from "react";import {
     ModalBody,   
     ModalFooter,
 } from "@nextui-org/modal";
-import { Button, Textarea } from "@nextui-org/react";
+import { Button, Input, Textarea } from "@nextui-org/react";
 import Banco from "../modalData/banco";
 import Instruments from "../modalData/instruments";
 import InstrumentsNew from "../modalData/InstrumenstNew";
@@ -35,7 +35,8 @@ export default function ModalData(
         pruebaCapacity,
         selectedPruebaKey,
         onConfirmSelection,
-        selectedMeter
+        selectedMeter,
+        removeKey
     }
     ) {
 
@@ -57,6 +58,8 @@ export default function ModalData(
                 return 'Detalles del medidor'
             case 'cancelForm':
                 return 'Formulario de Cancelación de prueba';
+            case 'recover':
+                return 'Retornar acceso';
             default:
                 return 'Instrumentos';
         }
@@ -141,6 +144,24 @@ export default function ModalData(
                                 pruebaCapacity={pruebaCapacity}
                             />
                         )
+                    }else if(popUpData === 'recover'){
+                        console.log("Medidor seleccionado: ", selectedMeter)
+                        return(
+                            <div className="flex flex-col w-full space-y-3 h-full place-items-center justify-center mb-3">
+                                <text>Si desea reiniciar el valor ingresado del medidor <span className="font-bold">{selectedMeter.meter_id}</span> porfavor llame a su supervisor e ingrese sus credenciales</text>
+                                <Input className="max-w-xs" type label="Usuario" placeholder="Ingrese su usuario" />
+                                <Input className="max-w-xs" label="Contraseña" placeholder="Ingrese su contraseña" />
+                                <Button 
+                                    className="bg-custom-blue text-white"
+                                    onPress={()=>{
+                                        onClose()
+                                        removeKey(selectedMeter.meter_id)
+                                    }}
+                                    >
+                                        Confirmar
+                                </Button>
+                            </div>
+                        )
                     }else if(popUpData === 'details'){
                         console.log("Medidor seleccionado: ", selectedMeter)
                         return(
@@ -189,7 +210,7 @@ export default function ModalData(
                 }, [popUpData, selectedMeterKeys])
                 }
                 </ModalBody>  
-                <ModalFooter className={`${popUpData != 'cancelForm' ? 'hidden': ''} w-full flex justify-center place-items-center`}>
+                <ModalFooter className={`${popUpData === 'cancelForm' ? 'flex': 'hidden'} w-full justify-center place-items-center`}>
                   <Button 
                     color="danger" 
                     variant="solid" 

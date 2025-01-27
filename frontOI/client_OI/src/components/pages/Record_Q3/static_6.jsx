@@ -21,12 +21,14 @@ const INITIAL_VISIBLE_COLUMNS = ["meter_id", "num", "record_li"];
 export default function Static_6_Q3() {
 
     const [isChanged, setIsChanged] = useState(false)
-        const [initialPreassure, setInitialPreassure] = React.useState(null);
-        const [endPreassure, setEndPreassure] = React.useState(null);
+    const [initialPreassure, setInitialPreassure] = React.useState(null);
+    const [endPreassure, setEndPreassure] = React.useState(null);
     const [seconds, setSeconds] = useState(0);
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [popUpData,setPopUpData] = React.useState(null);
     const [customMessage, setCustomMessage] = React.useState(null);
+    //Constante para guardar el medidor seleccionado para el popUp de recuperación de token
+    const [selectedMeter, setSelectedMeter] = React.useState(null);
     const [isOpenCustomMessage, setIsOpenCustomMessage] = React.useState(false);
     //Variable para activar el circulo de carga de datos en caso de estar ejecutando acciones de API
     const [isLoading, setIsLoading] = React.useState(true);
@@ -258,6 +260,8 @@ export default function Static_6_Q3() {
             isOpen={isOpen}
             onOpenChange={onOpenChange}
             popUpData={popUpData}
+            selectedMeter={selectedMeter}
+            removeKey={removeKey}
           />
         );
     }, [isOpen]);
@@ -282,6 +286,7 @@ export default function Static_6_Q3() {
         headerColumns={headerColumns}
         meters={meters}
         loadingState={loadingState}
+        setSelectedMeter={setSelectedMeter}
         //visualInspection={visualInspection}
         updateResult={updateResult}
         //updateValue={updateValue}
@@ -289,6 +294,8 @@ export default function Static_6_Q3() {
         handleEnterAction = {handleEnterAction}
         updateValidate={updateValidate}
         selectedQ={'q3'}
+        onOpen={onOpen}
+        setPopUpData={setPopUpData}
       />
     );
   }, [meters, headerColumns ,selectedKeys])

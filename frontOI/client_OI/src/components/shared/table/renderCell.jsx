@@ -12,7 +12,7 @@ const statusColorMap = {
   pending: 'yellow',
 };
 
-const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, visualInspection, updateResult, updateValue, addKey, updateValidate, meters, handleValidateErrorInput, location, handleEnterAction, selectedQ) => {
+const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, visualInspection, updateResult, updateValue, addKey, updateValidate, meters, handleValidateErrorInput, location, handleEnterAction, selectedQ, selectedKeys, setPopUpData) => {
   const cellValue = user[columnKey];
   switch (columnKey) {
     case "status":
@@ -148,7 +148,7 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
     );
     case "record_li":
       const pointerMeter = meters.find(item => item.meter_id === user.meter_id);
-
+      const isSelected = selectedKeys.has(user.meter_id);
       return (
         <Input
           className="flex justify-center text-center w-full whitespace-pre-wrap z-[0] border-none px-0 shadow-none"
@@ -173,8 +173,8 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
               : "danger"
           }
           onValueChange={(value) => {
-            value.length < 7 ? updateResult(user.meter_id, value) : null;
-            value.length < 7 ? updateValidate(user.meter_id, value) : null;
+            !isSelected && value.length < 7 ? updateResult(user.meter_id, value) : null;
+            !isSelected && value.length < 7 ? updateValidate(user.meter_id, value) : null;
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
@@ -182,10 +182,17 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
               console.log("Enter", inputValue);
               handleEnterAction(user.meter_id, inputValue);
             }
-            if (e.key === "Backspace") {
+            if (e.key === "Backspace" && !isSelected) {
               console.log("Backspace", 0);
               updateResult(user.meter_id, 0);
               updateValidate(user.meter_id, 0);
+            }
+          }}
+          onClick={() => {
+            if (isSelected){
+              onOpen();
+              setSelectedMeter(user);
+              setPopUpData("recover");
             }
           }}
           onPointerDown={(e) => {
@@ -236,6 +243,7 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
               updateValidate(user.meter_id, 0);
             }
           }}
+        
           onPointerDown={(e) => {
             e.stopPropagation();
             e.currentTarget.focus();
@@ -268,21 +276,21 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
       );
 
     case "q1":
-    return(
-      <span>{`${user["q1"].error} %`}</span>
-    );
+      return(
+        <span>{`${user["q1"].error} %`}</span>
+      );
 
     case "q2":
     
-    return(
-      <span>{`${user["q2"].error} %`}</span>
-    );
+      return(
+        <span>{`${user["q2"].error} %`}</span>
+      );
 
     case "q3":
     
-    return(
-      <span>{`${user["q3"].error} %`}</span>
-    );
+      return(
+        <span>{`${user["q3"].error} %`}</span>
+      );
 
     case "obs":
 
