@@ -284,6 +284,11 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
       <span>{`${user["q3"].error} %`}</span>
     );
 
+    case "obs":
+
+      return(
+        <span>{user.result === "No apto" ? "No apto" : cellValue}</span>
+      );
     default:
       return cellValue || 'NO DATA';
   }

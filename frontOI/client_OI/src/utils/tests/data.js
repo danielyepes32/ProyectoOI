@@ -15,9 +15,9 @@ const meterColumns = [
   {name: "LECTURA (Li)", uid: "record_li", sortable: true},
   {name: "LECTURA (Lf)", uid: "record_lf", sortable: true},
   {name: "ERROR", uid : "error", sortable: true},
-  {name: "Q1", uid : "q1", sortable: true},
-  {name: "Q2", uid : "q2", sortable: true},
   {name: "Q3", uid : "q3", sortable: true},
+  {name: "Q2", uid : "q2", sortable: true},
+  {name: "Q1", uid : "q1", sortable: true},
   {name: "ACCIONES", uid : "actions", sortable: true}
 ];
 

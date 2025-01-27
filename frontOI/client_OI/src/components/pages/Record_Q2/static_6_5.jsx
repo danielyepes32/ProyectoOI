@@ -21,19 +21,20 @@ export default function Static_6_5() {
   const displaySeconds = seconds % 60;
 
   const [data, setData] = useState([
-    { id: 1, entrada: "", salida: "", temperatura: "" },
-    { id: 2, entrada: "", salida: "", temperatura: "" },
-    { id: 3, entrada: "", salida: "", temperatura: "" },
-    { id: 4, entrada: "", salida: "", temperatura: "" },
-    { id: 5, entrada: "", salida: "", temperatura: "" },
-    { id: 6, entrada: "", salida: "", temperatura: "" },
-    { id: 7, entrada: "", salida: "", temperatura: "" },
-    { id: 8, entrada: "", salida: "", temperatura: "" },
+    { id: 1, entrada: "", salida: "", caudal: "", temperatura: "" },
+    { id: 2, entrada: "", salida: "", caudal: "", temperatura: "" },
+    { id: 3, entrada: "", salida: "", caudal: "", temperatura: "" },
+    { id: 4, entrada: "", salida: "", caudal: "", temperatura: "" },
+    { id: 5, entrada: "", salida: "", caudal: "", temperatura: "" },
+    { id: 6, entrada: "", salida: "", caudal: "", temperatura: "" },
+    { id: 7, entrada: "", salida: "", caudal: "", temperatura: "" },
+    { id: 8, entrada: "", salida: "", caudal: "", temperatura: "" },
   ]);
 
   const RANGES = {
     entrada: { min: 8.0, max: 9.0 },
     salida: { min: 0.5, max: 0.8 },
+    caudal: { min: 0.1, max: 20.0 },
     temperatura: { min: 0.1, max: 30.0 },
   };
 
@@ -51,6 +52,7 @@ export default function Static_6_5() {
       (row) =>
         validateValue(row.entrada, "entrada") &&
         validateValue(row.salida, "salida") &&
+        validateValue(row.caudal, "caudal") &&
         validateValue(row.temperatura, "temperatura")
     );
     setCanProceed(validRows.length >= 3);
@@ -133,6 +135,9 @@ export default function Static_6_5() {
               <th className="border border-gray-300 p-2">
                 Presiones dinámicas (Salida)
               </th>
+              <th className="border border-gray-300 p-2">
+                Caudal de agua
+              </th>
               <th className="border border-gray-300 p-2">Temperaturas</th>
             </tr>
           </thead>
@@ -140,7 +145,7 @@ export default function Static_6_5() {
             {data.map((row) => (
               <tr key={row.id} className="text-center">
                 <td className="border border-gray-300 p-2">{row.id}</td>
-                {["entrada", "salida", "temperatura"].map((key) => (
+                {["entrada", "salida", "caudal", "temperatura"].map((key) => (
                   <td
                     key={key}
                     className={`border border-gray-300 p-2 ${
@@ -150,14 +155,15 @@ export default function Static_6_5() {
                     }`}
                   >
                     <input
-                      type="text"
+                      type="number"
+                      max={RANGES[key].max}
                       value={row[key]}
                       className="w-full text-center border-none focus:ring-2 focus:ring-blue-300"
                       placeholder={`${
                         RANGES[key].min
                       }-${RANGES[key].max}`}
                       onChange={(e) =>
-                        handleInputChange(row.id, key, e.target.value)
+                        e.target.value.length < 6 ? handleInputChange(row.id, key, e.target.value) : null
                       }
                     />
                   </td>

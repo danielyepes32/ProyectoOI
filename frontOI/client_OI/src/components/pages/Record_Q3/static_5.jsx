@@ -97,6 +97,13 @@ export default function Static_5_Q3() {
       acc[item.meter_id] = { value: item.drain }; // Establecer valor por defecto
       return acc;
     }, {}) : null;
+
+    // Obtener los IDs de medidores con result "No apto"
+    const noAptoIds = new Set(
+      responses[0].medidores.filter((medidor) => medidor.result === "No apto").map((m) => m.meter_id)
+    );
+
+    setSelectedKeys(noAptoIds);
     // Actualizar el estado visualInspection
     setVisualInspection(visualInspectionObj);
     setMetersLength(responses[0] ? responses[0].medidores.length : null);

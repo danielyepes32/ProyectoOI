@@ -11,7 +11,7 @@ import ModalData from "../shared/ModalData";
 import apiService from "../../hook/services/apiService";
 import DateService  from "../../hook/services/dateService.js"
 //Las columnas se pueden agregar o eliminar de la vista, aquí inicializamos por default las necesarias
-const INITIAL_VISIBLE_COLUMNS = ["meter_id", "q1", "q2", "q3", "result", "actions"];
+const INITIAL_VISIBLE_COLUMNS = ["meter_id", "q3", "q2", "q1", "result", "actions"];
 
 export default function Static_end() {
 

@@ -71,6 +71,7 @@ const CustomAlert = ({ message, isVisible, setIsVisible, routeRedirect,handleCon
                 <Button 
                 className='bg-custom-blue text-white'
                 onPress={async () => {
+                    let api_recall = null
                   if (handleConfirm) {
                     api_recall = await handleConfirm(); // Espera a que handleConfirm termine
                   } else {
