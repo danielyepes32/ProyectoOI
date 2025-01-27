@@ -25,7 +25,7 @@ export default function Static_6_Q2() {
     const [seconds, setSeconds] = useState(0);
     const [initialPreassure, setInitialPreassure] = React.useState(null);
     const [endPreassure, setEndPreassure] = React.useState(null);
-
+    const [selectedMeter, setSelectedMeter] = React.useState(null); //Medidor seleccionado
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [popUpData,setPopUpData] = React.useState(null);
     const [customMessage, setCustomMessage] = React.useState(null);
@@ -260,6 +260,8 @@ export default function Static_6_Q2() {
             isOpen={isOpen}
             onOpenChange={onOpenChange}
             popUpData={popUpData}
+            selectedMeter={selectedMeter}
+            removeKey={removeKey}
           />
         );
     }, [isOpen]);
@@ -291,6 +293,9 @@ export default function Static_6_Q2() {
         handleEnterAction = {handleEnterAction}
         updateValidate={updateValidate}
         selectedQ={"q2"}
+        setSelectedMeter={setSelectedMeter}
+        onOpen={onOpen}
+        setPopUpData={setPopUpData}
       />
     );
   }, [meters, headerColumns ,selectedKeys])

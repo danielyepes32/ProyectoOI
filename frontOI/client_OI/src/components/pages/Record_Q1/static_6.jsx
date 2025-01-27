@@ -26,7 +26,7 @@ export default function Static_6() {
 
     const [initialPreassure, setInitialPreassure] = React.useState(null);
     const [endPreassure, setEndPreassure] = React.useState(null);
-
+    const [selectedMeter, setSelectedMeter] = React.useState(null);
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [popUpData,setPopUpData] = React.useState(null);
     const [customMessage, setCustomMessage] = React.useState(null);
@@ -260,6 +260,8 @@ export default function Static_6() {
             isOpen={isOpen}
             onOpenChange={onOpenChange}
             popUpData={popUpData}
+            selectedMeter={selectedMeter}
+            removeKey={removeKey}
           />
         );
     }, [isOpen]);
@@ -284,6 +286,7 @@ export default function Static_6() {
         headerColumns={headerColumns}
         meters={meters}
         loadingState={loadingState}
+        setSelectedMeter={setSelectedMeter}
         //visualInspection={visualInspection}
         updateResult={updateResult}
         //updateValue={updateValue}
@@ -291,6 +294,8 @@ export default function Static_6() {
         handleEnterAction = {handleEnterAction}
         updateValidate={updateValidate}
         selectedQ={"q1"}
+        onOpen={onOpen}
+        setPopUpData={setPopUpData}
       />
     );
   }, [meters, headerColumns ,selectedKeys])
