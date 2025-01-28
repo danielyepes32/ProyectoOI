@@ -173,9 +173,10 @@ export default function Static_2_c() {
               const assignedToPrueba = remaining.splice(0, pruebaCapacity);
               const payload = {
                   medidores: assignedToPrueba.map((id) => {
+                    const meterAsc = metersPrueba.find((meter) => meter.id === id)
                     const data = {
                         medidor: id,
-                        meter_id: metersPrueba[id-1]?.medidor,
+                        meter_id: meterAsc?.medidor,
                         state: "Sin observaciones",
                         drain: "Sin observaciones",
                         obs: "Conforme",
