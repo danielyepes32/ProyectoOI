@@ -89,7 +89,7 @@ export default function static_7_Q2() {
 
       }));
 
-      const prueba_search = selected_prueba != null && selected_prueba.length > 0 ? responses.find(prueba => prueba.id === selected_prueba.id) : responses[0]
+      const prueba_search = selected_prueba != null && selected_prueba != {} > 0 ? responses.find(prueba => prueba.id === selected_prueba.id) : responses[0]
 
       const filtrados = prueba_search ? prueba_search.medidores.filter(item => item.result !== "No apto" && item.obs !== "No conforme") : null;
       // Suponiendo que setPruebas es un setter de un estado que contiene un array

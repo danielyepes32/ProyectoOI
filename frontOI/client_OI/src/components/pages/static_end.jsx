@@ -92,7 +92,7 @@ export default function Static_end() {
       }));
 
       console.log('Respuestas ', responses)
-      const prueba_search = selected_prueba != null && selected_prueba.length > 0 ? responses.find(prueba => prueba.id === selected_prueba.id) : responses[0]
+      const prueba_search = selected_prueba != null && selected_prueba != {} > 0 ? responses.find(prueba => prueba.id === selected_prueba.id) : responses[0]
 
       console.log("pruebaSearch: ", prueba_search)
       const filtrados = prueba_search ? prueba_search.medidores.filter(item => item.result !== "No apto" && item.obs !== "No conforme") : null;
@@ -245,9 +245,11 @@ export default function Static_end() {
       }
       
       // Llama a la API para actualizar los medidores
-      const prueba_search = selected_prueba != null && selected_prueba.length > 0 ? pruebas.find(prueba => prueba.id === selected_prueba.id) : pruebas[0]
+      const prueba_search = selected_prueba != null && selected_prueba !={} ? pruebas.find(prueba => prueba.id === selected_prueba.id) : pruebas[0]
       // pruebas.find(prueba => prueba.id === selected_prueba.id)
-  
+      
+      console.log("Prueba search: ", prueba_search)
+
       console.log("Iniciando actualización de medidores...");
 
       const abortController = new AbortController();
@@ -258,7 +260,7 @@ export default function Static_end() {
   
           console.log(`Payload for index ${index}:`, singlePayload);
   
-          return apiService.updateMetersPrueba(prueba_search.id, singlePayload, { signal });
+          return apiService.updateMetersPrueba(prueba_search.id, singlePayload);
       });
 
 
@@ -329,21 +331,28 @@ export default function Static_end() {
       }
     };
 
+    const routeRedirect = React.useMemo(() => {
+      console.log("Selected Prueba: ", selected_prueba)
+      const index = selected_prueba?.id 
+        ? pruebas.findIndex(prueba => prueba.id === selected_prueba.id) 
+        : -1;
+    
+      console.log(index);
+    
+      const next_prueba = index >= 0 && index + 1 < pruebas.length 
+        ? pruebas[index + 1] 
+        : null;
+    
+      return next_prueba ? "/client/Q3/static_6" : "/client"; // Devuelve el string directamente
+    }, [pruebas, selected_prueba]);
+
     const confirmationMessage = React.useMemo(() => {
         return isOpenCustomMessage === true ? (
           <CustomAlert 
             message={customMessage} 
             isVisible={isOpenCustomMessage} 
             setIsVisible={setIsOpenCustomMessage}
-            routeRedirect={()=>{
-              
-              const index = selected_prueba != null && selected_prueba.length > 0 ? pruebas.findIndex(prueba => prueba.id === selected_prueba.id) : 0
-              console.log(index)
-              const next_prueba = index !== -1 && index + 1 < pruebas.length
-                ? pruebas[index + 1]
-                : null;// Si no hay siguiente prueba, devuelve null
-              return next_prueba ? "/client/Q3/static_6" : "/client"
-            }}
+            routeRedirect={routeRedirect}
             handleConfirm={handleConfirm}
             />
         ) : null

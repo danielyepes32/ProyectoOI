@@ -21,6 +21,7 @@ const INITIAL_VISIBLE_COLUMNS = ["meter_id", "num", "record_li"];
 export default function Static_6_Q3() {
 
     const selected_prueba = JSON.parse(localStorage.getItem('selected_prueba'))
+    console.log("Selected Prueba: ", selected_prueba)
 
     const [isChanged, setIsChanged] = useState(false)
     const [initialPreassure, setInitialPreassure] = React.useState(null);
@@ -106,8 +107,8 @@ export default function Static_6_Q3() {
 
       }));
 
-      const prueba_search = selected_prueba != null && selected_prueba.length > 0 ? responses.find(prueba => prueba.id === selected_prueba.id) : responses[0]
-      
+      const prueba_search = selected_prueba && selected_prueba != {} > 0 ? responses.find(prueba => prueba.id === selected_prueba.id) : responses[0]
+
       const filtrados = prueba_search ? prueba_search.medidores.filter(item => item.result !== "No apto" && item.obs !== "No conforme") : null;
       // Suponiendo que setPruebas es un setter de un estado que contiene un array
       console.log(filtrados)

@@ -93,7 +93,7 @@ export default function static_7_Q3() {
       }));
 
       // Llama a la API para actualizar los medidores
-      const prueba_search = selected_prueba != null && selected_prueba.length > 0 ? responses.find(prueba => prueba.id === selected_prueba.id) : responses[0]
+      const prueba_search = selected_prueba != null && selected_prueba != {} > 0 ? responses.find(prueba => prueba.id === selected_prueba.id) : responses[0]
 
       console.log(prueba_search)
 
