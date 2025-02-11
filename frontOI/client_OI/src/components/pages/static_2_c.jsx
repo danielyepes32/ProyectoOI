@@ -261,6 +261,20 @@ export default function Static_2_c() {
       </div>)
     }, [rangeStart, rangeEnd])
 
+    // Enviar en funcion de respuesta del estado del medidor si este ha sido evaluado
+    const handleMeterEvaluation = (meterKey, evaluation) => {
+      const updatedMeters = metersPrueba.map((meter) => {
+        if (meter.id === meterKey) {
+          return {
+            ...meter,
+            estado: evaluation,
+          };
+        }
+        return meter;
+        });
+        setMetersPrueba(updatedMeters);
+    };
+
     const confirmationMessage = useMemo(() => {
         return isOpenCustomMessage ? (
         <CustomAlert 

@@ -75,12 +75,31 @@ export default function Static_6_5() {
     setIsOpenCustomMessage(true);
   };
 
+  const handleConfirmCM = async () => {
+    try{    
+      const count_secuencia = localStorage.getItem("count_secuencia");
+      const puedeAvanzar = parseInt(count_secuencia) === 9; 
+
+      if (!puedeAvanzar) {
+        alert("No se puede avanzar: hay procesos pendientes o viene de la secuencia incorrecta");
+        return false;
+      } else {
+        alert("Se avanzará a la siguiente ruta")
+        localStorage.setItem("count_secuencia", "10");
+        return true;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   const confirmationMessage = isOpenCustomMessage ? (
     <CustomAlert
       message={customMessage}
       isVisible={isOpenCustomMessage}
       setIsVisible={setIsOpenCustomMessage}
       routeRedirect={"/client/Q1/static_7"} // No redirige automáticamente
+      handleConfirm={handleConfirmCM}
     />
   ) : null;
 

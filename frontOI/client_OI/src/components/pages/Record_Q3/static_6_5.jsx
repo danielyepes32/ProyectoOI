@@ -74,12 +74,31 @@ export default function Static_6_5() {
     setIsOpenCustomMessage(true);
   };
 
+  const handleConfirmCM = async () => {
+    try{    
+      const count_secuencia = localStorage.getItem("count_secuencia");
+      const puedeAvanzar = parseInt(count_secuencia) === 1; 
+
+      if (!puedeAvanzar) {
+        alert("No se puede avanzar: hay procesos pendientes o viene de la secuencia incorrecta");
+        return false;
+      } else {
+        alert("Se avanzará a la siguiente ruta")
+        localStorage.setItem("count_secuencia", "2");
+        return true;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   const confirmationMessage = isOpenCustomMessage ? (
     <CustomAlert
       message={customMessage}
       isVisible={isOpenCustomMessage}
       setIsVisible={setIsOpenCustomMessage}
       routeRedirect={"/client/Q3/static_7"} // No redirige automáticamente
+      handleConfirm={handleConfirmCM}
     />
   ) : null;
 
@@ -100,7 +119,7 @@ export default function Static_6_5() {
       </div>
 
       {/* Prueba actual */}
-      <div className="grid grid-cols-4 gap-4 mt-4">
+      <div className="grid grid-cols-4 gap-4 my-4">
         <div className="col-span-3 bg-white shadow-lg px-4 flex justify-between items-center rounded-[30px]">
           <span className="font-inter text-center w-full pr-2">
             Usted se encuentra en la prueba
@@ -121,33 +140,86 @@ export default function Static_6_5() {
           </Button>
         </div>
       </div>
+      
+      <div className="w-full shadow-md flex h-auto rounded-lg bg-white p-2">
+        <div className="w-1/4 flex-col justify-center place-items-center">
+          <div className="flex-col justify-center place-items-center">
+            <span className="text-center">
+              Var (%)
+            </span>
+            <Button
+              className="flex justify-center bg-custom-blue "
+              isIconOnly
+              >
+              1
+            </Button>
+          </div>
+        </div>
+        <div className="w-1/4 justify-center place-items-center">
+          <span className="text-center w-full">
+            Var (%)
+          </span>
+          <Button
+            className="flex justify-center bg-custom-blue"
+            isIconOnly
+            >
+            1
+          </Button>
+        </div>
+        <div className="w-1/4 flex-col justify-center place-items-center">
+          <span className="text-center w-full">
+            Var (%)
+          </span>
+          <Button
+            className="flex justify-center bg-custom-blue"
+            isIconOnly
+          >
+            1
+          </Button>
+        </div>
+        <div className="w-1/3 justify-center place-items-center">
+          <span className="text-center w-full">
+            Var (%)
+          </span>
+          <Button
+            className="flex justify-center bg-custom-blue "
+            isIconOnly
+          >
+            1
+          </Button>
+        </div>
+      </div>
 
       {/* Tabla de medición */}
-      <div className="mt-5 bg-gray-100 p-5 rounded-lg shadow-md">
-        <table className="w-full text-sm md:text-base border-collapse border border-gray-300">
-          <thead className="bg-custom-blue text-white">
-            <tr>
-              <th className="border border-gray-300 p-2">Nº</th>
-              <th className="border border-gray-300 p-2">
+      <div className="mt-5 h-full bg-gray-100 p-2 rounded-lg shadow-md flex justify-center place-items-center">
+        <table className="w-full text-sm md:text-base rounded-lg table-fixed h-full justify-center place-items-center border-collapse border border-gray-300 overflow-x-hidden">
+          <thead className="bg-custom-blue text-white h-auto">
+            <tr className="justify-center border place-items-center h-full">
+              <th className="border-l border-r w-1/4 border-gray-300 p-2">
                 Presiones dinámicas (Entrada)
               </th>
-              <th className="border border-gray-300 p-2">
+              <th className="border-l border-r w-1/4 border-gray-300 p-2">
                 Presiones dinámicas (Salida)
               </th>
-              <th className="border border-gray-300 p-2">
+              <th className="border-l border-r w-1/4 border-gray-300 p-2">
                 Caudal de agua
               </th>
-              <th className="border border-gray-300 p-2">Temperaturas</th>
+              <th className="border-l border-r w-1/3 border-gray-300 p-2 h-full">
+                <div className="flex justify-center place-items-center">
+                  <span className="text-center">Temperatura</span>
+                </div>
+              </th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="flex-col justify-between flex-grow overflow-auto">
             {data.map((row) => (
-              <tr key={row.id} className="text-center">
-                <td className="border border-gray-300 p-2">{row.id}</td>
+              <tr key={row.id} className="text-center flex-col ">
                 {["entrada", "salida", "caudal", "temperatura"].map((key) => (
                   <td
                     key={key}
-                    className={`border border-gray-300 p-2 ${
+                    className={`border border-gray-300 p-2 
+                    ${key === "temperatura" ? "w-1/3" : "w-1/4"} 
+                    ${
                       !validateValue(row[key], key) && row[key]
                         ? "bg-red-100"
                         : ""

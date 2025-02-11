@@ -32,6 +32,8 @@ const INITIAL_VISIBLE_COLUMNS = ["checkbox","meter_id", "num", "error"];
 
 export default function Static_8_Q3() {
 
+    const selected_prueba = JSON.parse(localStorage.getItem('selected_prueba'))
+
     const [isChanged, setIsChanged] = useState(false)
     const [pruebaValue, setPruebaValue] = useState(null)
 
@@ -130,7 +132,10 @@ export default function Static_8_Q3() {
         };
 
       }));
-      const filtrados = responses[0] ? responses[0].medidores.filter(item => item.result !== "No apto" && item.obs !== "No conforme") : null;
+
+      const prueba_search = selected_prueba != null && selected_prueba.length > 0 ? responses.find(prueba => prueba.id === selected_prueba.id) : responses[0]
+
+      const filtrados = prueba_search ? prueba_search.medidores.filter(item => item.result !== "No apto" && item.obs !== "No conforme") : null;
       // Suponiendo que setPruebas es un setter de un estado que contiene un array
       console.log(filtrados)
       setMeters(filtrados ? filtrados : null)
@@ -322,13 +327,25 @@ export default function Static_8_Q3() {
         })),
       };
 
+      const count_secuencia = localStorage.getItem("count_secuencia");
+      const puedeAvanzar = parseInt(count_secuencia) === 3; 
+
+      if(!puedeAvanzar){
+        alert("No puede confirmar, hay procesos pendientes o viene de la secuencia equivocada")
+        throw new Error("No se puede avanzar: La prueba tiene procesos pendientes")
+      }
+
+      const prueba_search = pruebas.find(prueba => prueba.id === selected_prueba.id)
+
       payload.medidores.map(async (item, index) => {
         const singlePayload = { medidores: [item] };
-        await apiService.updateMetersPrueba(pruebas[0].id, singlePayload);
+        await apiService.updateMetersPrueba(prueba_search.id, singlePayload);
         console.log(`Payload for index ${index}: `, singlePayload);
       })
 
       console.log("Payload: ", payload)
+
+      localStorage.setItem("count_secuencia", "4")
       // alert("Medidores actualizados correctamente");
       return true;    
       // Llamada al servicio de la API 

@@ -15,6 +15,8 @@ const INITIAL_VISIBLE_COLUMNS = ["meter_id", "q3", "q2", "q1", "result", "action
 
 export default function Static_end() {
 
+    const selected_prueba = JSON.parse(localStorage.getItem('selected_prueba'))
+
     const [isChanged, setIsChanged] = useState(false)
     const [initialPreassure, setInitialPreassure] = React.useState(null);
     const [endPreassure, setEndPreassure] = React.useState(null);
@@ -88,7 +90,12 @@ export default function Static_end() {
         };
 
       }));
-      const filtrados = responses[0] ? responses[0].medidores.filter(item => item.result !== "No apto" && item.obs !== "No conforme") : null;
+
+      console.log('Respuestas ', responses)
+      const prueba_search = selected_prueba != null && selected_prueba.length > 0 ? responses.find(prueba => prueba.id === selected_prueba.id) : responses[0]
+
+      console.log("pruebaSearch: ", prueba_search)
+      const filtrados = prueba_search ? prueba_search.medidores.filter(item => item.result !== "No apto" && item.obs !== "No conforme") : null;
       // Suponiendo que setPruebas es un setter de un estado que contiene un array
       console.log(filtrados)
       setMeters(filtrados ? filtrados : null)
@@ -228,15 +235,91 @@ export default function Static_end() {
         },
         })),
       };
+      const count_secuencia = localStorage.getItem("count_secuencia");
 
-      payload.medidores.map(async (item, index) => {
-        const singlePayload = { medidores: [item] };
-        await apiService.updateMetersPrueba(pruebas[0].id, singlePayload);
-        console.log(`Payload for index ${index}: `, singlePayload);
-      })
+      const puedeAvanzar = parseInt(count_secuencia) === 14 || parseInt(count_secuencia) === 12; 
 
-      console.log("Payload: ", payload)
-      // alert("Medidores actualizados correctamente");
+      if (!puedeAvanzar) {
+        console.warn("No se puede avanzar: hay procesos pendientes");
+        throw new Error("No se puede avanzar: La prueba tiene procesos pendientes")
+      }
+      
+      // Llama a la API para actualizar los medidores
+      const prueba_search = selected_prueba != null && selected_prueba.length > 0 ? pruebas.find(prueba => prueba.id === selected_prueba.id) : pruebas[0]
+      // pruebas.find(prueba => prueba.id === selected_prueba.id)
+  
+      console.log("Iniciando actualización de medidores...");
+
+      const abortController = new AbortController();
+      const signal = abortController.signal;
+  
+      const promises = payload.medidores.map(async (item, index) => {
+          const singlePayload = { estado: "CERRADA" , medidores: [item] };
+  
+          console.log(`Payload for index ${index}:`, singlePayload);
+  
+          return apiService.updateMetersPrueba(prueba_search.id, singlePayload, { signal });
+      });
+
+
+      const promiese_meters = medidores.map(meter => {
+        if (!meter.medidor.id) {
+            console.error("Error: Medidor inválido, falta ID:", meter.medidor);
+            throw new Error(`Medidor inválido detectado: ${JSON.stringify(meter.medidor)}`);
+        }
+
+        const metersPayload = {
+            ...meter.medidor,
+            registro_tecnico_id: meter.medidor.registro_tecnico.id,
+            estado: "Evaluado",
+        };
+
+        console.log(`Actualizando estado de medidor ID: ${meter.medidor.id}`, metersPayload);
+
+        return apiService.updateMetersData(meter.medidor.id, metersPayload)
+            .catch(error => {
+                console.error(`Error en updateMetersData para ID ${meter.medidor.id}:`, error);
+                return Promise.reject(error);
+            });
+      });
+  
+      const [resultsPruebas, resultsMeters] = await Promise.all([
+          Promise.allSettled(promises),
+          Promise.allSettled(promiese_meters)
+      ]);
+  
+      console.log("Resultados Pruebas:", resultsPruebas);
+      console.log("Resultados de la actualización de medidores:", resultsMeters);
+  
+        // Verificar errores en cada conjunto de promesas
+        const failedPruebas = resultsPruebas.filter(result => result.status === "rejected");
+        const failedMeters = resultsMeters.filter(result => result.status === "rejected");
+    
+        if (failedPruebas.length > 0 || failedMeters.length > 0) {
+            console.error("Algunas promesas fallaron:");
+            if (failedPruebas.length > 0) console.error("Errores en Pruebas:", failedPruebas);
+            if (failedMeters.length > 0) console.error("Errores en Medidores:", failedMeters);
+            throw new Error("Algunas solicitudes no se completaron correctamente.");
+        }
+    
+        console.log("Todas las promesas se resolvieron correctamente.");
+
+      const index = pruebas.findIndex(prueba => prueba.id === selected_prueba.id);
+
+      const next_prueba = index !== -1 && index + 1 < pruebas.length
+          ? pruebas[index + 1]
+          : null;// Si no hay siguiente prueba, devuelve null
+
+      const selected = next_prueba ? {
+        id: next_prueba.id,
+        nombre: next_prueba.nombre
+      } : {}
+
+      localStorage.setItem("selected_prueba", JSON.stringify(selected))
+      localStorage.setItem("count_secuencia", "0")
+
+      alert("Se avanzará a la siguiente prueba");
+      console.log("Siguiente prueba: ", next_prueba?.nombre)
       return true;    
       // Llamada al servicio de la API 
       } catch (error) {
@@ -252,7 +335,15 @@ export default function Static_end() {
             message={customMessage} 
             isVisible={isOpenCustomMessage} 
             setIsVisible={setIsOpenCustomMessage}
-            routeRedirect={"/client/Q3/static_8"}
+            routeRedirect={()=>{
+              
+              const index = selected_prueba != null && selected_prueba.length > 0 ? pruebas.findIndex(prueba => prueba.id === selected_prueba.id) : 0
+              console.log(index)
+              const next_prueba = index !== -1 && index + 1 < pruebas.length
+                ? pruebas[index + 1]
+                : null;// Si no hay siguiente prueba, devuelve null
+              return next_prueba ? "/client/Q3/static_6" : "/client"
+            }}
             handleConfirm={handleConfirm}
             />
         ) : null
