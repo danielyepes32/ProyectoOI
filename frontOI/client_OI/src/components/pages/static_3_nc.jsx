@@ -170,6 +170,25 @@ export default function Static_3_nc() {
         return totalMedidores;
     },[pruebasUpdated])
 
+    const handleConfirm = React.useCallback(async ()=>{
+
+        const selected_prueba = {
+            id: pruebas[0].id,
+            nombre: pruebas[0].nombre
+        }
+
+        console.log("selected_prueba: ", selected_prueba)
+        
+        const closedPruebas = pruebas.filter(prueba => prueba.estado === "CERRADA");
+
+        console.log("selected_prueba: ", closedPruebas)
+
+        closedPruebas.length === 0 ? localStorage.setItem("selected_prueba", JSON.stringify(selected_prueba)): null
+        
+        return true;
+        // Aquí se puede agregar la lógica para confirmar la selección de medidores
+    })
+
     const modal = React.useMemo(() => {
         return (
             <ModalData
@@ -188,6 +207,7 @@ export default function Static_3_nc() {
             isVisible={isOpenCustomMessage} 
             setIsVisible={setIsOpenCustomMessage}
             routeRedirect={"/client/Q3/static_4"}
+            handleConfirm={handleConfirm}
             />
         ) : null
       }, [isOpenCustomMessage]);

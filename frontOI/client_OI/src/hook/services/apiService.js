@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-const baseUrl = 'https://f461-181-56-8-48.ngrok-free.app/api/';
+const baseUrl = 'http://localhost:8000/api/';
 
 // Configuracion comun para las solicitudes para los headers y la informacion por fuera del payload
 const axiosInstance = axios.create({
@@ -122,6 +122,21 @@ export const updateMetersPrueba = async (pruebaId, updates) => {
 };
 
 // Servicio para actualizar los valores de un medidor
+export const updateMetersData = async (pruebaId, updates) => {
+  try {
+    const response = await axios.put(`${baseUrl}medidores/med/${pruebaId}/`, updates, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error updating meter:', error);
+    throw error.response ? error.response : 'Network Error';
+  }
+};
+
+// Servicio para actualizar los valores de un medidor
 export const postMetersPrueba = async (pruebaId, meters) => {
   try {
     const response = await axios.post(`${baseUrl}pruebas/pruebas/${pruebaId}/assign-medidores/`, meters, {
@@ -179,6 +194,7 @@ export const loginUser = async (credentials) => {
 export default {
   loginUser,
   getAll,
+  updateMetersData,
   getByKey,
   create,
   updateData,

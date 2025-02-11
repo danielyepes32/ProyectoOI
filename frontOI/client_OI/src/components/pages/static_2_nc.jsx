@@ -96,6 +96,7 @@ export default function Static_2_nc() {
                     drain: "Sin observaciones",
                     obs: "Conforme",
                     result: "Apto",
+
                     q1: {
                         record_li: 0.0,
                         record_lf: 0.0,
@@ -312,29 +313,95 @@ export default function Static_2_nc() {
         const enrichedPruebas = enrichUpdatedPruebas(updatedPruebas);
         console.log("Enriched Pruebas:", enrichedPruebas);
 
-        // Enviar los medidores de cada prueba al endpoint
         try {
+            console.log("Iniciando el proceso de asignación de medidores...");
+        
+            if (!enrichedPruebas || !Array.isArray(enrichedPruebas)) {
+                console.error("Error: 'enrichedPruebas' no está definido o no es un array.", enrichedPruebas);
+                throw new Error("Datos de pruebas inválidos.");
+            }
+        
+            if (!metersPrueba || !Array.isArray(metersPrueba)) {
+                console.error("Error: 'metersPrueba' no está definido o no es un array.", metersPrueba);
+                throw new Error("Datos de medidores inválidos.");
+            }
+        
+            console.log(`Cantidad de pruebas a procesar: ${enrichedPruebas.length}`);
+            console.log(`Cantidad de medidores a actualizar: ${metersPrueba.length}`);
+        
             const promises = enrichedPruebas.map(prueba => {
-                const pruebaId = prueba.id; // Asegúrate de que `id` está presente en cada prueba
+                if (!prueba.id || !prueba.medidores) {
+                    console.error("Error: Prueba inválida, falta ID o medidores:", prueba);
+                    throw new Error(`Prueba inválida detectada: ${JSON.stringify(prueba)}`);
+                }
+        
+                const pruebaId = prueba.id;
                 const metersPayload = {
-                    medidores: prueba.medidores, // Enviar directamente el array completo
+                    medidores: prueba.medidores,
                 };
-                return apiService.postMetersPrueba(pruebaId, metersPayload);
+        
+                console.log(`Enviando medidores para la prueba ID: ${pruebaId}`, metersPayload);
+        
+                return apiService.postMetersPrueba(pruebaId, metersPayload)
+                    .catch(error => {
+                        console.error(`Error en postMetersPrueba para ID ${pruebaId}:`, error);
+                        return Promise.reject(error);
+                    });
             });
-
-            // Esperar a que todas las solicitudes se completen
-            const results = await Promise.all(promises);
-            console.log("Resultados de la actualización:", results);
-
-            // Acción adicional tras la actualización exitosa (opcional)
+        
+            const promises_meters = metersPrueba.map(meter => {
+                if (!meter.id) {
+                    console.error("Error: Medidor inválido, falta ID:", meter);
+                    throw new Error(`Medidor inválido detectado: ${JSON.stringify(meter)}`);
+                }
+        
+                const metersPayload = {
+                    ...meter,
+                    registro_tecnico_id: meter.registro_tecnico.id,
+                    estado: "Asignado",
+                };
+        
+                console.log(`Actualizando estado de medidor ID: ${meter.id}`, metersPayload);
+        
+                return apiService.updateMetersData(meter.id, metersPayload)
+                    .catch(error => {
+                        console.error(`Error en updateMetersData para ID ${meter.id}:`, error);
+                        return Promise.reject(error);
+                    });
+            });
+        
+            console.log("Esperando que todas las promesas finalicen...");
+        
+            const [resultsPruebas, resultsMeters] = await Promise.all([
+                Promise.allSettled(promises),
+                Promise.allSettled(promises_meters)
+            ]);
+        
+            console.log("Resultados Pruebas:", resultsPruebas);
+            console.log("Resultados de la actualización de medidores:", resultsMeters);
+        
+            // Verificar errores en cada conjunto de promesas
+            const failedPruebas = resultsPruebas.filter(result => result.status === "rejected");
+            const failedMeters = resultsMeters.filter(result => result.status === "rejected");
+        
+            if (failedPruebas.length > 0 || failedMeters.length > 0) {
+                console.error("Algunas promesas fallaron:");
+                if (failedPruebas.length > 0) console.error("Errores en Pruebas:", failedPruebas);
+                if (failedMeters.length > 0) console.error("Errores en Medidores:", failedMeters);
+                throw new Error("Algunas solicitudes no se completaron correctamente.");
+            }
+        
+            console.log("Todas las promesas se resolvieron correctamente.");
+        
+            // Acción adicional tras la actualización exitosa
             alert("Los medidores se asignaron exitosamente a las pruebas.");
             return true;
-
+        
         } catch (error) {
             console.error("Error al enviar los medidores:", error);
             alert("Ocurrió un error al asignar los medidores. Intenta nuevamente.");
             return false;
-        }
+        }        
 
     }, [updatedPruebas, metersLength]); // Agregar metersLength como dependencia
 

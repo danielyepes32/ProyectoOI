@@ -194,6 +194,7 @@ export default function Static_4_Q3() {
         ...meter,
         state: visualInspection[meter.meter_id].value, // Asigna el valor de visualInspection para cada meter
       }))
+
       const apiResult = await handleUpdateMeter(medidores); // Llama a handleUpdateMeter como callback
 
       return apiResult; //Validar avanzar de vista
@@ -227,13 +228,60 @@ export default function Static_4_Q3() {
         })),
       };
 
-      payload.medidores.map(async (item, index) => {
+      const payload_metersObs = medidores.filter((medidor) => {
+        return medidor.result === "No apto";
+      })
+
+      const promiese_prueba = payload.medidores.map(async (item, index) => {
         const singlePayload = { medidores: [item] };
         await apiService.updateMetersPrueba(pruebas[0].id, singlePayload);
         console.log(`Payload for index ${index}: `, singlePayload);
       })
 
-      console.log("Payload: ", payload)
+      const promiese_meters = payload_metersObs.map(meter => {
+        if (!meter.medidor.id) {
+            console.error("Error: Medidor inválido, falta ID:", meter.medidor);
+            throw new Error(`Medidor inválido detectado: ${JSON.stringify(meter.medidor)}`);
+        }
+
+        const metersPayload = {
+            ...meter.medidor,
+            registro_tecnico_id: meter.medidor.registro_tecnico.id,
+            estado: "Deshabilitado",
+        };
+
+        console.log(`Actualizando estado de medidor ID: ${meter.medidor.id}`, metersPayload);
+
+        return apiService.updateMetersData(meter.medidor.id, metersPayload)
+            .catch(error => {
+                console.error(`Error en updateMetersData para ID ${meter.medidor.id}:`, error);
+                return Promise.reject(error);
+            });
+        });
+
+    const [resultsPruebas, resultsMeters] = await Promise.all([
+        Promise.allSettled(promiese_prueba),
+        Promise.allSettled(promiese_meters)
+    ]);
+
+    console.log("Resultados Pruebas:", resultsPruebas);
+    console.log("Resultados de la actualización de medidores:", resultsMeters);
+
+      // Verificar errores en cada conjunto de promesas
+      const failedPruebas = resultsPruebas.filter(result => result.status === "rejected");
+      const failedMeters = resultsMeters.filter(result => result.status === "rejected");
+  
+      if (failedPruebas.length > 0 || failedMeters.length > 0) {
+          console.error("Algunas promesas fallaron:");
+          if (failedPruebas.length > 0) console.error("Errores en Pruebas:", failedPruebas);
+          if (failedMeters.length > 0) console.error("Errores en Medidores:", failedMeters);
+          throw new Error("Algunas solicitudes no se completaron correctamente.");
+      }
+  
+      console.log("Todas las promesas se resolvieron correctamente.");
+  
+      // Acción adicional tras la actualización exitosa
+      alert("Datos actualizados exitosamente.");
       // alert("Medidores actualizados correctamente");
       return true;    
       // Llamada al servicio de la API 

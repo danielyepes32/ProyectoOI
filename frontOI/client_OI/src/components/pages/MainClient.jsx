@@ -51,6 +51,8 @@ export default function MainClient() {
   // Orden seleccionada
   const [selectedOrder, setSelectedOrder] = useState(null);
 
+  localStorage.setItem("count_secuencia", "0");
+
   useEffect(() => {
     // 1. Cargar info de usuario
     const user = JSON.parse(localStorage.getItem("user"));
