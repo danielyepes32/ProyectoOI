@@ -1,25 +1,7 @@
-import {  
-    Dropdown,  
-    DropdownTrigger,  
-    DropdownMenu,  
-    DropdownSection,  
-    DropdownItem
-} from "@nextui-org/dropdown";
 import React from "react";
 import { Button } from "@nextui-org/react";
-import { FaCaretDown } from "react-icons/fa";
-import { BsArrow90DegRight } from "react-icons/bs";
-import { IoMdAddCircleOutline } from "react-icons/io";
-import { CgSearch } from "react-icons/cg";
 import { RiPlayListAddFill } from "react-icons/ri";
-import { GoPencil } from "react-icons/go";
-
 import {  
-    Modal,   
-    ModalContent,   
-    ModalHeader,   
-    ModalBody,   
-    ModalFooter,
     useDisclosure
 } from "@nextui-org/modal";
 import CustomAlert from "../shared/CustomAlert";
@@ -29,8 +11,6 @@ import apiService from "../../hook/services/apiService.js";
 
 export default function Static_3_nc() {
 
-    console.log("LocalStorage: ", JSON.parse(localStorage.getItem("selectedOrderData")))
-
     const [bancoCapacity, setBancoCapacity] = React.useState(JSON.parse(localStorage.getItem("selectedOrderData")).selectedOrder.capacidad_banco);
     const [instrumentsData, setInstrumentsData] = React.useState(JSON.parse(localStorage.getItem("instrumentsAsociated")));
     //const [selectedKeys, setSelectedKeys] = React.useState(new Set(["text"]));
@@ -39,9 +19,7 @@ export default function Static_3_nc() {
     const [customMessage, setCustomMessage] = React.useState(null);
     const [popUpData, setPopUpData] = React.useState(null);
     const [pruebas, setPruebas] = React.useState([]);
-    const [totalSelectedMeters, setTotalSelectedMeters] = React.useState(0);
     const [pruebasUpdated, setPruebasUpdated] = React.useState([]);
-    const [meters, setMeters] = React.useState([]);
     const [metersLength, setMetersLength] = React.useState(0);
 
     //Función para obtener los gateways del autocomplete
@@ -64,7 +42,6 @@ export default function Static_3_nc() {
         const response = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden });
         // Suponiendo que setPruebas es un setter de un estado que contiene un array
         setPruebas(response);
-        console.log(response)
         //setSelectedKeys(new Set([response[0].nombre]))
             //usamos el componente "count" de la consulta para establecer el tamaño de los registros
         } catch (error) {
@@ -103,7 +80,6 @@ export default function Static_3_nc() {
                     medidores: medidores
                 };
             }));
-            console.log("Prueba: ", responses);
             setPruebasUpdated(responses);
 
             } catch (error) {
@@ -119,7 +95,7 @@ export default function Static_3_nc() {
             }
     , [pruebas]);
 
-    React.useEffect(() => {
+    React.useMemo(() => {
 
     //Al estar ejecutando el fetch activamos el loading de la data
         //setIsLoading(true);
@@ -130,7 +106,6 @@ export default function Static_3_nc() {
         const response = await apiService.getAll('ordenes/trabajo/identificador/', {identificador: sessionData.selectedOrder.id_orden});
         // Suponiendo que setPruebas es un setter de un estado que contiene un array
 
-        setMeters(response.medidores_asociados)
         setMetersLength(response.medidores_asociados.length);
             //usamos el componente "count" de la consulta para establecer el tamaño de los registros
         } catch (error) {
@@ -150,7 +125,7 @@ export default function Static_3_nc() {
         const currentDate = new Date().toISOString().split('T')[0]; // Obtiene solo la fecha en formato yyyy-mm-dd
     
         // Validar que la fecha de vencimiento de todos los instrumentos sea mayor a la fecha actual
-        const isValid = instrumentsData.every(instrument => {
+        const isValid = instrumentsData?.every(instrument => {
             // Comprobar si la fecha de vencimiento es mayor a la fecha actual
             return instrument.fecha_vencimiento_certificado > currentDate;
         });
@@ -177,12 +152,7 @@ export default function Static_3_nc() {
             nombre: pruebas[0].nombre
         }
 
-        console.log("selected_prueba: ", selected_prueba)
-        
         const closedPruebas = pruebas.filter(prueba => prueba.estado === "CERRADA");
-
-        console.log("selected_prueba: ", closedPruebas)
-
         closedPruebas.length === 0 ? localStorage.setItem("selected_prueba", JSON.stringify(selected_prueba)): null
         
         return true;
@@ -200,7 +170,6 @@ export default function Static_3_nc() {
     }, [isOpen]);
 
     const confirmationMessage = React.useMemo(() => {
-        console.log(isOpenCustomMessage)
         return isOpenCustomMessage === true ? (
           <CustomAlert 
             message={customMessage} 

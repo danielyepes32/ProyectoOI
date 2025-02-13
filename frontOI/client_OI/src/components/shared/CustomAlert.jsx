@@ -13,12 +13,10 @@ import { useNavigate } from 'react-router-dom';
 const CustomAlert = ({ message, isVisible, setIsVisible, routeRedirect,handleConfirm}) => {
 
   const {isOpen, onOpen, onOpenChange} = useDisclosure();
-  console.log("Visible: ",isVisible)
   const navigate = useNavigate();
 
   React.useEffect(() => {
     if(isVisible === true){
-      console.log("entra 1")
       onOpen()
     }else if (isVisible === false){
       null
@@ -31,15 +29,9 @@ const CustomAlert = ({ message, isVisible, setIsVisible, routeRedirect,handleCon
     <Modal 
       isOpen={isOpen} 
       placement="center"
-      onOpenChange={()=>{
-        onOpenChange()
-        console.log("isOpen: ", isVisible)
-      }}
+      onOpenChange={onOpenChange}
       onClose={()=>{
-        console.log("Visible: " , isVisible)
         setIsVisible(false)
-        console.log("Se cerró")
-        console.log("Visible: " , isVisible)
       }}
       className="mx-5"
       scrollBehavior='outside'

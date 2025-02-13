@@ -74,7 +74,7 @@ export default function Static_6_Q3() {
         const response = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden });
         // Suponiendo que setPruebas es un setter de un estado que contiene un array
         setPruebas(response);
-        console.log(response)
+        console.log("Responses: ", response)
         //setSelectedKeys(new Set([response[0].nombre]))
             //usamos el componente "count" de la consulta para establecer el tamaño de los registros
         } catch (error) {
@@ -111,7 +111,7 @@ export default function Static_6_Q3() {
 
       const filtrados = prueba_search ? prueba_search.medidores.filter(item => item.result !== "No apto" && item.obs !== "No conforme") : null;
       // Suponiendo que setPruebas es un setter de un estado que contiene un array
-      console.log(filtrados)
+      console.log("Selected: ", selected_prueba)
       setMeters(filtrados ? filtrados : null)
       // Actualizar el estado visualInspection
       setMetersLength(filtrados ? filtrados.length : null);
@@ -128,10 +128,6 @@ export default function Static_6_Q3() {
 
       fetchMetersPrueba();
     }, [pruebas]);
-
-    // Calcula los minutos y segundos a partir del total de segundos
-    const minutes = Math.floor(seconds / 60);
-    const displaySeconds = seconds % 60;
 
     //Esta función se usa para calcular las columnas que se etsablecen como visibles
     const headerColumns = React.useMemo(() => {
@@ -199,7 +195,13 @@ export default function Static_6_Q3() {
     };
     
     const handleConfirm = async () => {
-      console.log("Entra")
+      if(selectedKeys.size !== meters.length){
+        alert("Por favor asigne una lectuira a todos los medidores")
+        return null
+      }else if(initialPreassure > 9 && endPreassure > 9){
+        alert("Las presiones sobrepasan el límite establecido de 9")
+        return null
+      }
       // Actualizar todos los medidores con el valor de `visualInspection` correspondiente
       const apiResult = await handleUpdateMeter(meters); // Llama a handleUpdateMeter como callback
 

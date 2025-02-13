@@ -54,14 +54,25 @@ export default function TableVisualInspection(
           <TableRow
               key={item.meter_id}
               className={`${
+                window.location.pathname === "/client/Q3/static_5" ?
                 selectedKeys.has(item.meter_id)
-                  ? item.result === "No apto" || item.obs === "No conforme"
-                    ? "bg-red-100"
-                    : "bg-blue-100"
-                  : item.result === "No apto"
-                  ? "bg-red-100"
-                  : ""
-              }`}          
+                    ? item.result === "No apto" && item.obs === "Conforme"
+                        ? "bg-red-100 opacity-50 pointer-events-none"
+                        : item.obs === "Conforme"
+                            ? "bg-blue-100"
+                            : "bg-red-100"
+                    : item.result === "No apto" 
+                        ? "bg-red-100"
+                        : ""
+                    : selectedKeys.has(item.meter_id)
+                        ? item.result === "No apto" || item.obs === "No conforme"
+                            ? "bg-red-100"
+                            : "bg-blue-100"
+                        : item.result === "No apto"
+                            ? "bg-red-100"
+                            : ""
+              }`}
+                       
             >
             {(columnKey) => 
             <TableCell>

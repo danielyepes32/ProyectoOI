@@ -1,11 +1,11 @@
 import React from 'react';
 import { RiMenuSearchLine } from 'react-icons/ri';
-import { BrowserRouter as Router, Route, Routes , useLocation, useNavigate} from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes , useLocation} from 'react-router-dom';
 import { MdCancel } from "react-icons/md";
 
 import Menu from '../shared/menu';
 import Static_1 from './static_1';
-import { Button, divider } from '@nextui-org/react';
+import { Button } from '@nextui-org/react';
 import MainClient from './MainClient';
 import Static_2_nc from './static_2_nc';
 import Static_2_c from './static_2_c';
@@ -44,13 +44,19 @@ import {
 
 const Client = () => {
 
-  const navigate = useNavigate()
   const location = useLocation();
   //const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
   const isAuthenticated = true
-  console.log(isAuthenticated)
   const [sidebar, setSidebar] = React.useState(false);
   const {isOpen, onOpen, onOpenChange} = useDisclosure()
+
+  window.addEventListener("message", (event) => {
+    setTimeout(() => {
+      //console.log("Mensaje recibido:", event.data);
+      // Aquí va tu lógica
+    }, 0);
+  });
+  
 
   const modal = React.useMemo(() => {
     return(

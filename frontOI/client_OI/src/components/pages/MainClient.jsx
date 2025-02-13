@@ -90,6 +90,8 @@ export default function MainClient() {
           modelo_medidores: order?.medidores_asociados[0]?.registro_tecnico?.modelo,
           tipo_medidores: order?.medidores_asociados[0]?.registro_tecnico?.id,
         }));
+
+        console.log("Ordenes: ", allOrders)
         setOrders(mappedOrders);
         setOrdersLength(mappedOrders.length);
       } else {

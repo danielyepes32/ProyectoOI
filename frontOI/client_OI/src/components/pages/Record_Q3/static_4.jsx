@@ -188,6 +188,7 @@ export default function Static_4_Q3() {
         );
     }, [isOpen]);
 
+
     const handleConfirm = async () => {
       // Actualizar todos los medidores con el valor de `visualInspection` correspondiente
       const medidores = meters.map((meter) => ({
@@ -195,6 +196,11 @@ export default function Static_4_Q3() {
         state: visualInspection[meter.meter_id].value, // Asigna el valor de visualInspection para cada meter
       }))
 
+      if(selectedKeys.size !== meters.length){
+        alert("Debe confirmar un valor para todos los medidores para avanzar")
+        return null
+      }
+  
       const apiResult = await handleUpdateMeter(medidores); // Llama a handleUpdateMeter como callback
 
       return apiResult; //Validar avanzar de vista
@@ -292,17 +298,17 @@ export default function Static_4_Q3() {
       }
     };
 
-    const confirmationMessage = React.useMemo(() => {
-        return isOpenCustomMessage === true ? (
-          <CustomAlert 
-            message={customMessage} 
-            isVisible={isOpenCustomMessage} 
-            setIsVisible={setIsOpenCustomMessage}
-            routeRedirect={"/client/Q3/static_5"}
-            handleConfirm = {handleConfirm}
-            />
-        ) : null
-      }, [isOpenCustomMessage]);
+  const confirmationMessage = React.useMemo(() => {
+    return isOpenCustomMessage === true ? (
+      <CustomAlert 
+        message={customMessage} 
+        isVisible={isOpenCustomMessage} 
+        setIsVisible={setIsOpenCustomMessage}
+        routeRedirect={"/client/Q3/static_5"}
+        handleConfirm = {handleConfirm}
+        />
+    ) : null
+    }, [isOpenCustomMessage]);
 
   React.useEffect(() => {
     pruebaValue === '' ? setIsChanged(false) : setIsChanged(true)
@@ -322,6 +328,22 @@ export default function Static_4_Q3() {
       />
     )
   }, [meters, headerColumns, visualInspection])
+
+  const confirmButton = React.useMemo(()=>{
+
+    return(
+      <Button
+      className="bg-custom-blue mt-1"
+      onClick={()=>{
+        setIsOpenCustomMessage(true)
+        setIsChanged(!isChanged)
+      }}
+      disabled={isOpenCustomMessage}
+      >
+      <span className="font-inter text-white text-center text-[16px]">Confirmar</span>
+      </Button>
+    )
+  },[isOpenCustomMessage])
 
     return (
         <div className="w-screen h-screen bg-oi-bg flex flex-col px-[5vw] overflow-y-auto">
@@ -372,15 +394,7 @@ export default function Static_4_Q3() {
           </div>
           <div className="flex flex-grow flex-col bg-white rounded-[20px] px-5 py-5 shadow-sm mb-5">
             <span className="font-mulish font-semibold text-center text-[24px]">Terminar proceso de inspección visual</span>
-            <Button
-              className="bg-custom-blue mt-1"
-              onClick={()=>{
-                setIsOpenCustomMessage(true)
-                setIsChanged(!isChanged)
-              }}
-              >
-              <span className="font-inter text-white text-center text-[16px]">Confirmar</span>
-            </Button>
+            {confirmButton}
             <Button
               className="mt-2 "
               onClick={()=>{

@@ -175,7 +175,10 @@ export default function Static_5_Q3() {
       },[confirm])
   
     const handleConfirm = async () => {
-      console.log("Entra")
+      if(selectedKeys.size !== meters.length){
+        alert("Debe seleccionar todos los campos")
+        return null
+      }
       // Actualizar todos los medidores con el valor de `visualInspection` correspondiente
       const medidores = meters.map((meter) => ({
         ...meter,
