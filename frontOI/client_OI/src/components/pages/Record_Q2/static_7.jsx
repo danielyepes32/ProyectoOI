@@ -189,7 +189,10 @@ export default function static_7_Q2() {
     }, [isOpen]);
   
     const handleConfirm = async () => {
-      console.log("Entra")
+      if(selectedKeys.size !== meters.length){
+        alert("Debe asignar un valor para todos los medidores")
+        return null
+      }
       // Actualizar todos los medidores con el valor de `visualInspection` correspondiente
       const apiResult = await handleUpdateMeter(meters); // Llama a handleUpdateMeter como callback
 

@@ -128,9 +128,6 @@ export default function Static_6_Q2() {
       fetchMetersPrueba();
     }, [pruebas]);
 
-    // Calcula los minutos y segundos a partir del total de segundos
-    const minutes = Math.floor(seconds / 60);
-    const displaySeconds = seconds % 60;
 
     //Esta función se usa para calcular las columnas que se etsablecen como visibles
     const headerColumns = React.useMemo(() => {
@@ -198,7 +195,13 @@ export default function Static_6_Q2() {
     };
     
     const handleConfirm = async () => {
-      console.log("Entra")
+      if(selectedKeys.size !== meters.length){
+        alert("Por favor asigne una lectuira a todos los medidores")
+        return null
+      }else if(initialPreassure > 9 && endPreassure > 9){
+        alert("Las presiones sobrepasan el límite establecido de 9")
+        return null
+      }
       // Actualizar todos los medidores con el valor de `visualInspection` correspondiente
       const apiResult = await handleUpdateMeter(meters); // Llama a handleUpdateMeter como callback
 

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-const baseUrl = 'https://59c0-181-56-8-48.ngrok-free.app/api/';
+const baseUrl = 'https://cffb-181-56-8-48.ngrok-free.app/api/';
 
 // Configuracion comun para las solicitudes para los headers y la informacion por fuera del payload
 const axiosInstance = axios.create({

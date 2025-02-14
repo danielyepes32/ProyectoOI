@@ -82,7 +82,7 @@ export default function Static_8() {
     // Validar y actualizar segundos
     const handleMiliSecondsChange = (e) => {
       const value = e.target.value;
-      if (value === "" || (/^\d+$/.test(value) && parseInt(value) <= 59)) {
+      if (value === "" || (/^\d+$/.test(value) && parseInt(value) <= 1000)) {
         setMiliseconds(value);
       }
     };
@@ -723,7 +723,7 @@ export default function Static_8() {
                     value={miliseconds}
                     onChange={handleMiliSecondsChange}
                     placeholder="MS"
-                    maxLength={2}
+                    maxLength={4}
                     className="w-14 p-2 ml-1 text-center border-b border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none"
                   />
                   <span className="font-teko font-semibold text-[20px] ml-1">min</span>

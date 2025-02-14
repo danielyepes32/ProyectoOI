@@ -199,7 +199,13 @@ export default function Static_6() {
     };
     
     const handleConfirm = async () => {
-      console.log("Entra")
+      if(selectedKeys.size !== meters.length){
+        alert("Por favor asigne una lectuira a todos los medidores")
+        return null
+      }else if(initialPreassure > 9 && endPreassure > 9){
+        alert("Las presiones sobrepasan el límite establecido de 9")
+        return null
+      }
       // Actualizar todos los medidores con el valor de `visualInspection` correspondiente
       const apiResult = await handleUpdateMeter(meters); // Llama a handleUpdateMeter como callback
 

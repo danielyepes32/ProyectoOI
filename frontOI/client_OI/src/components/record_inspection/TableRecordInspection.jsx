@@ -81,7 +81,7 @@ export default function TableRecordInspection(
             </TableCell>}
         </TableRow>
         )) : null;
-      }, [meters, headerColumns])
+      }, [meters, headerColumns, selectedKeys])
 
 
     return(

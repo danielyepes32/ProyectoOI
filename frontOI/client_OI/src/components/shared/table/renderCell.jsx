@@ -189,11 +189,11 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
             }
           }}
           onClick={() => {
-            if (isSelected){
-              onOpen();
-              setSelectedMeter(user);
-              setPopUpData("recover");
-            }
+          if (isSelected){
+            onOpen();
+            setSelectedMeter(user);
+            setPopUpData("recover");
+          }
           }}
           onPointerDown={(e) => {
             e.stopPropagation();
