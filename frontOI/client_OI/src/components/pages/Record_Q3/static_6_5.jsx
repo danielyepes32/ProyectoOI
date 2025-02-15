@@ -6,6 +6,7 @@ import ModalData from "../../shared/ModalData";
 import CustomAlert from "../../shared/CustomAlert";
 import DateService from "../../../hook/services/dateService";
 import { useNavigate } from "react-router-dom";
+import VariationBar from "../../dataVariation/VariationBar";
 
 export default function Static_6_5() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -13,11 +14,17 @@ export default function Static_6_5() {
   const [isOpenCustomMessage, setIsOpenCustomMessage] = useState(false);
   const [customMessage, setCustomMessage] = useState(null);
 
-  const navigate = useNavigate();
+  const [maxDPIvar, setMaxDPIvar] = useState(21);
+  const [maxDPOvar, setMaxDPOvar] = useState(22);
+  const [maxFlowvar, setMaxFlowvar] = useState(15);
+  const [maxTemp, setMaxTemp] = useState(10);
 
-  const [seconds, setSeconds] = useState(0);
-  const minutes = Math.floor(seconds / 60);
-  const displaySeconds = seconds % 60;
+  const [validateDPIvar, setValidateDPIvar] = useState(true);
+  const [validateDPOvar, setValidateDPOvar] = useState(true);
+  const [validateFlowvar, setValidateFlowvar] = useState(true);
+  const [validateTempvar, setValidateTemp] = useState(true);
+
+  const navigate = useNavigate();
 
   const [data, setData] = useState([
     { id: 1, entrada: "", salida: "", caudal: "", temperatura: "" },
@@ -39,42 +46,90 @@ export default function Static_6_5() {
 
   const [canProceed, setCanProceed] = useState(false);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSeconds((prev) => prev + 1);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  const handleConfirm = () => {
+    setCustomMessage("¿Estás seguro de que deseas confirmar los valores?");
+    setIsOpenCustomMessage(true);
+  };
 
-  useEffect(() => {
-    const validRows = data.filter(
+  const validateValue = (value, key) => {
+    if (!value) return false;
+    const numValue = parseFloat(value.replace(",", "."));
+    return numValue >= RANGES[key].min && numValue <= RANGES[key].max;
+};
+
+  const validRows = React.useMemo(() => {
+    return data.filter(
       (row) =>
         validateValue(row.entrada, "entrada") &&
         validateValue(row.salida, "salida") &&
         validateValue(row.caudal, "caudal") &&
         validateValue(row.temperatura, "temperatura")
     );
+  }, [data, RANGES]);
+  
+  React.useEffect(() => {
     setCanProceed(validRows.length >= 3);
-  }, [data]);
-
-  const validateValue = (value, key) => {
-    if (!value) return false;
-    const numValue = parseFloat(value.replace(",", "."));
-    return numValue >= RANGES[key].min && numValue <= RANGES[key].max;
-  };
+  }, [validRows, setCanProceed]);
 
   const handleInputChange = (id, key, value) => {
     setData((prevData) =>
-      prevData.map((row) => (row.id === id ? { ...row, [key]: value } : row))
-    );
+        prevData.map((row) => (row.id === id ? { ...row, [key]: value } : row))
+      );
   };
 
-  const handleConfirm = () => {
-    setCustomMessage("¿Estás seguro de que deseas confirmar los valores?");
-    setIsOpenCustomMessage(true);
+  const calculateVariation = (data, field) => {
+    const values = data
+      .filter((d) => d[field] !== "" && d[field] !== "0") // Filtra valores vacíos o "0"
+      .map((d) => parseFloat(d[field])); // Convierte a número
+  
+    if (values.length === 0) return 0; // Retorna 0 si no hay valores válidos
+  
+    const minValue = Math.min(...values); // Obtiene el menor valor
+    const maxValue = Math.max(...values); // Obtiene el mayor valor
+    const diff = ((maxValue - minValue) / minValue) * 100; // Calcula la variación %
+
+    switch (field) {
+      case "entrada":
+        if (diff > maxDPIvar) {
+          setValidateDPIvar(false);
+        } else {
+          setValidateDPIvar(true);
+        }
+        break;
+      case "salida":
+        if (diff > maxDPOvar) {
+          setValidateDPOvar(false);
+        } else {
+          setValidateDPOvar(true);
+        }
+        break;
+      case "caudal":
+        if (diff > maxFlowvar) {
+          setValidateFlowvar(false);
+        } else {
+          setValidateFlowvar(true);
+        }
+        break;
+      case "temperatura":
+        if (diff > maxTemp) {
+          setValidateTemp(false);
+        } else {
+          setValidateTemp(true);
+        }
+        break;
+      default:
+        return; // O no hacer nada si no es uno de los casos
+    }  
+  
+    return diff.toFixed(3); // Retorna con 3 decimales
   };
 
   const handleConfirmCM = async () => {
+
+    if(!validateDPIvar || !validateDPOvar || !validateFlowvar || !validateTempvar){
+      alert("Las variaciones sobrepasan las exijidas por la prueba")
+      return null
+    }
     try{    
       const count_secuencia = localStorage.getItem("count_secuencia");
       const puedeAvanzar = parseInt(count_secuencia) === 1; 
@@ -101,6 +156,32 @@ export default function Static_6_5() {
       handleConfirm={handleConfirmCM}
     />
   ) : null;
+
+  const variationBar = React.useMemo(()=>{
+    return(
+      <>
+      <tr className="text-center bg-custom-blue text-white font-inter">
+        <td className="border border-gray-300 p-2 w-full" colSpan="100%">
+            Variación (%)
+        </td>
+        </tr>
+        <tr className="text-center text-gray-400 font-inter">
+        <td className="border border-gray-300 p-2 w-1/4">
+            {calculateVariation(data, "entrada")}
+        </td>
+        <td className="border border-gray-300 p-2 w-1/4">
+            {calculateVariation(data, "salida")}
+        </td>
+        <td className="border border-gray-300 p-2 w-1/4">
+            {calculateVariation(data, "caudal")}
+        </td>
+        <td className="border border-gray-300 p-2 w-1/3">
+            {calculateVariation(data, "temperatura")}
+        </td>
+      </tr>
+      </>
+    )
+  },[data])
 
   return (
     <div className="w-screen h-screen bg-white flex flex-col px-4 py-5 overflow-y-auto">
@@ -141,117 +222,87 @@ export default function Static_6_5() {
         </div>
       </div>
       
-      <div className="w-full shadow-md flex h-auto rounded-lg bg-white p-2">
-        <div className="w-1/4 flex-col justify-center place-items-center">
-          <div className="flex-col justify-center place-items-center">
-            <span className="text-center">
-              Var (%)
-            </span>
-            <Button
-              className="flex justify-center bg-custom-blue "
-              isIconOnly
-              >
-              1
-            </Button>
-          </div>
-        </div>
-        <div className="w-1/4 justify-center place-items-center">
-          <span className="text-center w-full">
-            Var (%)
-          </span>
-          <Button
-            className="flex justify-center bg-custom-blue"
-            isIconOnly
-            >
-            1
-          </Button>
-        </div>
-        <div className="w-1/4 flex-col justify-center place-items-center">
-          <span className="text-center w-full">
-            Var (%)
-          </span>
-          <Button
-            className="flex justify-center bg-custom-blue"
-            isIconOnly
-          >
-            1
-          </Button>
-        </div>
-        <div className="w-1/3 justify-center place-items-center">
-          <span className="text-center w-full">
-            Var (%)
-          </span>
-          <Button
-            className="flex justify-center bg-custom-blue "
-            isIconOnly
-          >
-            1
-          </Button>
-        </div>
-      </div>
+      <VariationBar
+        validateDPIvar={validateDPIvar}
+        validateDPOvar={validateDPOvar}
+        validateFlowvar={validateFlowvar}
+        validateTempvar={validateTempvar}
+        maxDPIvar={maxDPIvar}
+        maxDPOvar={maxDPOvar}
+        maxFlowvar={maxFlowvar}
+        maxTemp={maxTemp}
+      />
 
       {/* Tabla de medición */}
       <div className="mt-5 h-full bg-gray-100 p-2 rounded-lg shadow-md flex justify-center place-items-center">
         <table className="w-full text-sm md:text-base rounded-lg table-fixed h-full justify-center place-items-center border-collapse border border-gray-300 overflow-x-hidden">
           <thead className="bg-custom-blue text-white h-auto">
-            <tr className="justify-center border place-items-center h-full">
-              <th className="border-l border-r w-1/4 border-gray-300 p-2">
-                Presiones dinámicas (Entrada)
+          <tr className="justify-center border place-items-center h-full">
+              <th className="border-l border-r w-1/4 border-gray-300 p-2 text-center align-middle leading-none">
+              <span className="flex items-center justify-center w-full h-full">
+                  Presiones dinámicas (Entrada)
+              </span>
               </th>
-              <th className="border-l border-r w-1/4 border-gray-300 p-2">
-                Presiones dinámicas (Salida)
+              <th className="border-l border-r w-1/4 border-gray-300 p-2 text-center align-middle leading-none">
+              <span className="flex items-center justify-center w-full h-full">
+              Presiones dinámicas (Salida)
+              </span>
               </th>
-              <th className="border-l border-r w-1/4 border-gray-300 p-2">
-                Caudal de agua
+              <th className="border-l border-r w-1/4 border-gray-300 p-2 text-center align-middle leading-none">
+              <span className="flex items-center justify-center w-full h-full">
+              Caudal de agua
+              </span>
               </th>
-              <th className="border-l border-r w-1/3 border-gray-300 p-2 h-full">
-                <div className="flex justify-center place-items-center">
+              <th className="border-l border-r w-1/3 border-gray-300 p-2 h-full text-center align-middle leading-none">
+              <div className="flex justify-center place-items-center">
                   <span className="text-center">Temperatura</span>
-                </div>
+              </div>
               </th>
-            </tr>
+          </tr>
           </thead>
           <tbody className="flex-col justify-between flex-grow overflow-auto">
-            {data.map((row) => (
+          {data.map((row) => (
               <tr key={row.id} className="text-center flex-col ">
-                {["entrada", "salida", "caudal", "temperatura"].map((key) => (
+              {["entrada", "salida", "caudal", "temperatura"].map((key) => (
                   <td
-                    key={key}
-                    className={`border border-gray-300 p-2 
-                    ${key === "temperatura" ? "w-1/3" : "w-1/4"} 
-                    ${
+                  key={key}
+                  className={`border border-gray-300 p-2 
+                  ${key === "temperatura" ? "w-1/3" : "w-1/4"} 
+                  ${
                       !validateValue(row[key], key) && row[key]
-                        ? "bg-red-100"
-                        : ""
-                    }`}
+                      ? "bg-red-100"
+                      : ""
+                  }`}
                   >
-                    <input
+                  <input
                       type="number"
                       max={RANGES[key].max}
                       value={row[key]}
                       className="w-full text-center border-none focus:ring-2 focus:ring-blue-300"
                       placeholder={`${
-                        RANGES[key].min
+                      RANGES[key].min
                       }-${RANGES[key].max}`}
                       onChange={(e) =>
-                        e.target.value.length < 6 ? handleInputChange(row.id, key, e.target.value) : null
+                      e.target.value.length < 6 ? handleInputChange(row.id, key, e.target.value) : null
                       }
-                    />
+                  />
                   </td>
-                ))}
+              ))}
               </tr>
-            ))}
+          ))}
+          {variationBar}
           </tbody>
-        </table>
+        </table>  
       </div>
 
       {/* Botón Confirmar */}
-      <div className="flex justify-start mt-5">
+      <div className="flex-col space-y-2 flex place-items-center justify-center mt-7 border shadow-lg rounded-[30px] py-10">
+        <span className="font-inter font-semibold ">¿Desea confirmar?</span>
         <Button
           disabled={!canProceed}
           className={`${
             canProceed ? "bg-custom-blue" : "bg-gray-300 cursor-not-allowed"
-          } text-white font-bold px-5 py-2 rounded-md text-sm md:text-base`}
+          } text-white font-bold px-5 py-2 rounded-xl text-sm md:text-base`}
           onClick={handleConfirm}
         >
           Confirmar
