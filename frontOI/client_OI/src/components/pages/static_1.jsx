@@ -50,7 +50,6 @@ export default function Static_1() {
   async function consultingCapacities(nBanco){
     try{
       const response = await apiService.getByKey(`bancos/capacidades`, nBanco)
-      console.log(response, 'Olaaaaaaaaaaaaaaaaaa')
       setMaxCapacity(response.capacidad_por_turno);
     }
     catch (error) {
@@ -94,7 +93,7 @@ export default function Static_1() {
       }
     }
     fetchBancoData();
-    console.log(sessionData.bancoData)
+    console.log(dataModal)
     consultingCapacities(sessionData.bancoData.nBanco);
   }, []);
 
