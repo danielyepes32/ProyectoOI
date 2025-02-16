@@ -46,6 +46,18 @@ export default function Static_1() {
 
   const [isProcessing, setIsProcessing] = React.useState(false);
 
+  // Building the logic to consult the banks capacities
+  async function consultingCapacities(nBanco){
+    try{
+      const response = await apiService.getByKey(`bancos/capacidades`, nBanco)
+      console.log(response, 'Olaaaaaaaaaaaaaaaaaa')
+      setMaxCapacity(response.capacidad_por_turno);
+    }
+    catch (error) {
+      console.log(error)
+    }
+  }
+
   useEffect(() => {
     const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
     if (sessionData) {
@@ -57,7 +69,7 @@ export default function Static_1() {
         cert: sessionData.bancoData.cert,
       }
       setDataModal(data);
-      setMaxCapacity(sessionData.selectedOrder.capacidad_banco);
+      
     }
     // Aplicacion de la logica para llamar a la API y obtener toda la info del banco de Prueba y obtener los instrumentos
     async function fetchBancoData() {
@@ -82,6 +94,8 @@ export default function Static_1() {
       }
     }
     fetchBancoData();
+    console.log(sessionData.bancoData)
+    consultingCapacities(sessionData.bancoData.nBanco);
   }, []);
 
 

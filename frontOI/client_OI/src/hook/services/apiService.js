@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-const baseUrl = 'https://7c36-181-56-8-48.ngrok-free.app/api/';
+const baseUrl = 'http://127.0.0.1:8000/api/';
 
 // Configuracion comun para las solicitudes para los headers y la informacion por fuera del payload
 const axiosInstance = axios.create({
@@ -27,7 +27,8 @@ export const getAll = async (endpoint, params = {}) => {
 // Servicio general para obtener datos por id para todas las estructuras de datos
 export const getByKey = async (endpoint, key) => {
   try {
-    const response = await axiosInstance.get(`${endpoint}/${key}`)
+    const response = await axiosInstance.get(`${endpoint}/${key}/`)
+    return response.data;
   } catch (error) {
     console.error('Error ocurrido en Get by key: ', error)
     throw error.response ? error.response.data : 'Network Error';
