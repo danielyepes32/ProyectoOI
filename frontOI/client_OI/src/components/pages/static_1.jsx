@@ -88,8 +88,11 @@ export default function Static_1() {
   // Funcion encargada de manejar el cambio de la capacidad máxima de la prueba
   const handleMaxCapacityChange = (event) => {
     const value = event.target.value;
-    if (value === "" || (parseInt(value, 10) >= 1 && parseInt(value, 10) <= dataModal.capacidad)) {
+    const condicion = dataModal.capacidad? dataModal.capacidad : 10;
+    if (value && parseInt(value, 10) >= 0 && parseInt(value, 10) <= condicion) {
       setMaxCapacity(value);
+    } else {
+      setMaxCapacity("")
     }
   };
 
@@ -228,7 +231,7 @@ export default function Static_1() {
                     onChange={(event) => {handleMaxCapacityChange(event)}}
                     className="w-full font-teko font-semibold text-[40px] border-oi-bg border-4 rounded-xl px-5 my-2 text-center"
                     max={dataModal.capacidad}
-                    min={1}
+                    min={0}
                   />
               </div>
             </div>
