@@ -46,12 +46,14 @@ export default function Static_1() {
 
   const [isProcessing, setIsProcessing] = React.useState(false);
 
+  const [bankCapacity, setBankCapacity] = React.useState(null)
+
   // Building the logic to consult the banks capacities
   async function consultingCapacities(nBanco){
     try{
       const response = await apiService.getByKey(`bancos/capacidades`, nBanco)
       console.log(response, 'Olaaaaaaaaaaaaaaaaaa')
-      setMaxCapacity(response.capacidad_por_turno);
+      setBankCapacity(response.capacidad_por_turno);
     }
     catch (error) {
       console.log(error)
@@ -102,7 +104,7 @@ export default function Static_1() {
   // Funcion encargada de manejar el cambio de la capacidad máxima de la prueba
   const handleMaxCapacityChange = (event) => {
     const value = event.target.value;
-    const condicion = dataModal.capacidad? dataModal.capacidad : 10;
+    const condicion = bankCapacity? bankCapacity : 10;
     if (value && parseInt(value, 10) >= 0 && parseInt(value, 10) <= condicion) {
       setMaxCapacity(value);
     } else {
