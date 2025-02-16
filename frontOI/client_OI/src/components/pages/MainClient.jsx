@@ -76,8 +76,11 @@ export default function MainClient() {
     try {
       setIsLoading(true);
 
+      const params = {
+        estado: 'EN EVALUACION'
+      }
       // a) Obtener TODAS las órdenes de servicio
-      const allOrders = await apiService.getAll("ordenes/trabajo/");
+      const allOrders = await apiService.getAll("ordenes/trabajo/buscar/", params);
       if (Array.isArray(allOrders)) {
         const mappedOrders = allOrders.map((order) => ({
           id_orden: order.identificador,
@@ -92,6 +95,7 @@ export default function MainClient() {
         }));
 
         console.log("Ordenes: ", allOrders)
+
         setOrders(mappedOrders);
         setOrdersLength(mappedOrders.length);
       } else {

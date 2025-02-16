@@ -80,9 +80,11 @@ export default function Static_2_c() {
           }
           const fetchOrders = async () => {
               try {
-                  const medidores_orden = await apiService.getAll(`ordenes/trabajo/identificador/`, {identificador: sessionData.selectedOrder.id_orden});
+                  console.log("Session data: ", sessionData)
+                  const medidores_orden = await apiService.getAll(`ordenes/trabajo/buscar/`, {identificador: sessionData.selectedOrder.id_orden});
+                  console.log("Ordenes: ", medidores_orden[0].medidores_asociados)
                   if(medidores_orden){
-                      const medidores = medidores_orden.medidores_asociados.map((medidor) => ({
+                      const medidores = medidores_orden[0].medidores_asociados.map((medidor) => ({
                           id: medidor.id,
                           medidor: medidor.numero_serie,
                           estado: medidor.estado,
@@ -96,6 +98,7 @@ export default function Static_2_c() {
                   if (pruebasActuales) {
                       const filtradas = pruebasActuales.filter(p => p.estado === "ABIERTA");
                       setPruebas(filtradas);
+                      console.log("Pruebas: ", filtradas)
   
                       if (filtradas.length > 0) {
                           setSelectedKeys(new Set([filtradas[0].nombre]));
@@ -158,6 +161,8 @@ export default function Static_2_c() {
           return;
       }
       
+      console.log("Selected: ", selectedMedidores)
+
       let remaining = [...selectedMedidores];
       const assignedSummary = [];
       let success = true;
@@ -236,6 +241,7 @@ export default function Static_2_c() {
               setSelectedMeterKeys={setSelectedMedidores}
               headerColumns={headerColumns}
               onConfirmSelection={handlePartialSelectionConfirm}
+              pruebaCapacity={capacity}
           />
       ), [isOpen, popUpData, metersPrueba, selectedMedidores]);
 
@@ -285,7 +291,7 @@ export default function Static_2_c() {
         />
         ) : null;
     }, [isOpenCustomMessage, customMessage]);
-
+    
     return(
         <>
           {confirmationMessage}

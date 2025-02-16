@@ -66,6 +66,11 @@ export default function PartialMeterSelection({
 
   // Manejar confirmación de selección
   const handleConfirmSelection = () => {
+
+    console.log("Entra")
+    console.log("SelectedMeterKeys: ", selectedMeterKeys)
+    console.log("Prueba capacity: ", pruebaCapacity)
+
     if (selectedMeterKeys.size > pruebaCapacity) {
       alert(`Solo puedes seleccionar hasta ${pruebaCapacity} medidores.`);
       return;
@@ -74,6 +79,53 @@ export default function PartialMeterSelection({
     // Llamar al callback con los medidores seleccionados
     onConfirmSelection(Array.from(selectedMeterKeys));
   };
+
+  const handleSelectionKeys = (selectedValue) => {
+// Convertir selectedValue en un array
+    const selectedArray = Array.from(selectedValue);
+  
+    if (selectedArray.length >= 2) {
+      if(selectedValue.size > selectedMeterKeys.size){
+        // Ordenar correctamente como números
+        const sortedArray = selectedArray.map(Number).sort((a, b) => a - b);
+
+        // Obtener minValue y maxValue
+        const [minValue, maxValue] = [sortedArray[0], sortedArray[sortedArray.length - 1]];
+    
+        // Filtrar los meters y asegurarse de que todos sean strings
+        const filteredMeters = meters
+          .filter(meter => String(meter.id) >= minValue && String(meter.id) <= maxValue)
+          .map(meter => String(meter.id));
+        
+        setSelectedMeterKeys(new Set(filteredMeters));
+      } else {
+
+        const ArraySelected = Array.from(selectedMeterKeys)
+
+        const missingValue = ArraySelected.filter(value => !selectedArray.includes(value));
+
+        // Ordenar correctamente como números
+        const sortedArray = selectedArray.map(Number).sort((a, b) => a - b);
+        // Obtener minValue y maxValue
+        const [minValue, maxValue] = [sortedArray[0], sortedArray[sortedArray.length - 1]];
+
+        // Filtrar los meters y asegurarse de que todos sean strings
+        const filteredMeters = meters
+          .filter(meter => String(meter.id) >= minValue && String(meter.id) <= missingValue)
+          .map(meter => String(meter.id));
+        
+        setSelectedMeterKeys(new Set(filteredMeters));
+      }
+    } else {
+      // Si hay menos de 2 elementos seleccionados, actualizar normalmente
+      setSelectedMeterKeys(new Set(selectedArray));
+    }
+  };
+  
+  
+  
+  
+
 
   return (
     <div className="mt-5">
@@ -100,7 +152,7 @@ export default function PartialMeterSelection({
         className="bg-white py-4 rounded-lg h-full flex flex-col w-full overflow-x-auto"
         selectionMode="multiple" // Permite selección múltiple
         selectedKeys={selectedMeterKeys} // Llave vinculada al estado
-        onSelectionChange={(keys) => setSelectedMeterKeys(keys)} // Manejo del cambio
+        onSelectionChange={(keys) => handleSelectionKeys(keys)} // Manejo del cambio
         checkboxesProps={{
           classNames: {
             wrapper: "bg-gray-200 mt-1 rounded-lg p-1",
