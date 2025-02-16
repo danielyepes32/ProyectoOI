@@ -46,11 +46,14 @@ export default function Static_1() {
 
   const [isProcessing, setIsProcessing] = React.useState(false);
 
+  const [bankCapacity, setBankCapacity] = React.useState(null)
+
   // Building the logic to consult the banks capacities
   async function consultingCapacities(nBanco){
     try{
       const response = await apiService.getByKey(`bancos/capacidades`, nBanco)
-      setMaxCapacity(response.capacidad_por_turno);
+      setBankCapacity(response.capacidad_por_turno);
+      return response
     }
     catch (error) {
       console.log(error)
@@ -60,9 +63,10 @@ export default function Static_1() {
   useEffect(() => {
     const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
     if (sessionData) {
+      const resCapacitie = consultingCapacities(sessionData.bancoData.nBanco);
       const data = {
         nBanco: sessionData.bancoData.nBanco,
-        capacidad: sessionData.selectedOrder.capacidad_banco,
+        capacidad: resCapacitie.capacidad_por_turno,
         marca: sessionData.selectedOrder.marca_medidores,
         modelo: sessionData.selectedOrder.modelo_medidores,
         cert: sessionData.bancoData.cert,
@@ -93,16 +97,17 @@ export default function Static_1() {
       }
     }
     fetchBancoData();
-    console.log(dataModal)
-    consultingCapacities(sessionData.bancoData.nBanco);
   }, []);
 
 
   // Funcion encargada de manejar el cambio de la capacidad máxima de la prueba
   const handleMaxCapacityChange = (event) => {
     const value = event.target.value;
-    if (value === "" || (parseInt(value, 10) >= 1 && parseInt(value, 10) <= dataModal.capacidad)) {
+    const condicion = bankCapacity? bankCapacity : 10;
+    if (value && parseInt(value, 10) >= 0 && parseInt(value, 10) <= condicion) {
       setMaxCapacity(value);
+    } else {
+      setMaxCapacity("")
     }
   };
 
@@ -122,23 +127,6 @@ export default function Static_1() {
     }
 
     try {
-      const payload = {
-        orden_servicio_id: sessionData.selectedOrder.nombre_orden,
-        capacidad_elegida: parseInt(maxCapacity, 10),
-      };
-
-      // Eliminar Las pruebas creadas anteriormente
-      const pruebas_anterirores = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden });
-      // Solo si hay pruebas anteriores las elimina antes de crear las nuevas
-      if (pruebas_anterirores) {
-        for (const prueba of pruebas_anterirores) {
-          await apiService.deleteData(`pruebas/pruebas`, `${prueba.id}`);
-        }
-      }
-      
-      // Crear las pruebas automaticamente con la capacidad seleccionada
-      await apiService.create("pruebas/auto-creation/", payload);
-
       setCustomMessage("¡Se crearon automáticamente las pruebas con éxito!");
       setNavigateRoute(route);
       setIsOpenCustomMessage(true);
@@ -241,7 +229,7 @@ export default function Static_1() {
                     onChange={(event) => {handleMaxCapacityChange(event)}}
                     className="w-full font-teko font-semibold text-[40px] border-oi-bg border-4 rounded-xl px-5 my-2 text-center"
                     max={dataModal.capacidad}
-                    min={1}
+                    min={0}
                   />
               </div>
             </div>
