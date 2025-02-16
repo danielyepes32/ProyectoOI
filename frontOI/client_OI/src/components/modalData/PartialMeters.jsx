@@ -130,7 +130,7 @@ export default function PartialMeterSelection({
   return (
     <div className="mt-5">
       {/* Input para búsqueda */}
-      <Input
+      {/*<Input
         color="primary"
         className="text-black"
         classNames={{
@@ -140,7 +140,7 @@ export default function PartialMeterSelection({
         endContent={<CgSearch />}
         startContent={<RiPlayListAddFill />}
         placeholder="Buscar medidores..."
-      />
+      />*/}
 
       {/* Tabla de medidores */}
       <div className="w-full flex-grow bg-white mb-3">

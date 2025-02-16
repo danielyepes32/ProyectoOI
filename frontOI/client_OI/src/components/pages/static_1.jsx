@@ -143,9 +143,9 @@ export default function Static_1() {
       }
       
       // Crear las pruebas automaticamente con la capacidad seleccionada
-      await apiService.create("pruebas/auto-creation/", payload);
+      //await apiService.create("pruebas/auto-creation/", payload);
 
-      setCustomMessage("¡Se crearon automáticamente las pruebas con éxito!");
+      //setCustomMessage("¡Se crearon automáticamente las pruebas con éxito!");
       setNavigateRoute(route);
       setIsOpenCustomMessage(true);
 
