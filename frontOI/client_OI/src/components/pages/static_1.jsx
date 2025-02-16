@@ -53,6 +53,7 @@ export default function Static_1() {
     try{
       const response = await apiService.getByKey(`bancos/capacidades`, nBanco)
       setBankCapacity(response.capacidad_por_turno);
+      setMaxCapacity(response.capacidad_por_turno)
       return response
     }
     catch (error) {
