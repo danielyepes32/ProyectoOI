@@ -27,7 +27,8 @@ export const getAll = async (endpoint, params = {}) => {
 // Servicio general para obtener datos por id para todas las estructuras de datos
 export const getByKey = async (endpoint, key) => {
   try {
-    const response = await axiosInstance.get(`${endpoint}/${key}`)
+    const response = await axiosInstance.get(`${endpoint}/${key}/`)
+    return response.data;
   } catch (error) {
     console.error('Error ocurrido en Get by key: ', error)
     throw error.response ? error.response.data : 'Network Error';
