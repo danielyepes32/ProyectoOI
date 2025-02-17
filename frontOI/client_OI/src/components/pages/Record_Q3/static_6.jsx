@@ -23,8 +23,8 @@ export default function Static_6_Q3() {
     const selected_prueba = JSON.parse(localStorage.getItem('selected_prueba'))
 
     const [isChanged, setIsChanged] = useState(false)
-    const [initialPreassure, setInitialPreassure] = React.useState(null);
-    const [endPreassure, setEndPreassure] = React.useState(null);
+    const [initialPreassure, setInitialPreassure] = React.useState(null || "");
+    const [endPreassure, setEndPreassure] = React.useState(null || "");
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [popUpData,setPopUpData] = React.useState(null);
     const [customMessage, setCustomMessage] = React.useState(null);
@@ -38,7 +38,7 @@ export default function Static_6_Q3() {
     //Constante para establecer las columnas visibles puesto que estas son dinamicas
     const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
     //En esta variable se guardarán los medidores que se extraigan de la API
-    const [meters, setMeters] = React.useState(undefined);
+    const [meters, setMeters] = React.useState(null);
     //Variable para guardar el tamaño del conteo de medidores totales puesto que los datos se traen por pagination
     const [metersLength, setMetersLength] = React.useState(null);
     //Constante usada para definir si se estan cargando los datos o si en su defecto simplemente no hay datos en la consulta
@@ -244,7 +244,7 @@ export default function Static_6_Q3() {
       const count_secuencia = localStorage.getItem("count_secuencia");
       const puedeAvanzar = parseInt(count_secuencia) === 0; 
 
-      if(puedeAvanzar){
+      if(!puedeAvanzar){
         alert("No puede confirmar, hay procesos pendientes o viene de la secuencia equivocada")
         throw new Error("No se puede avanzar: La prueba tiene procesos pendientes")
       }

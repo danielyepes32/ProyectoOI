@@ -211,7 +211,9 @@ export default function Static_2_c() {
             window.location.reload();
           } else {
             console.error("Error en la asignación de medidores:", error);
+            alert("Hubo un error, intente de nuevo")
             setCustomMessage("Ocurrió un error al intentar asignar los medidores.");
+            window.location.reload()
             return null
           }
       }
