@@ -55,7 +55,9 @@ export default function Static_5_Q3() {
       //inizializamos los parametros de consultas a la API de consumo
         const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
         
-        const response = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden });
+        const user = JSON.parse(localStorage.getItem("user")); 
+        const response = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden, usuario: user.id, estado: 'ABIERTA' });
+
         // Suponiendo que setPruebas es un setter de un estado que contiene un array
         setPruebas(response);
         console.log(response)
@@ -100,7 +102,7 @@ export default function Static_5_Q3() {
 
     // Obtener los IDs de medidores con result "No apto"
     const noAptoIds = new Set(
-      responses[0].medidores.filter((medidor) => medidor.result === "No apto").map((m) => m.meter_id)
+      responses[0]?.medidores.filter((medidor) => medidor.result === "No apto").map((m) => m.meter_id)
     );
 
     setSelectedKeys(noAptoIds);

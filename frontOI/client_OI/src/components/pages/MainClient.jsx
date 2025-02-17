@@ -162,6 +162,7 @@ export default function MainClient() {
   // Manejar selección de una orden en la tabla
   const handleOrderSelect = (order) => {
     setSelectedOrder(order);
+    console.log("Orden: ", order)
     localStorage.setItem("selectedOrderId", order.id_orden);
 
     // Guardar la info del banco actual en localStorage también (si lo necesitas)
@@ -252,7 +253,7 @@ export default function MainClient() {
         <span className="font-mulish justify-center font-semibold text-[20px] mt-3 text-center">
           Órdenes de servicio
         </span>
-        <div className="w-full flex-grow bg-red-100 mb-3">
+        <div className="w-full flex-growmb-3">
           <Table
             isCompact
             removeWrapper
@@ -262,11 +263,12 @@ export default function MainClient() {
             selectionMode="single"
             sortDescriptor={sortDescriptor}
             onSelectionChange={(keys) => {
-              const selected = Array.from(keys).map((key) =>
+              const selected = keys.size > 0 ? Array.from(keys).map((key) =>
                 orders.find((order) => order.id_orden === key)
-              );
-              handleOrderSelect(selected[0]);
-              setSelectedKeys(keys);
+              ): null;
+              console.log("Selected: ", selected, keys)
+              selected ? handleOrderSelect(selected[0]) : null;
+              selected ? setSelectedKeys(keys) : null;
             }}
             onSortChange={setSortDescriptor}
             className="bg-white p-4 rounded-lg h-full flex flex-col w-full overflow-x-auto"

@@ -54,10 +54,11 @@ export default function static_7_Q3() {
       //inizializamos los parametros de consultas a la API de consumo
         const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
         
-        const response = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden });
+        const user = JSON.parse(localStorage.getItem("user")); 
+        const response = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden, usuario: user.id, estado: 'ABIERTA' });
+
         // Suponiendo que setPruebas es un setter de un estado que contiene un array
         setPruebas(response);
-        console.log(response)
         //setSelectedKeys(new Set([response[0].nombre]))
             //usamos el componente "count" de la consulta para establecer el tamaño de los registros
         } catch (error) {
@@ -238,6 +239,11 @@ export default function static_7_Q3() {
         },
         })),
       };
+
+      if(payload.medidores[0].q3.reference_volume === null ||payload.medidores[0].q3.reference_volume === "" || payload.medidores[0].q3.reference_volume === 1 ){
+        alert("Debe ingresar un volumen de referencia")
+        return;
+      }
 
       const count_secuencia = localStorage.getItem("count_secuencia");
       const puedeAvanzar = parseInt(count_secuencia) === 2; 

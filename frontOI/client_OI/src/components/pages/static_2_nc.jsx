@@ -191,7 +191,9 @@ export default function Static_2_nc() {
             try {
             const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
             
-            const response = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden });
+            const user = JSON.parse(localStorage.getItem("user")); 
+            const response = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden, usuario: user.id, estado: 'ABIERTA' });
+
             // Suponiendo que setPruebas es un setter de un estado que contiene un array
             setPruebas(response);
             setSelectedKeys(new Set([response[0].nombre]))

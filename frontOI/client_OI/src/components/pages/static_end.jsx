@@ -55,7 +55,9 @@ export default function Static_end() {
       //inizializamos los parametros de consultas a la API de consumo
         const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
         
-        const response = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden });
+      const user = JSON.parse(localStorage.getItem("user")); 
+      const response = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden, usuario: user.id, estado: 'ABIERTA' });
+
         // Suponiendo que setPruebas es un setter de un estado que contiene un array
         setPruebas(response);
         console.log(response)
@@ -260,7 +262,7 @@ export default function Static_end() {
   
           console.log(`Payload for index ${index}:`, singlePayload);
   
-          return apiService.updateMetersPrueba(prueba_search.id, singlePayload);
+          return apiService.updatePrueba(prueba_search.id, singlePayload);
       });
 
 
@@ -320,7 +322,7 @@ export default function Static_end() {
       localStorage.setItem("selected_prueba", JSON.stringify(selected))
       localStorage.setItem("count_secuencia", "0")
 
-      alert("Se avanzará a la siguiente prueba");
+      next_prueba ? alert("Se avanzará a la siguiente bancada") : alert("Ya terminó con todas las pruebas")
       console.log("Siguiente prueba: ", next_prueba?.nombre)
       return true;    
       // Llamada al servicio de la API 
@@ -331,17 +333,30 @@ export default function Static_end() {
       }
     };
 
+    const depuracion = () => {
+      const index = selected_prueba && selected_prueba != {} && selected_prueba.length > 0 ? pruebas.findIndex(prueba => prueba.id === selected_prueba.id) : 0;
+
+      const next_prueba = index !== -1 && index + 1 < pruebas.length
+          ? pruebas[index + 1]
+          : null;// Si no hay siguiente prueba, devuelve null
+
+      const selected = next_prueba ? {
+        id: next_prueba.id,
+        nombre: next_prueba.nombre
+      } : {}
+
+      console.log("Prueba seleccionada next: ", selected)
+    }
+
     const routeRedirect = React.useMemo(() => {
-      console.log("Selected Prueba: ", selected_prueba)
-      const index = selected_prueba?.id 
-        ? pruebas.findIndex(prueba => prueba.id === selected_prueba.id) 
-        : -1;
-    
-      console.log(index);
+      //console.log("Selected Prueba: ", selected_prueba)
+      const index = selected_prueba && selected_prueba != {} && selected_prueba.length > 0 ? pruebas.findIndex(prueba => prueba.id === selected_prueba.id) : 0;
     
       const next_prueba = index >= 0 && index + 1 < pruebas.length 
         ? pruebas[index + 1] 
         : null;
+
+      console.log("NextRoute: ", next_prueba ? "/client/Q3/static_6" : "/client")
     
       return next_prueba ? "/client/Q3/static_6" : "/client"; // Devuelve el string directamente
     }, [pruebas, selected_prueba]);
@@ -471,7 +486,7 @@ export default function Static_end() {
           </div>
           */}
           <div className="w-full flex flex-col mb-5 max-h-[60vh] bg-white shadow-lg items-center place-items-center mt-5 rounded-[20px]">
-            <span className="font-mulish justify-center font-semibold text-[20px] mt-3 text-center">Inspección final</span>
+            <span onClick={depuracion} className="font-mulish justify-center font-semibold text-[20px] mt-3 text-center">Inspección final</span>
             <div className="w-5/6 rounded-[20px] bg-custom-blue h-2 mb-2 text-white"></div>
             <div className="w-full flex h-auto my-3">
                 {tableRow}
