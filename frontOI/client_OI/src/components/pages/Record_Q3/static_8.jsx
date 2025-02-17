@@ -134,7 +134,7 @@ export default function Static_8_Q3() {
 
       }));
 
-      const prueba_search = selected_prueba != null && selected_prueba != {} > 0 ? responses.find(prueba => prueba.id === selected_prueba.id) : responses[0]
+      const prueba_search = selected_prueba != null && selected_prueba != {} && selected_prueba.length > 0 ? responses.find(prueba => prueba.id === selected_prueba.id) : responses[0]
 
       const filtrados = prueba_search ? prueba_search.medidores.filter(item => item.result !== "No apto" && item.obs !== "No conforme") : null;
       // Suponiendo que setPruebas es un setter de un estado que contiene un array
@@ -336,7 +336,7 @@ export default function Static_8_Q3() {
         throw new Error("No se puede avanzar: La prueba tiene procesos pendientes")
       }
 
-      const prueba_search = pruebas.find(prueba => prueba.id === selected_prueba.id)
+      const prueba_search = selected_prueba && selected_prueba != {} && selected_prueba.length > 0 ? pruebas.find(prueba => prueba.id === selected_prueba.id) : pruebas[0]
 
       payload.medidores.map(async (item, index) => {
         const singlePayload = { medidores: [item] };

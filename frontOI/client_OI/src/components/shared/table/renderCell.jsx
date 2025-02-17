@@ -297,6 +297,22 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
       return(
         <span>{user.result === "No apto" ? "No apto" : cellValue}</span>
       );
+    case "resume":
+
+    const conformanceStatus = (!user.q1.isInvalid || !user.q2.isInvalid || !user.q3.isInvalid) 
+    ? "No conforme" 
+    : "Conforme";
+
+    // Separar la cadena en palabras
+  const words = conformanceStatus.split(" ");
+
+      return(
+        <div>
+        {words.map((word, index) => (
+          <span key={index} className="block">{word}</span> // Cada palabra en un span con display: block
+        ))}
+      </div>
+      )
     default:
       return cellValue || 'NO DATA';
   }

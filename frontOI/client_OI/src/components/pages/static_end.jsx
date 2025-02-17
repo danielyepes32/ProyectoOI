@@ -11,7 +11,7 @@ import ModalData from "../shared/ModalData";
 import apiService from "../../hook/services/apiService";
 import DateService  from "../../hook/services/dateService.js"
 //Las columnas se pueden agregar o eliminar de la vista, aquí inicializamos por default las necesarias
-const INITIAL_VISIBLE_COLUMNS = ["meter_id", "q3", "q2", "q1", "result", "actions"];
+const INITIAL_VISIBLE_COLUMNS = ["meter_id", "q3", "q2", "q1", "resume", "actions"];
 
 export default function Static_end() {
 
@@ -92,7 +92,7 @@ export default function Static_end() {
       }));
 
       console.log('Respuestas ', responses)
-      const prueba_search = selected_prueba != null && selected_prueba != {} > 0 ? responses.find(prueba => prueba.id === selected_prueba.id) : responses[0]
+      const prueba_search = selected_prueba != null && selected_prueba != {} && selected_prueba.length > 0 ? responses.find(prueba => prueba.id === selected_prueba.id) : responses[0]
 
       console.log("pruebaSearch: ", prueba_search)
       const filtrados = prueba_search ? prueba_search.medidores.filter(item => item.result !== "No apto" && item.obs !== "No conforme") : null;
@@ -245,7 +245,7 @@ export default function Static_end() {
       }
       
       // Llama a la API para actualizar los medidores
-      const prueba_search = selected_prueba != null && selected_prueba !={} ? pruebas.find(prueba => prueba.id === selected_prueba.id) : pruebas[0]
+      const prueba_search = selected_prueba && selected_prueba != {} && selected_prueba.length > 0 ? pruebas.find(prueba => prueba.id === selected_prueba.id) : pruebas[0]
       // pruebas.find(prueba => prueba.id === selected_prueba.id)
       
       console.log("Prueba search: ", prueba_search)

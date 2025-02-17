@@ -44,7 +44,7 @@ export default function static_7() {
 
     const [pruebas, setPruebas] = React.useState([])
 
-    const [volumeValue, setVolumeValue] = React.useState()
+    const [volumeValue, setVolumeValue] = React.useState(null || "")
 
     //---------------------------------------------------------------------------------------------------------------------------
     //Aquí se encuentran las funciones usadas en el componente MainClient
@@ -76,7 +76,7 @@ export default function static_7() {
       }
   , []);
 
-    React.useMemo(() => {
+    React.useEffect(() => {
 
       //Al estar ejecutando el fetch activamos el loading de la data
       setIsLoading(true);
@@ -93,15 +93,14 @@ export default function static_7() {
 
       }));
 
-      const prueba_search = selected_prueba != null && selected_prueba !={} > 0 ? responses.find(prueba => prueba.id === selected_prueba.id) : responses[0]
+      const prueba_search = selected_prueba != null && selected_prueba !={} && selected_prueba.length > 0 ? responses.find(prueba => prueba.id === selected_prueba.id) : responses[0]
 
       const filtrados = prueba_search ? prueba_search.medidores.filter(item => item.result !== "No apto" && item.obs !== "No conforme") : null;
       // Suponiendo que setPruebas es un setter de un estado que contiene un array
-      console.log(filtrados)
       setMeters(filtrados ? filtrados : null)
       // Actualizar el estado visualInspection
       setMetersLength(filtrados ? filtrados.length : null);
-
+      setIsLoading(false)
           //usamos el componente "count" de la consulta para establecer el tamaño de los registros
       } catch (error) {
           //En caso de error en el llamado a la API se ejecuta un console.error
@@ -240,7 +239,7 @@ export default function static_7() {
         throw new Error("No se puede avanzar: La prueba tiene procesos pendientes")
       }
 
-      const prueba_search = pruebas.find(prueba => prueba.id === selected_prueba.id)
+      const prueba_search = selected_prueba && selected_prueba != {} && selected_prueba.length > 0 ? pruebas.find(prueba => prueba.id === selected_prueba.id) : pruebas[0]
 
       payload.medidores.map(async (item, index) => {
         const singlePayload = { medidores: [item] };
@@ -298,6 +297,11 @@ export default function static_7() {
 
     // Función para aplicar el valor del input a todos los medidores visibles
     const applyVolumeToMeters = () => {
+      if(isLoading){
+        alert("Espere hasta que se terminen de cargar los medidores")
+        return;
+      }
+
       if (!volumeValue || isNaN(volumeValue)) return; // Validación simple
   
       setMeters((prevMeters) =>
@@ -313,6 +317,7 @@ export default function static_7() {
             : meter
         )
       );
+      alert("Usted ha ingresado el volumen de referencia a la prueba")
     };
 
     return (
@@ -353,17 +358,18 @@ export default function static_7() {
               <input
                 id="reference_volume_q3"
                 type="number"
-                className="flex text-left w-full whitespace-pre-wrap z-[0] border-none px-0 shadow-none"
+                className="flex text-center w-full whitespace-pre-wrap z-[0] border-none px-0 shadow-none"
                 placeholder="Ingrese su volumen"
                 value={volumeValue} // Vincula al estado
                 onChange={handleVolumeChange} // Actualiza el estado
               />
-              <button
-                className="bg-custom-blue text-center text-white w-1/3 h-1/2 rounded-2xl hover:bg-blue-600 transition-all"
+              <Button
+                className="bg-custom-blue text-center text-white w-1/3 h-1/2 rounded-2xl transition-all"
                 onClick={applyVolumeToMeters} // Aplica el cambio
+                isIconOnly
               >
                 <GiConfirmed className="text-center w-full h-1/6 p-2"/>
-              </button>
+              </Button>
             </div>
           </div>
             <div>
