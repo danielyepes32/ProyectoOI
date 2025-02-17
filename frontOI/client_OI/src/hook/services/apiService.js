@@ -7,22 +7,30 @@ const axiosInstance = axios.create({
   baseURL: baseUrl,
   headers: {
     'Content-Type': 'application/json',
-    'ngrok-skip-browser-warning': 'true', // Evitar advertencia de ngrok en el navegador
+    'ngrok-skip-browser-warning': 'true', // Evitar advertencia de ngrok en el navegadors
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0'
   },
 });
 
 
 // Servicio general para obtener datos (GET) de todas las estructuras de datos
-export const getAll = async (endpoint, params = {}) => {
+const getAll = async (endpoint, params = {}) => {
   try {
-    const queryString = new URLSearchParams(params).toString();
-    const response = await axiosInstance.get(`${endpoint}${queryString ? `?${queryString}` : ''}`);
+    const queryString = new URLSearchParams({
+      ...params,
+      _t: new Date().getTime() // Agrega un parámetro para evitar caché
+    }).toString();
+
+    const response = await axiosInstance.get(`${endpoint}?${queryString}`);
     return response.data;
   } catch (error) {
     console.error('Error en Get todos: ', error);
     throw error.response ? error.response.data : 'Network Error';
   }
 };
+
 
 // Servicio general para obtener datos por id para todas las estructuras de datos
 export const getByKey = async (endpoint, key) => {

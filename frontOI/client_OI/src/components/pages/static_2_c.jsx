@@ -79,47 +79,33 @@ export default function Static_2_c() {
       return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
     }, [visibleColumns]);
 
-      // Carga inicial
-      useEffect(() => {
-        const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
-        if (sessionData) {
-            setCapacity(sessionData.selectedOrder.capacidad_banco);
-            setOrdenID(sessionData.selectedOrder.id_orden);
-        }
-        const fetchOrders = async () => {
-            try {
-                const medidores_orden = await apiService.getAll(`ordenes/trabajo/buscar/`, {identificador: sessionData.selectedOrder.id_orden});
-                localStorage.setItem("idOrdenSelected",sessionData.selectedOrder.id_orden)
-                console.log("Medidores orden: ", medidores_orden)
-                if(medidores_orden){
-                    const medidores = medidores_orden[0].medidores_asociados.filter((medidor) => (medidor.estado = 'Disponible')).map((medidor) => ({
-                        id: medidor.id,
-                        medidor: medidor.numero_serie,
-                        estado: medidor.estado,
-                    }));
-                    setMetersPrueba(medidores);
+    // Carga inicial
+    useEffect(() => {
+      const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
+      if (sessionData) {
+          setCapacity(sessionData.selectedOrder.capacidad_banco);
+          setOrdenID(sessionData.selectedOrder.id_orden);
+      }
+      const fetchOrders = async () => {
+        try {
+            const medidores_order = await apiService.getAll(`ordenes/trabajo/buscar/`, {
+              identificador: sessionData.selectedOrder.id_orden
+            });
+            localStorage.setItem("idOrdenSelected",sessionData.selectedOrder.nombre_orden)
+            if(medidores_order){
+                const medidores = medidores_order[0].medidores_asociados.filter((medidor) => (medidor.estado === 'Disponible')).map((medidor) => ({
+                    id: medidor.id,
+                    medidor: medidor.numero_serie,
+                    estado: medidor.estado,
+                }));
+                setMetersPrueba(medidores);
 
-                    setMetersLength(medidores.length);
-                }
-                
-                {/* Funcion para traer pruebas
-        
-                const pruebasActuales = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden });
-                if (pruebasActuales) {
-                    const filtradas = pruebasActuales.filter(p => p.estado === "ABIERTA");
-                    setPruebas(filtradas);
-                    console.log("Pruebas: ", filtradas)
-
-                    if (filtradas.length > 0) {
-                        setSelectedKeys(new Set([filtradas[0].nombre]));
-                    }
-                }
-        
-                */}
-
-            } catch (error) {
-                console.error('Error fetching initial meters:', error);
+                setMetersLength(medidores.length);
             }
+
+        } catch (error) {
+            console.error('Error fetching initial meters:', error);
+        }
         };
         fetchOrders();
       }, []);
@@ -220,7 +206,7 @@ export default function Static_2_c() {
           return null;
         }
       } catch (error) {
-          if(error.status === 417){
+          if(error.details === "Algunos medidores no están en estado 'Disponible'."){
             alert("Otro operario ya seleccionó esta secuencia de medidores, intente de nuevo")
             window.location.reload();
           } else {
