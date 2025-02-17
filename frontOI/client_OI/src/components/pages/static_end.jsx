@@ -306,7 +306,7 @@ export default function Static_end() {
     
         console.log("Todas las promesas se resolvieron correctamente.");
 
-      const index = pruebas.findIndex(prueba => prueba.id === selected_prueba.id);
+      const index = selected_prueba && selected_prueba != {} && selected_prueba.length > 0 ? pruebas.findIndex(prueba => prueba.id === selected_prueba.id) : 0;
 
       const next_prueba = index !== -1 && index + 1 < pruebas.length
           ? pruebas[index + 1]
