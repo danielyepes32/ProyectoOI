@@ -90,7 +90,7 @@ export default function Static_2_c() {
             try {
                 const medidores_orden = await apiService.getAll(`ordenes/trabajo/buscar/`, {identificador: sessionData.selectedOrder.id_orden});
                 localStorage.setItem("idOrdenSelected",sessionData.selectedOrder.id_orden)
-                console.log("Medidores orden: ", medidores_orden)
+                console.log("Medidores orden: ", medidores_orden[0].medidores_asociados)
                 if(medidores_orden){
                     const medidores = medidores_orden[0].medidores_asociados.filter((medidor) => (medidor.estado = 'Disponible')).map((medidor) => ({
                         id: medidor.id,
