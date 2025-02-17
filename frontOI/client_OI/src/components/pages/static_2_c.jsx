@@ -30,6 +30,7 @@ import  DateService  from "../../hook/services/dateService.js"
 //---------------------------------------------------------------
 //Funcionamiento
 import React, { useState, useEffect, useMemo } from "react";
+import { GiConsoleController } from "react-icons/gi";
 
 const INITIAL_VISIBLE_COLUMNS = ["medidor"];
 
@@ -42,6 +43,7 @@ const columns = [
 
 export default function Static_2_c() {
 
+    const maxCapacity = parseInt(localStorage.getItem("maxCapacity"))
     // -- Estados, modals y variables --
     const {isOpen, onOpen, onOpenChange} = useDisclosure(); // Para el ModalData
     const [isOpenCustomMessage, setIsOpenCustomMessage] = useState(false); // Para el CustomAlert
@@ -52,8 +54,14 @@ export default function Static_2_c() {
     const [selectedMedidores, setSelectedMedidores] = useState([]); // IDs (o series) de medidores seleccionados
     const [metersLength, setMetersLength] = useState(0);
 
+    const [selectedConfirmMeters, setSelectedConfirmMeters] = useState([]); // IDs (o series) de medidores seleccionados
+
     const [ordenID, setOrdenID] = useState(null);
-    const [pruebas, setPruebas] = useState([]);         // Pruebas abiertas
+    const [pruebas, setPruebas] = useState([
+      {
+        nombre: "Ninguna",
+      }
+    ]);         // Pruebas abiertas
     const [selectedKeys, setSelectedKeys] = useState(new Set([])); 
     const [capacity, setCapacity] = useState(0);
 
@@ -71,66 +79,80 @@ export default function Static_2_c() {
       return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
     }, [visibleColumns]);
 
-        // Carga inicial
-        useEffect(() => {
-          const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
-          if (sessionData) {
-              setCapacity(sessionData.selectedOrder.capacidad_banco);
-              setOrdenID(sessionData.selectedOrder.id_orden);
-          }
-          const fetchOrders = async () => {
-              try {
-                  console.log("Session data: ", sessionData)
-                  const medidores_orden = await apiService.getAll(`ordenes/trabajo/buscar/`, {identificador: sessionData.selectedOrder.id_orden});
-                  console.log("Ordenes: ", medidores_orden[0].medidores_asociados)
-                  if(medidores_orden){
-                      const medidores = medidores_orden[0].medidores_asociados.map((medidor) => ({
-                          id: medidor.id,
-                          medidor: medidor.numero_serie,
-                          estado: medidor.estado,
-                      }));
-                      setMetersPrueba(medidores);
+      // Carga inicial
+      useEffect(() => {
+        const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
+        if (sessionData) {
+            setCapacity(sessionData.selectedOrder.capacidad_banco);
+            setOrdenID(sessionData.selectedOrder.id_orden);
+        }
+        const fetchOrders = async () => {
+            try {
+                const medidores_orden = await apiService.getAll(`ordenes/trabajo/buscar/`, {identificador: sessionData.selectedOrder.id_orden});
+                localStorage.setItem("idOrdenSelected",sessionData.selectedOrder.id_orden)
+                console.log("Medidores orden: ", medidores_orden)
+                if(medidores_orden){
+                    const medidores = medidores_orden[0].medidores_asociados.filter((medidor) => (medidor.estado = 'Disponible')).map((medidor) => ({
+                        id: medidor.id,
+                        medidor: medidor.numero_serie,
+                        estado: medidor.estado,
+                    }));
+                    setMetersPrueba(medidores);
 
-                      setMetersLength(medidores.length);
-                  }
-                  
-                  const pruebasActuales = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden });
-                  if (pruebasActuales) {
-                      const filtradas = pruebasActuales.filter(p => p.estado === "ABIERTA");
-                      setPruebas(filtradas);
-                      console.log("Pruebas: ", filtradas)
-  
-                      if (filtradas.length > 0) {
-                          setSelectedKeys(new Set([filtradas[0].nombre]));
-                      }
-                  }
-              } catch (error) {
-                  console.error('Error fetching initial meters:', error);
-              }
-          };
-          fetchOrders();
+                    setMetersLength(medidores.length);
+                }
+                
+                {/* Funcion para traer pruebas
+        
+                const pruebasActuales = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden });
+                if (pruebasActuales) {
+                    const filtradas = pruebasActuales.filter(p => p.estado === "ABIERTA");
+                    setPruebas(filtradas);
+                    console.log("Pruebas: ", filtradas)
+
+                    if (filtradas.length > 0) {
+                        setSelectedKeys(new Set([filtradas[0].nombre]));
+                    }
+                }
+        
+                */}
+
+            } catch (error) {
+                console.error('Error fetching initial meters:', error);
+            }
+        };
+        fetchOrders();
       }, []);
 
-      useEffect(() => {
-        if (selectedMedidores.length > 0) {
-          const selectedMeters = metersPrueba.filter(m => selectedMedidores.includes(m.id));
-          setRangeStart(selectedMeters[0]?.medidor || null);
-          setRangeEnd(selectedMeters[selectedMeters.length - 1]?.medidor || null);
-        } else {
-          setRangeStart(null);
-          setRangeEnd(null);
-        }
-      }, [selectedMedidores, metersPrueba]);
+      const handleOnClose = () => {
+        //En caso de no confirmar la selección mostrar los medidores previamente confirmados
+        setSelectedMedidores([...new Set(selectedConfirmMeters.map(String))])
+      }
+
+      const generateTestObjects = (idSet) => {
+        const ids = Array.from(idSet); // Convertimos el Set en un Array
+        const testObjects = [];
       
-  
+        for (let i = 0; i < ids.length; i += maxCapacity) {
+          testObjects.push({ nombre: `Prueba generada ${i / maxCapacity + 1}` });
+        }
+      
+        return testObjects;
+      };
+      
       // Selección total
       const handleSelectAll = () => {
           const all = metersPrueba.map(m => m.id);
-          setSelectedMedidores(all);
+          setSelectedConfirmMeters(all);
+          setSelectedMedidores([...new Set(all.map(String))])
           if (all.length > 0) {
               setRangeStart(metersPrueba[0].medidor);
               setRangeEnd(metersPrueba[all.length - 1].medidor);
           }
+
+          const pruebas = generateTestObjects([...new Set(all.map(Number))])
+          setPruebas(pruebas)
+
       };
   
       // Selección parcial
@@ -142,95 +164,72 @@ export default function Static_2_c() {
     const handlePartialSelectionConfirm = (selected) => {
       let selectedTransformed = [...new Set(selected.map(Number))];
       let sorted = selectedTransformed.sort((a, b) => a - b);
+
+      console.log("Selected meters: ", selected)
       
-      const selectedMeters = metersPrueba.filter(m => selected.includes(m.id));
+      const selectedMeters = metersPrueba.filter(m => sorted.includes(m.id));
+      console.log("filtrados: ", metersPrueba)
+
       const start = selectedMeters.length > 0 ? selectedMeters[0].medidor : null;
       const end = selectedMeters.length > 0 ? selectedMeters[selectedMeters.length - 1].medidor : null;
     
+      const pruebas = generateTestObjects(selectedTransformed)
+      setPruebas(pruebas)
+
       // Combinar actualizaciones relacionadas
-      setSelectedMedidores(sorted);
+      setSelectedConfirmMeters(sorted);
       setRangeStart(start);
       setRangeEnd(end);
-    
       onOpenChange(false); // Cerrar el modal explícitamente
     };
 
     const handleConfirmSelection = async () => {
-      if (selectedMedidores.length === 0) {
+      if (selectedConfirmMeters.length === 0) {
           alert("No has seleccionado ningún medidor.");
-          return;
+          return null;
       }
-      
-      console.log("Selected: ", selectedMedidores)
-
-      let remaining = [...selectedMedidores];
-      const assignedSummary = [];
       let success = true;
-      const selectedMeters = metersPrueba.filter(m => selectedMedidores.includes(m.id));
+      //const selectedMeters = metersPrueba.filter(m => selectedMedidores.includes(m.id));
   
       try {
-          for (const prueba of pruebas) {
-              if (remaining.length === 0) break;
-  
-              const availableCapacity = prueba.n_medidores_seleccionados;
-              const pruebaCapacity = Math.min(remaining.length, availableCapacity);
-  
-              const assignedToPrueba = remaining.splice(0, pruebaCapacity);
-              const payload = {
-                  medidores: assignedToPrueba.map((id) => {
-                    const meterAsc = metersPrueba.find((meter) => meter.id === id)
-                    const data = {
-                        medidor: id,
-                        meter_id: meterAsc?.medidor,
-                        state: "Sin observaciones",
-                        drain: "Sin observaciones",
-                        obs: "Conforme",
-                        result: "Apto",
-                        num: 1,
-                        q1: { record_li: 0.0, record_lf: 0.0, reference_volume: 1.0 },
-                        q2: { record_li: 0.0, record_lf: 0.0, reference_volume: 1.0 },
-                        q3: { record_li: 0.0, record_lf: 0.0, reference_volume: 1.0 },
-                        }
-                    return data
-                  }),
-              };
-              console.log(payload)
-  
-              const response = await apiService.create(
-                  `pruebas/pruebas/${prueba.id}/assign-medidores/`,
-                  payload
-              );
+        const payload = {
+          medidores: Array.from(selectedConfirmMeters),
+          n_medidores_seleccionados: maxCapacity,
+          usuario: JSON.parse(localStorage.getItem('user')).id,
+          id_orden: parseInt(localStorage.getItem("idOrdenSelected"))
+        }
 
-              console.log(response)
-  
-              if (response) {
-                  assignedSummary.push({
-                      prueba: prueba.nombre,
-                      medidoresAsignados: assignedToPrueba.length,
-                  });
-              } else {
-                  success = false;
-                  console.error(`Error asignando medidores a la prueba ${prueba.nombre}`);
-              }
-          }
-  
-          if (success) {
-              // Forzar recarga de datos tras confirmación exitosa
-              // const updatedMeters = await apiService.getAll('ruta/actualizacion');
-              // setMetersPrueba(updatedMeters);
-          }
-  
+        const response = await apiService.create(
+            `pruebas/pruebas/crear-pruebas/`,
+            payload
+        );
+
+        console.log("Response: ", response)
+
+        response.length < 1 ? success = false : null
+
+        if (success) {
           setCustomMessage("Asignación completada con éxito.");
-          setIsOpenCustomMessage(true);
+
+          return success;
+            // Forzar recarga de datos tras confirmación exitosa
+            // const updatedMeters = await apiService.getAll('ruta/actualizacion');
+            // setMetersPrueba(updatedMeters);
+        }else{
+          throw new Error("Un error ha ocurrido");
+          return null;
+        }
       } catch (error) {
-          console.error("Error en la asignación de medidores:", error);
-          setCustomMessage("Ocurrió un error al intentar asignar los medidores.");
-          setIsOpenCustomMessage(true);
+          if(error.status === 417){
+            alert("Otro operario ya seleccionó esta secuencia de medidores, intente de nuevo")
+            window.location.reload();
+          } else {
+            console.error("Error en la asignación de medidores:", error);
+            setCustomMessage("Ocurrió un error al intentar asignar los medidores.");
+            return null
+          }
       }
   };
-  
-      
-
       const modal = useMemo(() => (
           <ModalData
               isOpen={isOpen}
@@ -242,6 +241,7 @@ export default function Static_2_c() {
               headerColumns={headerColumns}
               onConfirmSelection={handlePartialSelectionConfirm}
               pruebaCapacity={capacity}
+              handleOnClose={handleOnClose}
           />
       ), [isOpen, popUpData, metersPrueba, selectedMedidores]);
 
@@ -286,12 +286,13 @@ export default function Static_2_c() {
         <CustomAlert 
             message={customMessage} 
             isVisible={isOpenCustomMessage} 
+            handleConfirm={handleConfirmSelection}
             setIsVisible={setIsOpenCustomMessage}
             routeRedirect={"/client/static_3_c"}
         />
         ) : null;
     }, [isOpenCustomMessage, customMessage]);
-    
+
     return(
         <>
           {confirmationMessage}
@@ -307,14 +308,14 @@ export default function Static_2_c() {
             <div className="w-full h-auto flex mt-8">
               <div className="bg-white w-4/6 h-full rounded-[20px] flex flex-col justify-center p-3">
                 <span className="font-inter font-semibold text-opacity-text text-[16px] ml-4">
-                  Identificador prueba
+                  Previsualización de pruebas
                 </span>
                 <Dropdown>
                   <DropdownTrigger>
                     <Button variant="bordered" className="capitalize mt-2 z-[0]">
                       <div className="flex justify-between w-full">
                         <span className="font-teko font-semibold text-black text-center text-[22px]">
-                          {Array.from(selectedKeys).join(", ") || "Seleccionar prueba"}
+                          {Array.from(selectedKeys).join(", ") || "Bancadas a realizar"}
                         </span>
                         <FaCaretDown className="text-custom-blue"/>
                       </div>
@@ -343,7 +344,7 @@ export default function Static_2_c() {
                 <span className="font-inter font-semibold text-opacity-text text-[16px] mt-3">
                   Capacidad
                 </span>
-                <span className="font-teko font-semibold text-[40px]">{capacity}</span>
+                <span className="font-teko font-semibold text-[40px]">{maxCapacity}</span>
               </div>
             </div>
 
@@ -403,7 +404,7 @@ export default function Static_2_c() {
                   Medidores seleccionados
                 </span>
                 <span className="font-teko font-semibold text-[40px]">
-                  {selectedMedidores.length}
+                  {selectedConfirmMeters.length}
                 </span>
               </div>
               <div className="flex flex-col">
@@ -413,7 +414,9 @@ export default function Static_2_c() {
                     <Button
                       isIconOnly
                       className="my-2 bg-white"
-                      onClick={handleConfirmSelection}
+                      onClick={()=>{
+                        setIsOpenCustomMessage(true)//se abre el modal de confirmación de mensaje
+                      }}
                     >
                       <div className="w-[40px] h-[40px] bg-custom-blue rounded-[10px] shadow-sm flex justify-center items-center">
                         <IoMdAddCircleOutline className="text-white p-1 w-[28px] h-[28px]" />

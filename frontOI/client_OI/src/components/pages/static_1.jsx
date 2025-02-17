@@ -131,6 +131,7 @@ export default function Static_1() {
       setCustomMessage("¡Se crearon automáticamente las pruebas con éxito!");
       setNavigateRoute(route);
       setIsOpenCustomMessage(true);
+      localStorage.setItem("maxCapacity",maxCapacity.toString());
 
     } catch (error) {
       console.log("Error al crear las pruebas automáticamente:", error);

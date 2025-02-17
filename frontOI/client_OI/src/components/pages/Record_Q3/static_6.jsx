@@ -21,12 +21,10 @@ const INITIAL_VISIBLE_COLUMNS = ["meter_id", "num", "record_li"];
 export default function Static_6_Q3() {
 
     const selected_prueba = JSON.parse(localStorage.getItem('selected_prueba'))
-    console.log("Selected Prueba: ", selected_prueba)
 
     const [isChanged, setIsChanged] = useState(false)
     const [initialPreassure, setInitialPreassure] = React.useState(null);
     const [endPreassure, setEndPreassure] = React.useState(null);
-    const [seconds, setSeconds] = useState(0);
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [popUpData,setPopUpData] = React.useState(null);
     const [customMessage, setCustomMessage] = React.useState(null);
@@ -40,7 +38,7 @@ export default function Static_6_Q3() {
     //Constante para establecer las columnas visibles puesto que estas son dinamicas
     const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
     //En esta variable se guardarán los medidores que se extraigan de la API
-    const [meters, setMeters] = React.useState([]);
+    const [meters, setMeters] = React.useState(undefined);
     //Variable para guardar el tamaño del conteo de medidores totales puesto que los datos se traen por pagination
     const [metersLength, setMetersLength] = React.useState(null);
     //Constante usada para definir si se estan cargando los datos o si en su defecto simplemente no hay datos en la consulta
@@ -99,18 +97,18 @@ export default function Static_6_Q3() {
       
       const responses = await Promise.all(pruebas.map(async (prueba) => {
         const medidores = await apiService.getAll(`pruebas/pruebas/${prueba.id}/medidores-asociados/`);
-        
+
         return {
             ...prueba,
             medidores: medidores
         };
-
       }));
 
-      const prueba_search = selected_prueba && selected_prueba != {} > 0 ? responses.find(prueba => prueba.id === selected_prueba.id) : responses[0]
+      const prueba_search = selected_prueba && selected_prueba != {} && selected_prueba.length > 0 ? responses.find(prueba => prueba.id === selected_prueba.id) : responses[0]
 
       const filtrados = prueba_search ? prueba_search.medidores.filter(item => item.result !== "No apto" && item.obs !== "No conforme") : null;
       // Suponiendo que setPruebas es un setter de un estado que contiene un array
+      const respuesta = selected_prueba != {} ? true : false
       console.log("Selected: ", selected_prueba)
       setMeters(filtrados ? filtrados : null)
       // Actualizar el estado visualInspection
@@ -246,12 +244,12 @@ export default function Static_6_Q3() {
       const count_secuencia = localStorage.getItem("count_secuencia");
       const puedeAvanzar = parseInt(count_secuencia) === 0; 
 
-      if(!puedeAvanzar){
+      if(puedeAvanzar){
         alert("No puede confirmar, hay procesos pendientes o viene de la secuencia equivocada")
         throw new Error("No se puede avanzar: La prueba tiene procesos pendientes")
       }
 
-      const prueba_search = pruebas.find(prueba => prueba.id === selected_prueba.id)
+      const prueba_search = selected_prueba && selected_prueba != {} && selected_prueba.length > 0 ? pruebas.find(prueba => prueba.id === selected_prueba.id) : pruebas[0]
 
       payload.medidores.map(async (item, index) => {
         const singlePayload = { medidores: [item] };

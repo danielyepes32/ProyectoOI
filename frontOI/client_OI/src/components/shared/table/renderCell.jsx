@@ -153,7 +153,7 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
         <Input
           className="flex justify-center text-center w-full whitespace-pre-wrap z-[0] border-none px-0 shadow-none"
           value={
-            pointerMeter?.[selectedQ]?.record_li === 0
+            pointerMeter?.[selectedQ].record_li === 0
               ? ""
               : pointerMeter?.[selectedQ]?.record_li
           }

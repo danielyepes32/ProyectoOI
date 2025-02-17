@@ -36,7 +36,8 @@ export default function ModalData(
         selectedPruebaKey,
         onConfirmSelection,
         selectedMeter,
-        removeKey
+        removeKey,
+        handleOnClose,
     }
     ) {
 
@@ -70,6 +71,9 @@ export default function ModalData(
             isOpen={isOpen} 
             placement="center"
             onOpenChange={onOpenChange}
+            onClose={()=>{
+                handleOnClose? handleOnClose() : console.log("Se cerró")
+            }}
             className="mx-5"
             size="sm"
             scrollBehavior="outside"
