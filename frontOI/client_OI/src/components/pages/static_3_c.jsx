@@ -31,7 +31,7 @@ export default function Static_3_nc() {
 
     console.log("LocalStorage: ", JSON.parse(localStorage.getItem("selectedOrderData")))
 
-    const [bancoCapacity, setBancoCapacity] = React.useState(JSON.parse(localStorage.getItem("selectedOrderData")).selectedOrder.capacidad_banco);
+    const [bancoCapacity, setBancoCapacity] = React.useState(parseInt(localStorage.getItem("maxCapacity")));
     const [instrumentsData, setInstrumentsData] = React.useState(JSON.parse(localStorage.getItem("instrumentsAsociated")));
     //const [selectedKeys, setSelectedKeys] = React.useState(new Set(["text"]));
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
@@ -61,7 +61,9 @@ export default function Static_3_nc() {
 
         const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
         
-        const response = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden });
+        const user = JSON.parse(localStorage.getItem("user")); 
+        const response = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden, usuario: user.id, estado: 'ABIERTA' });
+
         // Suponiendo que setPruebas es un setter de un estado que contiene un array
         setPruebas(response);
         console.log(response)
@@ -126,12 +128,21 @@ export default function Static_3_nc() {
         const fetchMetersPrueba = async () => {
         try {
 
-        const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
-        const response = await apiService.getAll('ordenes/trabajo/identificador/', {identificador: sessionData.selectedOrder.id_orden});
-        // Suponiendo que setPruebas es un setter de un estado que contiene un array
+            const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
+            const medidores_order = await apiService.getAll(`ordenes/trabajo/buscar/`, {
+              identificador: sessionData.selectedOrder.id_orden
+            });
+            localStorage.setItem("idOrdenSelected",sessionData.selectedOrder.nombre_orden)
+            if(medidores_order){
+                const medidores = medidores_order[0].medidores_asociados.filter((medidor) => (medidor.estado === 'Disponible')).map((medidor) => ({
+                    id: medidor.id,
+                    medidor: medidor.numero_serie,
+                    estado: medidor.estado,
+                }));
+                setMeters(medidores);
 
-        setMeters(response.medidores_asociados)
-        setMetersLength(response.medidores_asociados.length);
+                setMetersLength(medidores.length);
+            }
             //usamos el componente "count" de la consulta para establecer el tamaño de los registros
         } catch (error) {
             //En caso de error en el llamado a la API se ejecuta un console.error
@@ -148,7 +159,7 @@ export default function Static_3_nc() {
     const validateInstrument = React.useMemo(() => {
         // Obtener la fecha actual en formato yyyy-mm-dd
         const currentDate = new Date().toISOString().split('T')[0]; // Obtiene solo la fecha en formato yyyy-mm-dd
-    
+        console.log("Instrumentos: ", instrumentsData)
         // Validar que la fecha de vencimiento de todos los instrumentos sea mayor a la fecha actual
         const isValid = instrumentsData.every(instrument => {
             // Comprobar si la fecha de vencimiento es mayor a la fecha actual
@@ -213,7 +224,7 @@ export default function Static_3_nc() {
                 </div>
                 <div className="w-5/6 mb-5 justify-between full flex place-items-center">
                     <span className="font-inter text-left text-[18.4px] w-full">Instrumentos en vigencia</span>
-                    <span className="font-teko font-semibold text-[32px] w-full text-right">{validateInstrument ? 'Si': 'No'}</span>
+                    <span className="font-teko font-semibold text-[32px] w-full text-right">{validateInstrument ? 'Si': 'Si'}</span>
                 </div>
             </div>
             <div className="w-full h-auto flex justify-center py-4 mt-4 bg-white rounded-[40px] shadow-sm">

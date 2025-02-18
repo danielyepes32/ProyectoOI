@@ -67,11 +67,11 @@ export default function Static_4_Q3() {
         //};
 
         const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
-        
-        const response = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden });
+        const user = JSON.parse(localStorage.getItem("user"))
+        const response = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden, usuario: user.id, estado: 'ABIERTA' });
         // Suponiendo que setPruebas es un setter de un estado que contiene un array
         setPruebas(response);
-        console.log(response)
+        console.log("pruebas: ", response)
         //setSelectedKeys(new Set([response[0].nombre]))
             //usamos el componente "count" de la consulta para establecer el tamaño de los registros
         } catch (error) {
@@ -352,7 +352,7 @@ export default function Static_4_Q3() {
           <span className="font-mulish font-bold pt-5 text-[24px] justify-center">Inspección visual</span>
           <span className="font-mulisg font-semibold text-opacity-text ">Sesion iniciada en Julio 24, 2024</span>
           <div className="w-full h-auto grid grid-cols-4 space-x-2 pt-2">
-            <div className="col-span-3 bg-white shadow-lg px-7 flex flex-col space-x-2 rounded-[20px] items-center py-4">
+            <div className="col-span-3 bg-white shadow-lg px-7 flex flex-col space-x-2 rounded-[20px] items-center place-items-center justify-center py-4">
               <span className="font-inter text-center w-full">Usted se encuentra en la prueba No.</span>
               <span className="font-teko text-[32px] font-semibold w-full text-center">{pruebas[0] ? pruebas[0].nombre : ''}</span>
             </div>

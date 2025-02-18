@@ -177,7 +177,7 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
             !isSelected && value.length < 7 ? updateValidate(user.meter_id, value) : null;
           }}
           onKeyDown={(e) => {
-            if (e.key === "Enter") {
+            if (e.key === "Enter" || e.key === "Tab") {
               const inputValue = e.target.value;
               console.log("Enter", inputValue);
               handleEnterAction(user.meter_id, inputValue);
@@ -232,7 +232,7 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
             updateValidate(user.meter_id, value);
           }}
           onKeyDown={(e) => {
-            if (e.key === "Enter") {
+            if (e.key === "Enter" || e.key === "Tab") {
               const inputValue = e.target.value;
               console.log("Enter", inputValue);
               handleEnterAction(user.meter_id, inputValue);
