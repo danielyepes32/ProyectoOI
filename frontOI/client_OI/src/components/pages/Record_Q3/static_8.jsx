@@ -287,7 +287,10 @@ export default function Static_8_Q3() {
     }, [isOpen]);
 
     const handleConfirm = async () => {
-      console.log("Entra")
+      if(minutes === "" || seconds === "" || miliseconds === ""){
+        alert("Por favor, complete los campos de tiempo antes de continuar.");
+        return;
+      }
       // Actualizar todos los medidores con el valor de `visualInspection` correspondiente
       const apiResult = await handleUpdateMeter(meters); // Llama a handleUpdateMeter como callback
 
@@ -530,7 +533,7 @@ export default function Static_8_Q3() {
         );
       case "error":
         return(
-          <span>{`${ Math.round(user.q3.error * 100) / 100 } %`}</span>
+          <span>{`${parseFloat(user.q3.error).toFixed(2).padEnd(4, "0")} %`}</span>
         )
       default:
         return cellValue;
@@ -700,7 +703,7 @@ export default function Static_8_Q3() {
                 </div>
                 <div className="flex place-items-center justify-center w-full h-full">
                   <input
-                    type="text"
+                    type="number"
                     value={minutes}
                     onChange={handleMinutesChange}
                     placeholder="MM"
@@ -710,7 +713,7 @@ export default function Static_8_Q3() {
                   <span className="text-xl font-bold">:</span>
                   {/* Input de segundos */}
                   <input
-                    type="text"
+                    type="number"
                     value={seconds}
                     onChange={handleSecondsChange}
                     placeholder="SS"
@@ -719,7 +722,7 @@ export default function Static_8_Q3() {
                   />
                   <span className="text-xl font-bold">:</span>
                   <input
-                    type="text"
+                    type="number"
                     value={miliseconds}
                     onChange={handleMiliSecondsChange}
                     placeholder="MS"

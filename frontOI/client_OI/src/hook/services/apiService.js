@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-const baseUrl = 'https://1743-181-56-8-48.ngrok-free.app/api/';
+const baseUrl = 'https://many-katie-exclusion-infrared.trycloudflare.com/api/';
 
 // Configuracion comun para las solicitudes para los headers y la informacion por fuera del payload
 const axiosInstance = axios.create({
@@ -10,7 +10,7 @@ const axiosInstance = axios.create({
     'ngrok-skip-browser-warning': 'true', // Evitar advertencia de ngrok en el navegadors
     'Cache-Control': 'no-cache, no-store, must-revalidate',
     'Pragma': 'no-cache',
-    'Expires': '0'
+    'Expires': '0',
   },
 });
 

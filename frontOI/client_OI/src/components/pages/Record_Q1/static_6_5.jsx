@@ -13,10 +13,10 @@ export default function Static_6_5() {
   const [isOpenCustomMessage, setIsOpenCustomMessage] = useState(false);
   const [customMessage, setCustomMessage] = useState(null);
 
-  const [maxDPIvar, setMaxDPIvar] = useState(21);
-  const [maxDPOvar, setMaxDPOvar] = useState(22);
-  const [maxFlowvar, setMaxFlowvar] = useState(15);
-  const [maxTemp, setMaxTemp] = useState(10);
+  const [maxDPIvar, setMaxDPIvar] = useState(10);
+  const [maxDPOvar, setMaxDPOvar] = useState(10);
+  const [maxFlowvar, setMaxFlowvar] = useState(5);
+  const [maxTemp, setMaxTemp] = useState(5);
 
   const [validateDPIvar, setValidateDPIvar] = useState(true);
   const [validateDPOvar, setValidateDPOvar] = useState(true);
@@ -35,9 +35,9 @@ export default function Static_6_5() {
   ]);
 
   const RANGES = {
-    entrada: { min: 8.0, max: 9.0 },
-    salida: { min: 0.5, max: 0.8 },
-    caudal: { min: 0.1, max: 20.0 },
+    entrada: { min: 0.1, max: 10 },
+    salida: { min: 0.1, max: 10 },
+    caudal: { min: 5, max: 30 },
     temperatura: { min: 0.1, max: 30.0 },
   };
 
@@ -101,7 +101,8 @@ export default function Static_6_5() {
   
     const minValue = Math.min(...values); // Obtiene el menor valor
     const maxValue = Math.max(...values); // Obtiene el mayor valor
-    const diff = ((maxValue - minValue) / minValue) * 100; // Calcula la variación %
+    const promedio = (minValue + maxValue) / 2;
+    const diff = ((maxValue - minValue) / promedio) * 100; // Calcula la variación %
 
     switch (field) {
       case "entrada":
@@ -126,7 +127,8 @@ export default function Static_6_5() {
         }
         break;
       case "temperatura":
-        if (diff > maxTemp) {
+        const tempvar = maxValue - minValue;
+        if (tempvar > maxTemp) {
           setValidateTemp(false);
         } else {
           setValidateTemp(true);
@@ -136,7 +138,7 @@ export default function Static_6_5() {
         return; // O no hacer nada si no es uno de los casos
     }  
   
-    return diff.toFixed(3); // Retorna con 3 decimales
+    return field === 'temperatura' ? maxValue - minValue : diff.toFixed(3); // Retorna con 3 decimales
   };
 
   const confirmationMessage = isOpenCustomMessage ? (
@@ -288,12 +290,12 @@ export default function Static_6_5() {
       </div>
 
       {/* Botón Confirmar */}
-      <div className="flex justify-start mt-5">
+      <div className="flex justify-center mt-5">
         <Button
           disabled={!canProceed}
           className={`${
-            canProceed ? "bg-blue-500" : "bg-gray-300 cursor-not-allowed"
-          } text-white font-bold px-5 py-2 rounded-md text-sm md:text-base`}
+            canProceed ? "bg-custom-blue" : "bg-gray-300 cursor-not-allowed"
+          } text-white font-bold px-5 py-2 text-sm md:text-base`}
           onClick={handleConfirm}
         >
           Confirmar

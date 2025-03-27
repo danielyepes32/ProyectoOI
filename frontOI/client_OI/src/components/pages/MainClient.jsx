@@ -177,11 +177,30 @@ export default function MainClient() {
   const handleProceed = () => {
     if (!selectedOrder) {
       alert("Por favor, seleccione una orden de trabajo antes de continuar.");
-      return;
+      setIsOpenCustomMessage(false)
+      return null;
     }
     setCustomMessage("Orden de trabajo seleccionada correctamente.");
-    setIsOpenCustomMessage(true);
+    return true;
   };
+
+  console.log("Visible: ", isOpenCustomMessage)
+  const startTestButton = React.useMemo(()=>{
+    console.log("Entra")
+    return(
+      <Button
+        className={`w-full ${isOpenCustomMessage ? "pointer-events-none" :""} flex flex-col overflow-x-3 items-center place-items-center h-auto bg-custom-blue my-3 py-2 rounded-[15px] text-center break-words cursos-pointer`}
+        onClick={()=>{setIsOpenCustomMessage(true)}}
+        >
+        <span className="font-inter w-full text-[18px] h-full text-white justify-center flex text-center leading-tight">
+          Iniciar nueva prueba
+        </span>
+        <span className="font-inter w-full text-[18px] h-full text-white justify-center flex text-center leading-tight">
+          de sistemas OI
+        </span>
+      </Button>
+    )
+  },[isOpenCustomMessage])
 
   return (
     <div className="w-screen h-screen bg-oi-bg flex flex-col px-[5vw] overflow-y-auto">
@@ -200,6 +219,7 @@ export default function MainClient() {
         <CustomAlert
           message={customMessage}
           isVisible={isOpenCustomMessage}
+          handleConfirm={handleProceed}
           setIsVisible={setIsOpenCustomMessage}
           routeRedirect={"/client/static_1"}
         />
@@ -236,17 +256,7 @@ export default function MainClient() {
         <span className="font-mulish font-bold text-[22px] pt-5 text-center">
           ¿Desea iniciar una nueva prueba?
         </span>
-        <Button
-          className="w-full flex flex-col overflow-x-3 items-center place-items-center h-auto bg-custom-blue my-3 py-2 rounded-[15px] text-center break-words cursos-pointer"
-          onClick={handleProceed}
-        >
-          <span className="font-inter w-full text-[18px] h-full text-white justify-center flex text-center leading-tight">
-            Iniciar nueva prueba
-          </span>
-          <span className="font-inter w-full text-[18px] h-full text-white justify-center flex text-center leading-tight">
-            de sistemas OI
-          </span>
-        </Button>
+          {startTestButton}
       </div>
 
       <div className="w-full flex flex-col flex-grow mb-20 h-[300px] bg-white shadow-lg items-center place-items-center mt-5 rounded-[20px]">

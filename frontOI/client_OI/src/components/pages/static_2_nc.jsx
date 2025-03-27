@@ -30,16 +30,17 @@ import CustomAlert from "../shared/CustomAlert";
 import ModalData from "../shared/ModalData";
 
 //Esta variable global guarda la selección de columnas que quieres desplegar en cada vista, esto permite delimitar enm reenderizado de variables en el componente table
-const INITIAL_VISIBLE_COLUMNS = ["numero_serie"];
+const INITIAL_VISIBLE_COLUMNS = ["medidor"];
 
 const columns = [
-    {name: "ID MEDIDOR", uid: "numero_serie", sortable: true},
+    {name: "ID MEDIDOR", uid: "medidor", sortable: true},
     {name: "ESTADO", uid: "estado", sortable: true},
     {name: "MARCA", uid: "marca", sortable: true},
   ];
 
 export default function Static_2_nc() {
 
+    const maxCapacity = parseInt(localStorage.getItem("maxCapacity"))
     //Variable, de tipo set que guarda el valor seleccionado en el dropdown de las ordenes
     const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
     //Esta variable guarda los identificadortes de los medidores seleccionados en el modal de selección, de tipo set evitando duplicados
@@ -58,7 +59,7 @@ export default function Static_2_nc() {
     //En esta variable se guardarán los medidores que se extraigan de la API, para el caso de prueba son datos del archivo data.js
     const [meters, setMeters] = React.useState(DataPrueba);
     //Variable para guardar el tamaño del conteo de medidores totales puesto que los datos se traen por pagination
-    const [metersLength, setMetersLength] = React.useState(DataPrueba.length);
+    const [metersLength, setMetersLength] = React.useState("Cargando... ");
     //Variable para activar el circulo de carga de datos en caso de estar ejecutando acciones de API
     const [isLoading, setIsLoading] = React.useState(true);
     //Constante usada para definir si se estan cargando los datos o si en su defecto simplemente no hay datos en la consulta
@@ -74,7 +75,6 @@ export default function Static_2_nc() {
 
     const[selectedOrderId, setSelectedOrderId] = React.useState(localStorage.getItem("selectedOrderId"));
 
-    const[pruebasApi, setPruebasApi] = React.useState([]);
     //---------------------------------------------------------------------------------------------------------------------------
     //Aquí se encuentran las funciones usadas en el componente static_2_nc que tienen cambios de reenderizado y caché
     //---------------------------------------------------------------------------------------------------------------------------
@@ -183,47 +183,27 @@ export default function Static_2_nc() {
     //Funciones que requieren un manejo de reenderizado y manejo de caché
     //------------------------------------------------------------------------------------------------
 
-    //Función para obtener los gateways del autocomplete
-    React.useEffect(() => {
-  
-        //Al estar ejecutando el fetch activamos el loading de la data
-            const fetchPruebas = async () => {
-            try {
-            const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
-            
-            const user = JSON.parse(localStorage.getItem("user")); 
-            const response = await apiService.getAll("pruebas/pruebas/by-orden/", { orden_id: sessionData.selectedOrder.nombre_orden, usuario: user.id, estado: 'ABIERTA' });
-
-            // Suponiendo que setPruebas es un setter de un estado que contiene un array
-            setPruebas(response);
-            setSelectedKeys(new Set([response[0].nombre]))
-                //usamos el componente "count" de la consulta para establecer el tamaño de los registros
-            } catch (error) {
-                //En caso de error en el llamado a la API se ejecuta un console.error
-                console.error('Error fetching initial meters:', error);
-            } finally {
-                //al finalizar independientemente de haber encontrado o no datos se detiene el circulo de cargue de datos
-                //console.log("salio");
-            }
-            }
-    
-            fetchPruebas();
-          }, []);
-    
         React.useEffect(() => {
     
         //Al estar ejecutando el fetch activamos el loading de la data
             //setIsLoading(true);
             const fetchMetersPrueba = async () => {
             try {
+                const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
+                const medidores_order = await apiService.getAll(`ordenes/trabajo/buscar/`, {
+                    identificador: sessionData.selectedOrder.id_orden
+                });
+                localStorage.setItem("idOrdenSelected",sessionData.selectedOrder.nombre_orden)
+                if(medidores_order){
+                    const medidores = medidores_order[0].medidores_asociados.filter((medidor) => (medidor.estado === 'Disponible')).map((medidor) => ({
+                        id: medidor.id,
+                        medidor: medidor.numero_serie,
+                        estado: medidor.estado,
+                    }));
+                    setMetersPrueba(medidores);
+                    setMetersLength(medidores.length);
+                }
 
-            const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
-            const response = await apiService.getAll('ordenes/trabajo/identificador/', {identificador: sessionData.selectedOrder.id_orden});
-            // Suponiendo que setPruebas es un setter de un estado que contiene un array
-
-            setMetersPrueba(response.medidores_asociados)
-            setMetersLength(response.medidores_asociados.length);
-                //usamos el componente "count" de la consulta para establecer el tamaño de los registros
             } catch (error) {
                 //En caso de error en el llamado a la API se ejecuta un console.error
                 console.error('Error fetching initial meters:', error);
@@ -279,135 +259,60 @@ export default function Static_2_nc() {
                 meters={metersPrueba}
                 loadingState={loadingState}
                 selectedKeys={selectedKeys}
-                pruebas={updatedPruebas}
+                maxCapacity={maxCapacity}
             />
         );
-    }, [isOpen,selectedMeterKeys, sortDescriptor, popUpData, selectedKeys, updatedPruebas]); //Variables de reenderizado
+    }, [isOpen,selectedMeterKeys, sortDescriptor, popUpData, selectedKeys]); //Variables de reenderizado
 
     // Crear un closure de enrichUpdatedPruebas con updatedPruebas
-    const handleConfirm = React.useCallback(async () => {
-        // Calcular la suma de todos los medidores de updatedPruebas, validando la existencia de medidores
-        const totalMedidores = updatedPruebas.reduce((acc, prueba) => {
-            if (prueba.medidores && Array.isArray(prueba.medidores)) {
-                return acc + prueba.medidores.length;
-            }
-            return acc; // Ignorar si prueba.medidores es undefined o no es un array
-        }, 0);
+    const handleConfirm = async () => {
+      if (selectedMeterKeys.size === 0) {
+          alert("No has seleccionado ningún medidor.");
+          return null;
+      }
+      let success = true;
+      try {
+        const payload = {
+          medidores: Array.from(selectedMeterKeys),
+          n_medidores_seleccionados: maxCapacity,
+          usuario: JSON.parse(localStorage.getItem('user')).id,
+          id_orden: parseInt(localStorage.getItem("idOrdenSelected"))
+        }
 
-        // Validar que todas las pruebas tengan al menos un medidor
-        const allPruebasHaveMedidores = updatedPruebas.every(
-            prueba => prueba.medidores && Array.isArray(prueba.medidores) && prueba.medidores.length > 0
+        console.log("Payload: ", payload)
+
+        const response = await apiService.create(
+            `pruebas/pruebas/crear-pruebas/`,
+            payload
         );
 
-        // Validar condiciones antes de proceder
-        if (totalMedidores !== metersLength) {
-            alert(
-                `La suma total de medidores (${totalMedidores}) no es igual a metersLength (${metersLength}).`
-            );
-            return null; // O cualquier acción deseada en caso de que no se cumpla
+        console.log("Response: ", response)
+
+        response.length < 1 ? success = false : null
+
+        if (success) {
+          setCustomMessage("Asignación completada con éxito.");
+
+          return success;
+            // Forzar recarga de datos tras confirmación exitosa
+            // const updatedMeters = await apiService.getAll('ruta/actualizacion');
+            // setMetersPrueba(updatedMeters);
+        }else{
+          throw new Error("Un error ha ocurrido");
         }
-
-        if (!allPruebasHaveMedidores) {
-            alert(`Una o más pruebas no tienen medidores seleccionados.`);
-            return null; // O cualquier acción deseada en caso de que no se cumpla
-        }
-
-        const enrichedPruebas = enrichUpdatedPruebas(updatedPruebas);
-        console.log("Enriched Pruebas:", enrichedPruebas);
-
-        try {
-            console.log("Iniciando el proceso de asignación de medidores...");
-        
-            if (!enrichedPruebas || !Array.isArray(enrichedPruebas)) {
-                console.error("Error: 'enrichedPruebas' no está definido o no es un array.", enrichedPruebas);
-                throw new Error("Datos de pruebas inválidos.");
-            }
-        
-            if (!metersPrueba || !Array.isArray(metersPrueba)) {
-                console.error("Error: 'metersPrueba' no está definido o no es un array.", metersPrueba);
-                throw new Error("Datos de medidores inválidos.");
-            }
-        
-            console.log(`Cantidad de pruebas a procesar: ${enrichedPruebas.length}`);
-            console.log(`Cantidad de medidores a actualizar: ${metersPrueba.length}`);
-        
-            const promises = enrichedPruebas.map(prueba => {
-                if (!prueba.id || !prueba.medidores) {
-                    console.error("Error: Prueba inválida, falta ID o medidores:", prueba);
-                    throw new Error(`Prueba inválida detectada: ${JSON.stringify(prueba)}`);
-                }
-        
-                const pruebaId = prueba.id;
-                const metersPayload = {
-                    medidores: prueba.medidores,
-                };
-        
-                console.log(`Enviando medidores para la prueba ID: ${pruebaId}`, metersPayload);
-        
-                return apiService.postMetersPrueba(pruebaId, metersPayload)
-                    .catch(error => {
-                        console.error(`Error en postMetersPrueba para ID ${pruebaId}:`, error);
-                        return Promise.reject(error);
-                    });
-            });
-        
-            const promises_meters = metersPrueba.map(meter => {
-                if (!meter.id) {
-                    console.error("Error: Medidor inválido, falta ID:", meter);
-                    throw new Error(`Medidor inválido detectado: ${JSON.stringify(meter)}`);
-                }
-        
-                const metersPayload = {
-                    ...meter,
-                    registro_tecnico_id: meter.registro_tecnico.id,
-                    estado: "Asignado",
-                };
-        
-                console.log(`Actualizando estado de medidor ID: ${meter.id}`, metersPayload);
-        
-                return apiService.updateMetersData(meter.id, metersPayload)
-                    .catch(error => {
-                        console.error(`Error en updateMetersData para ID ${meter.id}:`, error);
-                        return Promise.reject(error);
-                    });
-            });
-        
-            console.log("Esperando que todas las promesas finalicen...");
-        
-            const [resultsPruebas, resultsMeters] = await Promise.all([
-                Promise.allSettled(promises),
-                Promise.allSettled(promises_meters)
-            ]);
-        
-            console.log("Resultados Pruebas:", resultsPruebas);
-            console.log("Resultados de la actualización de medidores:", resultsMeters);
-        
-            // Verificar errores en cada conjunto de promesas
-            const failedPruebas = resultsPruebas.filter(result => result.status === "rejected");
-            const failedMeters = resultsMeters.filter(result => result.status === "rejected");
-        
-            if (failedPruebas.length > 0 || failedMeters.length > 0) {
-                console.error("Algunas promesas fallaron:");
-                if (failedPruebas.length > 0) console.error("Errores en Pruebas:", failedPruebas);
-                if (failedMeters.length > 0) console.error("Errores en Medidores:", failedMeters);
-                throw new Error("Algunas solicitudes no se completaron correctamente.");
-            }
-        
-            console.log("Todas las promesas se resolvieron correctamente.");
-        
-            // Acción adicional tras la actualización exitosa
-            alert("Los medidores se asignaron exitosamente a las pruebas.");
-            return true;
-        
-        } catch (error) {
-            console.error("Error al enviar los medidores:", error);
-            alert("Ocurrió un error al asignar los medidores. Intenta nuevamente.");
-            return false;
-        }        
-
-    }, [updatedPruebas, metersLength]); // Agregar metersLength como dependencia
-
-
+      } catch (error) {
+          if(error.details === "Algunos medidores no están en estado 'Disponible'."){
+            alert("Otro operario ya seleccionó esta secuencia de medidores, intente de nuevo")
+            window.location.reload();
+          } else {
+            console.error("Error en la asignación de medidores:", error);
+            alert("Hubo un error, intente de nuevo")
+            setCustomMessage("Ocurrió un error al intentar asignar los medidores.");
+            window.location.reload()
+            return null
+          }
+      }
+  };
     
     // Ejecución de componente externo modal para confirmación
     const confirmationMessage = React.useMemo(() => {
@@ -431,39 +336,11 @@ export default function Static_2_nc() {
             <span className="font-mulisg font-semibold text-opacity-text">Julio 24, 2024</span>
             <div className="w-full h-auto flex mt-8">
                 <div className="bg-white w-4/6 h-full rounded-[20px] flex flex-col justify-center p-3">
-                    <span className="font-inter font-semibold text-opacity-text text-[16px] ml-4">Identificador de Prueba</span>
-                    <Dropdown
-                        >
-                        <DropdownTrigger>
-                            <Button 
-                            variant="bordered" 
-                            className="capitalize mt-2 z-[0] px-0 justify-items-end w-full"
-                            >
-                            <div className="flex justify-between w-full">
-                                <span className="font-teko text-center font-semibold text-black text-[18px]">{selectedKeys}</span>
-                                <FaCaretDown className="text-custom-blue"/>
-                            </div>
-                            </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu 
-                            aria-label="Single selection example"
-                            variant="flat"
-                            disallowEmptySelection
-                            selectionMode="single"
-                            selectedKeys={selectedKeys}
-                            onSelectionChange={setSelectedKeys}
-                        >
-                        {pruebas.length > 0 ? pruebas.map((prueba, index) => (
-                            <DropdownItem key={prueba.nombre} textValue={`${prueba.nombre}`}>
-                                Prueba: {prueba.nombre}
-                            </DropdownItem>
-                        )) : null}
-                        </DropdownMenu>
-                    </Dropdown>
+                    <span className="font-inter font-semibold text-opacity-text text-[16px] ml-4 text-center">Seleccione los medidores a evaluar en esta bancada (En orden de evaluación)</span>
                 </div>
                 <div className="ml-3 bg-white w-2/6 h-auto rounded-[20px] flex flex-col justify-center place-items-center">
                     <span className="font-inter font-semibold text-opacity-text text-[16px] mt-3">Capacidad</span>
-                    <span className="font-teko font-semibold text-[40px]">{updatedPruebas.length > 0 ? updatedPruebas.find(prueba => selectedKeys.has(prueba.nombre)).n_medidores_seleccionados : 0}</span>
+                    <span className="font-teko font-semibold text-[40px]">{maxCapacity}</span>
                 </div>
             </div>
             <Button 
@@ -482,7 +359,7 @@ export default function Static_2_nc() {
                 <div className="w-5/6 flex justify-between place-items-center h-auto">
                     <div className="ml-3 bg-white w-[45%] h-auto rounded-[20px] flex flex-col place-items-center">
                         <span className="font-inter font-semibold text-opacity-text text-center text-[16px] mt-3">Medidores seleccionados</span>
-                        <span className="font-teko font-semibold text-[40px]">{medidoresCount}</span>
+                        <span className="font-teko font-semibold text-[40px]">{selectedMeterKeys.size}</span>
                     </div>
                     <div className="ml-3 bg-white w-[45%] h-auto rounded-[20px] flex flex-col place-items-center">
                         <span className="font-inter font-semibold text-center text-opacity-text text-[16px] mt-3">Modificar selección</span>
@@ -499,7 +376,7 @@ export default function Static_2_nc() {
                     </div>
                 </div>
             </div>
-            <div className="flex-grow flex w-full mt-[8vw]">
+            <div className="flex-grow flex justify-center mb-3 w-full mt-[8vw]">
                 <Button
                     className="mx-[20vw] h-[75px] py-2 bg-custom-blue"
                     onClick={()=>{

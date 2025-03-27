@@ -124,7 +124,7 @@ export default function static_7() {
         return meterColumns.filter((column) => Array.from(visibleColumns).includes(column.uid));
     }, [visibleColumns]);//Se ejecuta cada que hay un cambio en la constante vsisibleColumns
 
-    const validateInput = (pruebaValue) => pruebaValue ? pruebaValue.match(/^\d{1,3}(\.\d{0,2})?$/) : "";
+    const validateInput = (pruebaValue) => pruebaValue ? pruebaValue.match(/^\d{1,3}(\.\d{0,3})?$/) : "";
 
     // Función para actualizar el value de un objeto específico
     const updateResult = (key, newValue) => {
@@ -194,9 +194,13 @@ export default function static_7() {
     }, [isOpen]);
   
     const handleConfirm = async () => {
-      if(selectedKeys.size !== meters.length){
-        alert("Debe asignar un valor para todos los medidores")
+      {/*if(selectedKeys.size !== meters.length){
+        alert("Por favor asigne una lectuira a todos los medidores")
         return null
+      }else */} 
+      if(meters[0].q1.reference_volume === null ||meters[0].q1.reference_volume === "" || meters[0].q1.reference_volume === 1 ){
+        alert("Debe ingresar un volumen de referencia válido")
+        return;
       }
       // Actualizar todos los medidores con el valor de `visualInspection` correspondiente
       const apiResult = await handleUpdateMeter(meters); // Llama a handleUpdateMeter como callback

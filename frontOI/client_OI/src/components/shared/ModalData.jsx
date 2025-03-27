@@ -38,6 +38,7 @@ export default function ModalData(
         selectedMeter,
         removeKey,
         handleOnClose,
+        maxCapacity
     }
     ) {
 
@@ -120,7 +121,7 @@ export default function ModalData(
                                 meters = {meters}
                                 loadingState = {loadingState}
                                 selectedKeys={selectedKeys}
-                                pruebas={pruebas}
+                                maxCapacity={maxCapacity}
                             />
                         )
                     }else if(popUpData === 'meter_c'){
@@ -152,8 +153,8 @@ export default function ModalData(
                         console.log("Medidor seleccionado: ", selectedMeter)
                         return(
                             <div className="flex flex-col w-full space-y-3 h-full place-items-center justify-center mb-3">
-                                <text>Si desea reiniciar el valor ingresado del medidor <span className="font-bold">{selectedMeter.meter_id}</span> porfavor llame a su supervisor e ingrese sus credenciales</text>
-                                <Input className="max-w-xs" type label="Usuario" placeholder="Ingrese su usuario" />
+                                <span>Si desea reiniciar el valor ingresado del medidor <span className="font-bold">{selectedMeter.meter_id}</span> porfavor llame a su supervisor e ingrese sus credenciales</span>
+                                <Input className="max-w-xs" label="Usuario" placeholder="Ingrese su usuario" />
                                 <Input className="max-w-xs" label="Contraseña" placeholder="Ingrese su contraseña" />
                                 <Button 
                                     className="bg-custom-blue text-white"
@@ -175,7 +176,7 @@ export default function ModalData(
                                         <span>Detalles de Inspección</span> 
                                     </div>
                                     <div className="w-1/2 flex justify-end place-items-center">
-                                        <span className="text-right">{selectedMeter.medidor.observaciones}</span>
+                                        <span className="text-right">{selectedMeter.state}</span>
                                     </div> 
                                 </div>
                                 <div className="w-full flex justify-between h-auto space-x-2">

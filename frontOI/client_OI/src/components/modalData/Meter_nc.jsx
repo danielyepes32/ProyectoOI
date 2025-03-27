@@ -9,7 +9,10 @@ import {
     TableRow, //Componente que establece las filas de un registro
     TableCell, //Componente que representa una zelda de cada registro
     Spinner,
-    Input
+    Input,
+    Autocomplete,
+    AutocompleteItem,
+    AutocompleteSection
   } from "@nextui-org/react";
 
 import renderCell from "../shared/table/renderCell";
@@ -24,7 +27,7 @@ export default function Meter_nc(
         loadingState,
         selectedMeterKeys,
         selectedKeys,
-        pruebas,
+        maxCapacity,
     }
     ){
 
@@ -50,6 +53,7 @@ export default function Meter_nc(
                 ],
         }),[]);
 
+        {/*
         const isDisabled = (item) => {
             // Encuentra la prueba seleccionada.
             const pruebaSeleccionada = pruebas.find((prueba) => selectedKeys.has(prueba.nombre));
@@ -62,13 +66,14 @@ export default function Meter_nc(
                 prueba.medidores?.some((medidor) => medidor.meter_id === item.numero_serie)
             );
         };
+        */}
 
     const tableRow = React.useMemo(() => {
 
         return meters.map((item) => (
             <TableRow 
-                className={`${isDisabled(item) ? "pointer-events-none opacity-40" : ""}`}
-                key={item.numero_serie}
+                //className={`${isDisabled(item) ? "pointer-events-none opacity-40" : ""}`}
+                key={item.id}
                 >
                 {(columnKey) => 
                 <TableCell
@@ -77,24 +82,57 @@ export default function Meter_nc(
                         {renderCell(item, columnKey)}</TableCell>}
             </TableRow>
         ));
-      }, [meters, headerColumns, selectedMeterKeys, pruebas, selectedKeys])
+      }, [meters, headerColumns, selectedMeterKeys, selectedKeys])
 
 
     return(
         <div className="mt-5">
-        <Input
-            color="primary"
-            className="text-black"
-            classNames={{
-                label: "text-black",
-                input: ["text-black"]
+        <Autocomplete 
+            className="w-full bg-gray-100 rounded-xl" 
+            //onInputChange={onSearchChange}
+            listboxProps={{
+            hideSelectedIcon: true,
+            itemClasses: {
+                base: [
+                "text-default-500",
+                "transition-opacity",
+                "data-[hover=true]:text-foreground",
+                "dark:data-[hover=true]:bg-gray-100",
+                "data-[pressed=true]:opacity-70",
+                "data-[hover=true]:bg-default-200",
+                "data-[selectable=true]:focus:bg-default-100",
+                "data-[focus-visible=true]:ring-default-500",
+                ],
+            },
             }}
-            endContent={<CgSearch/>}
-            startContent={<RiPlayListAddFill />}
-            placeholder="Autocomplete para los medidores"
+            aria-label="Select an employee"
+            variant='flat'
+            placeholder='Ingrese serial del medidor para buscar'
+            popoverProps={{
+            offset: 5,
+            classNames: {
+                base: "rounded-large",
+                content: "p-1 border-small border-black bg-gray-100 justify-center items-center",
+                itemClasses: "hover"
+            },
+            }}
+            onSelectionChange={
+                (key)=>{
+                    const newSet = new Set([...selectedMeterKeys, key]);
+                    newSet.size > maxCapacity ? null: setSelectedMeterKeys(newSet);
+                    //setGatewayPost(key)
+                }
+            }
+
+            onClear={() => {setFilterValue("")}}
             >
-            Autocomplete
-        </Input>
+            {meters.map((meter) => (
+                <AutocompleteItem key={meter.id} value={meter.medidor}>
+                    {meter.medidor}
+                </AutocompleteItem>
+                ))
+                }
+        </Autocomplete>
         <div className="w-full flex-grow bg-red-100 mb-3">
             <Table
                 isCompact
@@ -116,9 +154,7 @@ export default function Meter_nc(
                 //topContent={topContent}
                 //topContentPlacement="outside"
                 onSelectionChange={(keys) => {
-                    if (keys.size <= pruebas.find((prueba) => selectedKeys.has(prueba.nombre)).n_medidores_seleccionados) {
-                        setSelectedMeterKeys(keys);
-                    }
+                    keys.size > maxCapacity || keys === 'all' ? null: setSelectedMeterKeys(keys);
                 }}                
                 onSortChange={setSortDescriptor}
                 >
