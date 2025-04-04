@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-const baseUrl = 'https://many-katie-exclusion-infrared.trycloudflare.com/api/';
+const baseUrl = 'http://localhost:8000/api/'; // Cambia esto a la URL de tu API
 
 // Configuracion comun para las solicitudes para los headers y la informacion por fuera del payload
 const axiosInstance = axios.create({

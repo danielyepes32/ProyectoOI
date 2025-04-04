@@ -19,6 +19,7 @@ import ModalData from "../shared/ModalData"; //Modal externo para el manejo de m
 // Importacion de librerias utils de carga de datos
 import  DateService  from "../../hook/services/dateService.js"
 import apiService from "../../hook/services/apiService";
+import { param } from "framer-motion/client";
 
 export default function Static_1() {
   //Variables del useDisclosure, este useDisclosure se usa solo para el popUp de datos 
@@ -51,7 +52,8 @@ export default function Static_1() {
   // Building the logic to consult the banks capacities
   async function consultingCapacities(nBanco){
     try{
-      const response = await apiService.getAll(`bancos/capacidades/filtradas/`, params={"banco": nBanco, "registro": 2});
+      const params = {banco: nBanco, registro: 2}
+      const response = await apiService.getAll(`bancos/capacidades/filtradas/`, params);
       setBankCapacity(response.capacidad_por_turno);
       setMaxCapacity(response.capacidad_por_turno);
       return response;
@@ -61,20 +63,25 @@ export default function Static_1() {
     }
   }
 
-  useEffect(() => {
+  useEffect( () => {
     const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
-    if (sessionData) {
-      const resCapacitie = consultingCapacities(sessionData.bancoData.nBanco);
-      const data = {
-        nBanco: sessionData.bancoData.nBanco,
-        capacidad: resCapacitie.capacidad_por_turno,
-        marca: sessionData.selectedOrder.marca_medidores,
-        modelo: sessionData.selectedOrder.modelo_medidores,
-        cert: sessionData.bancoData.cert,
-      }
-      setDataModal(data);
-      
-    }
+    const fetchCapacities = async () => {
+      if (sessionData) {
+        const resCapacitie = await consultingCapacities(sessionData.bancoData.nBanco);
+        // Podés usar resCapacitie si necesitás hacer algo más acá
+        const data = {
+          nBanco: sessionData.bancoData.nBanco,
+          capacidad: resCapacitie?.[0].capacidad_por_turno,
+          marca: sessionData.selectedOrder.marca_medidores,
+          modelo: sessionData.selectedOrder.modelo_medidores,
+          cert: sessionData.bancoData.cert,
+        }
+        setDataModal(data);
+        }
+    };
+  
+    fetchCapacities();
+    
     // Aplicacion de la logica para llamar a la API y obtener toda la info del banco de Prueba y obtener los instrumentos
     async function fetchBancoData() {
       try {
