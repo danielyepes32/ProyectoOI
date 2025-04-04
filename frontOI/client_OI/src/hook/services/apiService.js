@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-const baseUrl = 'https://many-katie-exclusion-infrared.trycloudflare.com/api/';
+const baseUrl = 'https://president-lid-myth-eagle.trycloudflare.com/api/';
 
 // Configuracion comun para las solicitudes para los headers y la informacion por fuera del payload
 const axiosInstance = axios.create({
