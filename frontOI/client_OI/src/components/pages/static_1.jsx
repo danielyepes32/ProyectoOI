@@ -50,12 +50,12 @@ export default function Static_1() {
   const [bankCapacity, setBankCapacity] = React.useState(null)
 
   // Building the logic to consult the banks capacities
-  async function consultingCapacities(nBanco){
+  async function consultingCapacities(nBanco, registro){
     try{
-      const params = {banco: nBanco, registro: 2}
+      const params = {banco: nBanco, registro: registro}
       const response = await apiService.getAll(`bancos/capacidades/filtradas/`, params);
-      setBankCapacity(response.capacidad_por_turno);
-      setMaxCapacity(response.capacidad_por_turno);
+      setBankCapacity(response?.[0].capacidad_por_turno);
+      setMaxCapacity(response?.[0].capacidad_por_turno);
       return response;
     }
     catch (error) {
@@ -65,9 +65,11 @@ export default function Static_1() {
 
   useEffect( () => {
     const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
+    console.log(sessionData)
     const fetchCapacities = async () => {
       if (sessionData) {
-        const resCapacitie = await consultingCapacities(sessionData.bancoData.nBanco);
+        const resCapacitie = await consultingCapacities(sessionData.bancoData.nBanco, sessionData.selectedOrder.tipo_medidores);
+
         // Podés usar resCapacitie si necesitás hacer algo más acá
         const data = {
           nBanco: sessionData.bancoData.nBanco,
@@ -237,7 +239,7 @@ export default function Static_1() {
                     value={maxCapacity}
                     onChange={(event) => {handleMaxCapacityChange(event)}}
                     className="w-full font-teko font-semibold text-[40px] border-oi-bg border-4 rounded-xl px-5 my-2 text-center"
-                    max={dataModal.capacidad}
+                    max={dataModal?.capacidad}
                     min={0}
                   />
               </div>
