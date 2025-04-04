@@ -11,7 +11,7 @@ import apiService from "../../hook/services/apiService.js";
 
 export default function Static_3_nc() {
 
-    const [bancoCapacity, setBancoCapacity] = React.useState(JSON.parse(localStorage.getItem("selectedOrderData")).selectedOrder.capacidad_banco);
+    const bancoCapacity = parseInt(localStorage.getItem("maxCapacity"))
     const [instrumentsData, setInstrumentsData] = React.useState(JSON.parse(localStorage.getItem("instrumentsAsociated")));
     //const [selectedKeys, setSelectedKeys] = React.useState(new Set(["text"]));
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
@@ -104,11 +104,19 @@ export default function Static_3_nc() {
         const fetchMetersPrueba = async () => {
         try {
 
-        const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
-        const response = await apiService.getAll('ordenes/trabajo/identificador/', {identificador: sessionData.selectedOrder.id_orden});
-        // Suponiendo que setPruebas es un setter de un estado que contiene un array
-
-        setMetersLength(response.medidores_asociados.length);
+            const sessionData = JSON.parse(localStorage.getItem('selectedOrderData'));
+            const medidores_order = await apiService.getAll(`ordenes/trabajo/buscar/`, {
+              identificador: sessionData.selectedOrder.id_orden
+            });
+            localStorage.setItem("idOrdenSelected",sessionData.selectedOrder.nombre_orden)
+            if(medidores_order){
+                const medidores = medidores_order[0].medidores_asociados.filter((medidor) => (medidor.estado === 'Disponible')).map((medidor) => ({
+                    id: medidor.id,
+                    medidor: medidor.numero_serie,
+                    estado: medidor.estado,
+                }));
+                setMetersLength(medidores.length);
+            }
             //usamos el componente "count" de la consulta para establecer el tamaño de los registros
         } catch (error) {
             //En caso de error en el llamado a la API se ejecuta un console.error

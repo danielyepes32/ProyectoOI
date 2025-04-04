@@ -254,13 +254,19 @@ export default function Static_1() {
             <span className="font-mulish font-bold text-[22px] pt-5 text-center">Selección de medidores a evaluar</span>
             <Button 
               className="w-full bg-custom-blue mt-3 py-1 rounded-[15px]"
-              onClick={() => handleProceed("/client/static_2_c")}
+              onClick={() => {
+                handleProceed("/client/static_2_c")
+                localStorage.setItem("typePrueba", 'c');
+              }}
               >
               <span className="font-inter text-[18px] text-white">Correlativos</span>
             </Button>
             <Button 
               className="w-ful bg-gray-but mt-3 mb-5 py-1 rounded-[15px]"
-              onClick={() => handleProceed("/client/static_2_nc")}
+              onClick={() => {
+                handleProceed("/client/static_2_nc")
+                localStorage.setItem("typePrueba", 'nc');
+              }}
               isDisabled={isProcessing}
               >
               <span className="font-inter text-[18px] text-white">No correlativos</span>

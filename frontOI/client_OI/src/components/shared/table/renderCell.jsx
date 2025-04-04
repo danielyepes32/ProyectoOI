@@ -173,8 +173,8 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
               : "danger"
           }
           onValueChange={(value) => {
-            !isSelected && value.length < 7 ? updateResult(user.meter_id, value) : null;
-            !isSelected && value.length < 7 ? updateValidate(user.meter_id, value) : null;
+            !isSelected && value.length < 8 ? updateResult(user.meter_id, value) : null;
+            !isSelected && value.length < 8 ? updateValidate(user.meter_id, value) : null;
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === "Tab") {
@@ -252,9 +252,14 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
       );
 
     case "meter_id":
-      
+      let validUser = true;
+      if (user.result !== "No apto" && user.obs !== "No conforme") {
+       null 
+      } else {
+        validUser = false;
+      }
       return (
-        <span className={ 'text-custom-blue'}>
+        <span className={`${validUser ? "text-custom-blue":"text-red-300"}`}>
           {cellValue}
         </span>
       );
@@ -272,25 +277,47 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
       const Q = 'q2';
 
       return(
-        <span>{`${user[Q].error} %`}</span>
+        <span>{`${user[Q].error.toFixed(2).padEnd(4, "0")} %`}</span>
       );
 
     case "q1":
+
+      let validUserQ1 = true;
+      if (user.result !== "No apto" && user.obs !== "No conforme") {
+       null 
+      } else {
+        validUserQ1 = false;
+      }
+
       return(
-        <span>{`${user["q1"].error} %`}</span>
+        <span>{`${validUserQ1 ? user["q1"].error.toFixed(2).padEnd(4, "0"): "-"} %`}</span>
       );
 
     case "q2":
-    
+
+      let validUserQ2 = true;
+      if (user.result !== "No apto" && user.obs !== "No conforme") {
+       null 
+      } else {
+        validUserQ2 = false;
+      }
+
       return(
-        <span>{`${user["q2"].error} %`}</span>
+        <span>{`${validUserQ2 ? user["q2"].error.toFixed(2).padEnd(4, "0"): "-"} %`}</span>
       );
 
     case "q3":
     
-      return(
-        <span>{`${user["q3"].error} %`}</span>
-      );
+      let validUserQ3 = true;
+      if (user.result !== "No apto" && user.obs !== "No conforme") {
+      null 
+      } else {
+        validUserQ3 = false;
+      }
+
+    return(
+      <span>{`${validUserQ3 ? user["q2"].error.toFixed(2).padEnd(4, "0"): "-"} %`}</span>
+    );
 
     case "obs":
 
@@ -299,8 +326,8 @@ const renderCell = (user, columnKey, setSelectedMeter, setActionKey, onOpen, vis
       );
     case "resume":
 
-    const conformanceStatus = (!user.q1.isInvalid || !user.q2.isInvalid || !user.q3.isInvalid) 
-    ? "No conforme" 
+    const conformanceStatus = (user.q1.isInvalid || user.q2.isInvalid || user.q3.isInvalid) 
+    ? user.result === "No apto" || user.obs === "No conforme" ? "No apto" : "No conforme"
     : "Conforme";
 
     // Separar la cadena en palabras

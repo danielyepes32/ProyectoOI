@@ -19,7 +19,7 @@ const meterColumns = [
   {name: "Q2", uid : "q2", sortable: true},
   {name: "Q1", uid : "q1", sortable: true},
   {name: "CONCLUSION", uid: "resume", sortable: true},
-  {name: "ACCIONES", uid : "actions", sortable: true},
+  {name: "", uid : "actions", sortable: true},
 ];
 
 const orderColumns = [

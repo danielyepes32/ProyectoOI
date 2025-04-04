@@ -143,7 +143,7 @@ export default function Static_6() {
         return meterColumns.filter((column) => Array.from(visibleColumns).includes(column.uid));
     }, [visibleColumns]);//Se ejecuta cada que hay un cambio en la constante vsisibleColumns
 
-    const validateInput = (pruebaValue) => pruebaValue ? pruebaValue.match(/^\d{1,3}(\.\d{0,2})?$/) : "";
+    const validateInput = (pruebaValue) => pruebaValue ? pruebaValue.match(/^\d{1,3}(\.\d{0,3})?$/) : "";
 
     // Función para actualizar el value de un objeto específico
     const updateResult = (key, newValue) => {
@@ -201,10 +201,15 @@ export default function Static_6() {
     };
     
     const handleConfirm = async () => {
-      if(selectedKeys.size !== meters.length){
+      {/*if(selectedKeys.size !== meters.length){
         alert("Por favor asigne una lectuira a todos los medidores")
         return null
-      }else if(initialPreassure > 9 && endPreassure > 9){
+      }else */}  
+      if(initialPreassure === "" || endPreassure === ""){
+        alert("Por favor asigne una lectura de presion a todos los medidores")
+        return null
+      }
+      if(initialPreassure > 9 && endPreassure > 9){
         alert("Las presiones sobrepasan el límite establecido de 9")
         return null
       }
